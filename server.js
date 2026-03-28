@@ -10,19 +10,25 @@ const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 // ── DATABASE ──────────────────────────────────────────────────────────────────
-// Use /data if it exists (Railway persistent volume), otherwise fall back to /tmp
-// To enable persistence on Railway: add a Volume mounted at /data in your service settings
+// Use /data if it exists (Railway persistent volume), otherwise fall back to local
 const DATA_DIR = fs.existsSync('/data') ? '/data' : path.join(__dirname, 'data');
 try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(e) {}
 const DB_PATH = path.join(DATA_DIR, 'micaela_apps.json');
 
-console.log('Database path:', DB_PATH);
+console.log('✅ Server starting');
+console.log('📁 Database path:', DB_PATH);
+console.log('🔑 API key present:', !!ANTHROPIC_API_KEY);
+
+// Resolve the public directory — handle both local dev and Railway deployment
+const PUBLIC_DIR = path.join(__dirname, 'public');
+console.log('🌐 Public dir:', PUBLIC_DIR, '| exists:', fs.existsSync(PUBLIC_DIR));
 
 function readDb() {
   try {
     if (fs.existsSync(DB_PATH)) {
       const raw = fs.readFileSync(DB_PATH, 'utf8');
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return parsed;
     }
   } catch (e) { console.error('DB read error:', e.message); }
   return { apps: [] };
@@ -36,7 +42,14 @@ function writeDb(data) {
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files — must come BEFORE API routes so assets load correctly
+if (fs.existsSync(PUBLIC_DIR)) {
+  app.use(express.static(PUBLIC_DIR));
+  console.log('✅ Serving static files from:', PUBLIC_DIR);
+} else {
+  console.error('❌ WARNING: public/ directory not found at', PUBLIC_DIR);
+}
 
 // ── SYNC ENDPOINTS ────────────────────────────────────────────────────────────
 app.get('/api/apps', (req, res) => {
@@ -69,20 +82,28 @@ app.delete('/api/apps/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// Health check
+// Health check — useful to verify Railway deployment is alive
 app.get('/api/health', (req, res) => {
   const db = readDb();
-  res.json({ ok: true, apps: (db.apps || []).length, dbPath: DB_PATH });
+  res.json({
+    ok: true,
+    apps: (db.apps || []).length,
+    dbPath: DB_PATH,
+    publicDir: PUBLIC_DIR,
+    publicExists: fs.existsSync(PUBLIC_DIR),
+    apiKeyPresent: !!ANTHROPIC_API_KEY,
+    uptime: process.uptime()
+  });
 });
 
 // ── CLAUDE PROXY ──────────────────────────────────────────────────────────────
 app.post('/api/claude', async (req, res) => {
   if (!ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured in Railway variables.' });
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set in Railway environment variables.' });
   }
   const { model, max_tokens, messages } = req.body;
   if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ error: 'Invalid request body' });
+    return res.status(400).json({ error: 'Invalid request: messages array required' });
   }
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -96,24 +117,32 @@ app.post('/api/claude', async (req, res) => {
     });
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Anthropic error:', response.status, errText.slice(0, 200));
+      console.error('Anthropic API error:', response.status, errText.slice(0, 300));
       return res.status(response.status).json({
-        error: `Anthropic API error ${response.status}: ${errText.slice(0, 200)}`
+        error: `Anthropic API error ${response.status}: ${errText.slice(0, 300)}`
       });
     }
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.error('Server error:', err.message);
+    console.error('Claude proxy error:', err.message);
     res.status(500).json({ error: 'Internal server error: ' + err.message });
   }
 });
 
+// ── SPA FALLBACK ──────────────────────────────────────────────────────────────
+// This MUST be last — catches everything that isn't an API route or static file
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('index.html not found. Make sure public/index.html exists in your repository.');
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ Micaela tracker running at http://localhost:${PORT}`);
-  console.log(`📁 Data stored at: ${DB_PATH}\n`);
+  console.log(`📁 Data stored at: ${DB_PATH}`);
+  console.log(`🌐 Serving frontend from: ${PUBLIC_DIR}\n`);
 });
