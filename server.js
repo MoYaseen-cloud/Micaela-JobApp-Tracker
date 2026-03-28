@@ -9,22 +9,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-// ── DATABASE (simple JSON file) ───────────────────────────────────────────────
-const DB_PATH = path.join('/tmp', 'micaela_apps.json');
+// ── DATABASE ──────────────────────────────────────────────────────────────────
+// Use /data if it exists (Railway persistent volume), otherwise fall back to /tmp
+// To enable persistence on Railway: add a Volume mounted at /data in your service settings
+const DATA_DIR = fs.existsSync('/data') ? '/data' : path.join(__dirname, 'data');
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(e) {}
+const DB_PATH = path.join(DATA_DIR, 'micaela_apps.json');
+
+console.log('Database path:', DB_PATH);
 
 function readDb() {
   try {
     if (fs.existsSync(DB_PATH)) {
-      return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+      const raw = fs.readFileSync(DB_PATH, 'utf8');
+      return JSON.parse(raw);
     }
-  } catch (e) { console.error('DB read error:', e); }
+  } catch (e) { console.error('DB read error:', e.message); }
   return { apps: [] };
 }
 
 function writeDb(data) {
   try {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-  } catch (e) { console.error('DB write error:', e); }
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) { console.error('DB write error:', e.message); }
 }
 
 app.use(cors());
@@ -34,20 +41,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ── SYNC ENDPOINTS ────────────────────────────────────────────────────────────
 app.get('/api/apps', (req, res) => {
   const db = readDb();
-  res.json(db.apps);
+  res.json(db.apps || []);
 });
 
 app.post('/api/apps', (req, res) => {
   const { apps } = req.body;
   if (!Array.isArray(apps)) return res.status(400).json({ error: 'apps must be an array' });
-  writeDb({ apps });
+  writeDb({ apps, updated: new Date().toISOString() });
   res.json({ ok: true, count: apps.length });
 });
 
 app.patch('/api/apps/:id', (req, res) => {
   const db = readDb();
   const id = parseInt(req.params.id);
-  const idx = db.apps.findIndex(a => a.id === id);
+  const idx = db.apps ? db.apps.findIndex(a => a.id === id) : -1;
   if (idx === -1) return res.status(404).json({ error: 'not found' });
   db.apps[idx] = { ...db.apps[idx], ...req.body };
   writeDb(db);
@@ -57,17 +64,26 @@ app.patch('/api/apps/:id', (req, res) => {
 app.delete('/api/apps/:id', (req, res) => {
   const db = readDb();
   const id = parseInt(req.params.id);
-  db.apps = db.apps.filter(a => a.id !== id);
+  db.apps = (db.apps || []).filter(a => a.id !== id);
   writeDb(db);
   res.json({ ok: true });
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  const db = readDb();
+  res.json({ ok: true, apps: (db.apps || []).length, dbPath: DB_PATH });
 });
 
 // ── CLAUDE PROXY ──────────────────────────────────────────────────────────────
 app.post('/api/claude', async (req, res) => {
   if (!ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured.' });
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured in Railway variables.' });
   }
   const { model, max_tokens, messages } = req.body;
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -80,13 +96,16 @@ app.post('/api/claude', async (req, res) => {
     });
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(response.status).json({ error: `Anthropic API error: ${response.status}` });
+      console.error('Anthropic error:', response.status, errText.slice(0, 200));
+      return res.status(response.status).json({
+        error: `Anthropic API error ${response.status}: ${errText.slice(0, 200)}`
+      });
     }
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Server error:', err.message);
+    res.status(500).json({ error: 'Internal server error: ' + err.message });
   }
 });
 
@@ -95,5 +114,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n✅ Micaela tracker running at http://localhost:${PORT}\n`);
+  console.log(`\n✅ Micaela tracker running at http://localhost:${PORT}`);
+  console.log(`📁 Data stored at: ${DB_PATH}\n`);
 });
