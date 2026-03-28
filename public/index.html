@@ -619,75 +619,53 @@ Return ONLY raw JSON — no markdown, no code blocks, nothing else.
 
 function buildCvPrompt(title, company, jd, cvType, analysis) {
   const typeInstruction = {
-    admin: 'Lead with the Admin/Healthcare/Sales angle — use Profile A summary, prioritise client-facing and admin bullets.',
-    science: 'Lead with the Science/Lab/Research angle — use Profile B summary, prioritise lab and research bullets.',
-    hybrid: 'Blend both angles equally — create a hybrid summary and mix the most relevant bullets from both.',
-    auto: 'Decide which angle (or blend) best serves this specific role. Read the job description carefully and choose.'
+    admin: 'Lead with the Admin/Healthcare/Sales angle — prioritise client-facing, admin, and communication bullets.',
+    science: 'Lead with the Science/Lab/Research angle — prioritise lab, research, and compliance bullets.',
+    hybrid: 'Blend both angles equally — mix the most relevant bullets from both.',
+    auto: 'Decide which angle or blend best serves this specific role based on the job description.'
   }[cvType] || 'Decide which angle is best.';
 
-  return `You are an expert CV writer. Actively REWRITE Micaela's CV from scratch for this specific role. Do not just pick a template — restructure, reframe, and rewrite every section so it speaks directly to what this employer wants.
+  const htmlTemplate = [
+    'Output the CV as a complete, valid HTML file.',
+    'Start directly with <!DOCTYPE html> — no preamble, no explanation, nothing before the doctype.',
+    'Use this CSS in a style tag in the head:',
+    '  body: font-family Calibri Arial sans-serif, font-size 11pt, color #1a1a1a, margin 2.5cm, line-height 1.5',
+    '  h1: font-size 20pt, bold, centered, color #1a1a1a, letter-spacing 1px',
+    '  .contact: centered, font-size 10pt, color #444, margin-bottom 4px',
+    '  hr: border none, border-top 2px solid #1a3a6b, margin 10px 0 14px 0',
+    '  h2: font-size 11pt, bold, color #1a3a6b, text-transform uppercase, letter-spacing 1.2px, border-bottom 1px solid #c8d8f0',
+    '  .job-title: font-size 11pt, bold, color #1a1a1a, margin 10px 0 1px 0',
+    '  .job-meta: font-size 10pt, italic, color #555, margin 0 0 4px 0',
+    '  ul: margin 4px 0 8px 20px',
+    '  li: margin-bottom 3px, font-size 11pt',
+    '  p: margin 3px 0 6px 0, font-size 11pt',
+    'Structure:',
+    '  - h1 for full name',
+    '  - div.contact for email, phone, location, linkedin separated by |',
+    '  - hr divider after contact',
+    '  - h2 for each section heading (PROFESSIONAL SUMMARY, CORE COMPETENCIES, PROFESSIONAL EXPERIENCE, EDUCATION, CERTIFICATIONS, HONOURS AND AWARDS)',
+    '  - div.job-title for each job title',
+    '  - div.job-meta for company, location, and date range',
+    '  - ul and li for all bullet points',
+    '  - p for paragraph text like the summary'
+  ].join('\n');
 
-${typeInstruction}
-
-== EXPERIENCE BANK (your raw material) ==
-${MASTER_CV}
-
-== HER FULL PROFILE ==
-${PROFILE}
-
-== TARGET ROLE ==
-Title: ${title}
-Company: ${company}
-Job Description:
-${jd}
-
-${analysis ? `== PRIOR ANALYSIS ==
-Verdict: ${analysis.verdict || ''}
-Transferable skills: ${analysis.transferable_skills || ''}
-Key requirements: ${analysis.requirements || ''}` : ''}
-
-== REWRITING RULES ==
-1. Write a completely fresh Professional Summary — first sentence must name exactly what she is and why she fits THIS role. Use the employer's own language.
-2. Select only the experience bullets most relevant to this role. Reorder them so the most relevant appears first in each job.
-3. Reframe bullet language to use THIS industry's vocabulary — without inventing anything.
-4. Inject keywords from the job description naturally throughout for ATS.
-5. Make transferable skills explicit — don't make the reader guess.
-6. Remove or shrink experience that doesn't help this application.
-
-== OUTPUT FORMAT — CRITICAL ==
-Output the CV as clean HTML using EXACTLY this structure. No preamble, no explanation, start directly with <!DOCTYPE html>.
-
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-<style>
-  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2.5cm; line-height: 1.5; }
-  h1 { font-size: 20pt; font-weight: bold; text-align: center; margin: 0 0 4px 0; color: #1a1a1a; letter-spacing: 1px; }
-  .contact { text-align: center; font-size: 10pt; color: #444; margin-bottom: 4px; }
-  .contact a { color: #1a3a6b; text-decoration: none; }
-  hr { border: none; border-top: 2px solid #1a3a6b; margin: 10px 0 14px 0; }
-  h2 { font-size: 11pt; font-weight: bold; color: #1a3a6b; text-transform: uppercase; letter-spacing: 1.2px; margin: 16px 0 2px 0; border-bottom: 1px solid #c8d8f0; padding-bottom: 3px; }
-  .job-title { font-size: 11pt; font-weight: bold; color: #1a1a1a; margin: 10px 0 1px 0; }
-  .job-meta { font-size: 10pt; font-style: italic; color: #555; margin: 0 0 4px 0; }
-  ul { margin: 4px 0 8px 20px; padding: 0; }
-  li { margin-bottom: 3px; font-size: 11pt; }
-  p { margin: 3px 0 6px 0; font-size: 11pt; }
-  .competencies { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
-  .comp-item { background: #f0f4ff; border: 1px solid #c8d8f0; border-radius: 3px; padding: 2px 8px; font-size: 10pt; color: #1a3a6b; }
-</style>
-</head><body>
-
-[NAME as h1]
-[Contact line as .contact with | separators]
-<hr>
-
-[Each section as h2]
-[Job titles as .job-title, company/dates as .job-meta]
-[Bullets as ul/li]
-[Competencies as .competencies with individual .comp-item spans]
-
-</body></html>
-
-Use real content — this is just the structure guide. Output valid complete HTML only.`;
+  return 'You are an expert CV writer. Actively REWRITE Micaela\'s CV from scratch for this specific role.\n\n'
+    + typeInstruction + '\n\n'
+    + '== EXPERIENCE BANK ==\n' + MASTER_CV + '\n\n'
+    + '== HER FULL PROFILE ==\n' + PROFILE + '\n\n'
+    + '== TARGET ROLE ==\n'
+    + 'Title: ' + title + '\nCompany: ' + company + '\nJob Description:\n' + jd + '\n\n'
+    + (analysis ? '== PRIOR ANALYSIS ==\nVerdict: ' + (analysis.verdict||'') + '\nTransferable skills: ' + (analysis.transferable_skills||'') + '\nKey requirements: ' + (analysis.requirements||'') + '\n\n' : '')
+    + '== REWRITING RULES ==\n'
+    + '1. Fresh Professional Summary — first sentence names what she is and why she fits THIS role.\n'
+    + '2. Select and reorder bullets — most relevant to this role appears first.\n'
+    + '3. Use this industry\'s vocabulary throughout — without inventing anything.\n'
+    + '4. Inject keywords from the job description naturally for ATS.\n'
+    + '5. Make transferable skills explicit.\n'
+    + '6. Remove experience that adds no value for this role.\n\n'
+    + '== OUTPUT FORMAT ==\n'
+    + htmlTemplate;
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -952,9 +930,7 @@ function showCvOutput(text, title) {
   if (isHtml) {
     currentCvHtml = text;
     // Strip HTML tags for the plain text version (for copy/download)
-    currentCvText = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, '
-').trim();
+    currentCvText = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/[ \t]{2,}/g, ' ').trim();
     // Show preview in iframe so it renders properly
     const output = document.getElementById('cv-output');
     output.innerHTML = '';
