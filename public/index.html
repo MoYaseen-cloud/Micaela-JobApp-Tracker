@@ -236,86 +236,71 @@
 
       <div id="result-panel" style="display:none;">
         <div class="card">
-          <div class="card-title">Analysis result</div>
 
-          <!-- Extracted pills -->
-          <div style="margin-bottom:1.4rem;padding:1rem 1.2rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:10px;">Extracted from posting</div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <!-- DECISION SUMMARY — top, big, immediate -->
+          <div id="decision-banner" style="border-radius:var(--radius-sm);padding:1.4rem 1.6rem;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border:1px solid var(--border2);">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+              <span id="res-fit" class="badge" style="font-size:14px;padding:6px 16px;">—</span>
+              <span id="res-prob" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-1px;">—</span>
+              <span style="font-size:13px;color:var(--text3);">interview probability</span>
+              <span style="margin-left:auto;font-size:22px;font-weight:700;color:var(--text);"><span id="res-score">—</span><span style="font-size:13px;color:var(--text3);font-weight:400;">/10</span></span>
+            </div>
+            <div id="res-recommendation" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.65);border-radius:var(--radius-sm);"></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="extracted-pills">
               <span class="ext-pill extracted"><span class="pill-label">Title</span>&nbsp;<span class="pill-val" id="disp-title">—</span></span>
               <span class="ext-pill extracted"><span class="pill-label">Company</span>&nbsp;<span class="pill-val" id="disp-company">—</span></span>
               <span class="ext-pill extracted"><span class="pill-label">Location</span>&nbsp;<span class="pill-val" id="disp-location">—</span></span>
               <span class="ext-pill extracted"><span class="pill-label">Source</span>&nbsp;<span class="pill-val" id="disp-source">—</span></span>
             </div>
+            <!-- ACTION BUTTONS — right here, high up -->
+            <div class="btn-row" style="margin-top:0;">
+              <button class="btn btn-primary" id="save-rewrite-btn" onclick="saveAndRewrite()">Save &amp; rewrite CV →</button>
+              <button class="btn btn-outline" onclick="saveOnly()">Save without CV</button>
+              <button class="btn btn-applied" onclick="saveAsApplied()">✓ Mark as Applied</button>
+            </div>
+            <div class="loader-wrap" id="loader-cv"><div class="spinner"></div> Writing your tailored CV...</div>
           </div>
 
-          <!-- Score strip -->
-          <div class="result-metrics">
-            <div class="metric-box">
-              <div class="metric-label">Fit match</div>
-              <span id="res-fit" class="badge" style="font-size:15px;padding:5px 14px;margin-top:4px;">—</span>
-            </div>
-            <div class="metric-box">
-              <div class="metric-label">Interview probability</div>
-              <div class="metric-val" id="res-prob">—</div>
-              <div class="prob-track"><div class="prob-fill" id="res-prob-bar" style="width:0%"></div></div>
-            </div>
-            <div class="metric-box">
-              <div class="metric-label">Ranking score</div>
-              <div class="metric-val"><span id="res-score">—</span><span style="font-size:14px;color:var(--text3);font-weight:400;"> /10</span></div>
-            </div>
-          </div>
-
-          <!-- Verdict -->
-          <div style="margin-bottom:1.2rem;padding:1rem 1.2rem;background:var(--bg);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;">Verdict</div>
+          <!-- VERDICT -->
+          <div style="margin-bottom:1rem;padding:1rem 1.2rem;background:var(--bg);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:5px;">What the AI thinks</div>
             <div id="res-verdict" style="font-size:13.5px;color:var(--text2);line-height:1.7;"></div>
           </div>
 
-          <!-- Two column: skills + gaps -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.2rem;">
-            <div style="background:var(--green-light);border:1px solid rgba(45,106,79,0.15);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--green);margin-bottom:8px;font-weight:600;">✓ What transfers</div>
-              <div id="res-transferable" style="font-size:13px;color:#1a4a34;line-height:1.75;white-space:pre-wrap;"></div>
+          <!-- WHY YOU MATCH + GAPS — two columns -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+            <div style="background:var(--green-light);border:1px solid rgba(45,106,79,0.15);border-radius:var(--radius-sm);padding:1rem 1.1rem;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--green);margin-bottom:8px;font-weight:600;">✓ Why you match</div>
+              <div id="res-transferable" style="font-size:12.5px;color:#1a4a34;line-height:1.75;white-space:pre-wrap;"></div>
             </div>
-            <div style="background:var(--rose-light);border:1px solid rgba(194,24,91,0.12);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
+            <div style="background:var(--rose-light);border:1px solid rgba(194,24,91,0.12);border-radius:var(--radius-sm);padding:1rem 1.1rem;">
               <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--rose);margin-bottom:8px;font-weight:600;">⚠ Gaps to address</div>
-              <div id="res-gaps" style="font-size:13px;color:#6b1a35;line-height:1.75;white-space:pre-wrap;"></div>
+              <div id="res-gaps" style="font-size:12.5px;color:#6b1a35;line-height:1.75;white-space:pre-wrap;"></div>
             </div>
           </div>
 
-          <!-- Two column: requirements + CV rec -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.2rem;">
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:8px;font-weight:600;">📋 What they want</div>
-              <div id="res-requirements" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;"></div>
-            </div>
-            <div style="background:var(--purple-light);border:1px solid rgba(123,63,110,0.15);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--purple);margin-bottom:8px;font-weight:600;">💅 CV to use</div>
-              <div id="res-cv" style="font-size:13px;color:var(--purple);line-height:1.75;white-space:pre-wrap;"></div>
-            </div>
-          </div>
+          <!-- DETAILS — collapsed by default -->
+          <details style="margin-bottom:0.6rem;">
+            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
+              📋 What they actually want <span style="font-size:16px;color:var(--pink);">+</span>
+            </summary>
+            <div id="res-requirements" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          </details>
 
-          <!-- Talk points — collapsible -->
-          <details style="margin-bottom:1.2rem;">
-            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.75rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
+          <details style="margin-bottom:0.6rem;">
+            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
+              💅 Which CV version to send <span style="font-size:16px;color:var(--pink);">+</span>
+            </summary>
+            <div id="res-cv" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          </details>
+
+          <details style="margin-bottom:0;">
+            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
               💬 When they reach out — what to say <span style="font-size:16px;color:var(--pink);">+</span>
             </summary>
             <div id="res-talkpoints" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
           </details>
 
-          <div class="section-divider"></div>
-
-          <div style="background:var(--pink-light);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:var(--text2);">
-            <strong style="color:var(--pink);">Ready to apply?</strong> Save &amp; rewrite CV now, then mark as Applied once you've sent it. You can always mark as Applied from the tracker too.
-          </div>
-
-          <div class="btn-row">
-            <button class="btn btn-primary" id="save-rewrite-btn" onclick="saveAndRewrite()">Save &amp; rewrite CV →</button>
-            <button class="btn btn-outline" onclick="saveOnly()">Save without CV</button>
-            <button class="btn btn-applied" onclick="saveAsApplied()">✓ Mark as Applied now</button>
-          </div>
-          <div class="loader-wrap" id="loader-cv"><div class="spinner"></div> Writing your tailored CV...</div>
         </div>
       </div>
     </div>
@@ -389,7 +374,15 @@
       </div>
       <div id="cv-output-wrap" style="display:none;">
         <div class="card">
-          <div class="card-title">Your tailored CV</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
+            <div>
+              <div class="card-title" style="margin-bottom:2px;">Your tailored CV</div>
+              <div id="cv-output-job-label" style="font-size:13px;color:var(--text2);"></div>
+            </div>
+            <div id="cv-applied-wrap" style="display:none;">
+              <button class="btn btn-applied" onclick="markCurrentCvApplied()">✓ Mark as Applied</button>
+            </div>
+          </div>
           <div class="cv-output" id="cv-output"></div>
           <div class="copy-bar">
             <button class="btn btn-outline" onclick="copyCv()">Copy to clipboard</button>
@@ -847,6 +840,26 @@ function showAnalysis(r) {
   document.getElementById('res-requirements').textContent = r.requirements || '';
   document.getElementById('res-cv').textContent = r.cv_recommendation || '';
   document.getElementById('res-talkpoints').textContent = r.talk_points || '';
+  // Recommendation sentence
+  const rec = document.getElementById('res-recommendation');
+  if (rec) {
+    let msg, color;
+    if (r.probability >= 70) {
+      msg = '🟢 You should apply — strong match. Get the CV rewritten and send it.';
+      color = 'var(--green)';
+    } else if (r.probability >= 50) {
+      msg = '🟡 Worth applying — solid transferable skills. Tailor the CV carefully.';
+      color = 'var(--gold)';
+    } else if (r.probability >= 30) {
+      msg = '🟠 Borderline — apply if you are targeting stretch roles, but manage expectations.';
+      color = '#c05a00';
+    } else {
+      msg = '🔴 Hard match — a key requirement is missing. Only apply if you have a strong reason to.';
+      color = 'var(--red)';
+    }
+    rec.textContent = msg;
+    rec.style.color = color;
+  }
   document.getElementById('result-panel').style.display = 'block';
   document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -883,7 +896,7 @@ async function saveAndRewrite() {
     await saveApps();
     clearForm();
     nav('cv');
-    showCvOutput(cvText, app.title + ' — ' + app.company);
+    showCvOutput(cvText, app.title + ' — ' + app.company, app.id);
   } catch (e) {
     alert('CV rewrite failed — job was saved. Try rewriting from the CV tab.');
   }
@@ -922,9 +935,16 @@ function clearForm() {
 let currentCvText = '';
 let currentCvTitle = '';
 let currentCvHtml = '';
+let currentCvAppId = null;
 
-function showCvOutput(text, title) {
+function showCvOutput(text, title, appId) {
   currentCvTitle = title;
+  currentCvAppId = appId || null;
+  // Show/hide the applied button based on whether we have a linked app
+  const apWrapper = document.getElementById('cv-applied-wrap');
+  if (apWrapper) apWrapper.style.display = appId ? 'block' : 'none';
+  const jobLabel = document.getElementById('cv-output-job-label');
+  if (jobLabel) jobLabel.textContent = title || '';
   // Check if the output is HTML
   const isHtml = text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html');
   if (isHtml) {
@@ -958,7 +978,7 @@ async function rewriteFromSaved() {
     const text = await callClaude([{ role: 'user', content: buildCvPrompt(app.title, app.company, app.jd, cvType, app) }], 2800);
     app.cv = text;
     await saveApps();
-    showCvOutput(text, app.title + ' — ' + app.company);
+    showCvOutput(text, app.title + ' — ' + app.company, app.id);
   } catch (e) { alert('Rewrite failed — please try again.'); }
   setLoading('cv-saved', false);
 }
@@ -1073,6 +1093,12 @@ function renderJobCard(a) {
 
 function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function markApplied(id) { patchApp(id, { status: 'Applied' }); toast('Marked as Applied! Good luck! 💌'); }
+function markCurrentCvApplied() {
+  if (!currentCvAppId) return;
+  patchApp(currentCvAppId, { status: 'Applied' });
+  document.getElementById('cv-applied-wrap').style.display = 'none';
+  toast('Marked as Applied! Good luck! 💌');
+}
 function toggleDrawer(id) { document.getElementById('drawer-' + id)?.classList.toggle('open'); }
 function updateStatus(id, status) { patchApp(id, { status }); }
 function deleteApp(id) { if (!confirm('Remove this job?')) return; deleteAppById(id); }
