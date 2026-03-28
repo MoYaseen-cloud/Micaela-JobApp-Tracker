@@ -6,189 +6,197 @@
 <title>Micaela — Job Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#FFF5F8;--surface:#FFFFFF;--surface2:#FFF0F4;
-    --border:rgba(219,112,147,0.15);--border2:rgba(219,112,147,0.3);
-    --text:#2D1B22;--text2:#7A4D5E;--text3:#B08090;
-    --pink:#E8547A;--pink-light:#FFF0F4;--pink-mid:#F9D0DC;
-    --rose:#C2185B;--rose-light:#FCE4EC;
-    --mauve:#9C4D6E;--mauve-light:#F8E6EE;
-    --gold:#B5830A;--gold-light:#FDF8E8;
-    --green:#2D6A4F;--green-light:#E8F5EE;
-    --red:#C0392B;--red-light:#FDECEA;
-    --purple:#7B3F6E;--purple-light:#F5E8F2;
-    --radius:14px;--radius-sm:9px;
-  }
+  :root{--bg:#FFF5F8;--surface:#FFFFFF;--surface2:#FFF0F4;--border:rgba(219,112,147,0.15);--border2:rgba(219,112,147,0.3);--text:#2D1B22;--text2:#7A4D5E;--text3:#B08090;--pink:#E8547A;--pink-light:#FFF0F4;--pink-mid:#F9D0DC;--rose:#C2185B;--rose-light:#FCE4EC;--mauve:#9C4D6E;--mauve-light:#F8E6EE;--gold:#B5830A;--gold-light:#FDF8E8;--green:#2D6A4F;--green-light:#E8F5EE;--red:#C0392B;--red-light:#FDECEA;--purple:#7B3F6E;--purple-light:#F5E8F2;--radius:14px;--radius-sm:9px;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;}
-
-  /* Soft background pattern */
-  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%, rgba(232,84,122,0.06) 0%, transparent 60%),radial-gradient(ellipse at 80% 80%, rgba(156,77,110,0.05) 0%, transparent 60%);pointer-events:none;z-index:0;}
-
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;cursor:none;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(232,84,122,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(156,77,110,0.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
   .app{display:flex;min-height:100vh;position:relative;z-index:1;}
 
-  /* ── SIDEBAR ── */
-  .sidebar{width:250px;background:linear-gradient(160deg,#2D1B22 0%,#4A1E35 100%);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;box-shadow:4px 0 24px rgba(45,27,34,0.15);}
-  .main{margin-left:250px;flex:1;padding:2.5rem;max-width:1100px;}
+  /* ── CUSTOM CURSOR ── */
+  .cursor{position:fixed;width:12px;height:12px;background:var(--pink);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.2s,height 0.2s;mix-blend-mode:multiply;}
+  .cursor-ring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(232,84,122,0.4);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform 0.15s ease-out,left 0.08s,top 0.08s;}
+  .sparkle{position:fixed;pointer-events:none;z-index:99997;font-size:14px;animation:sparkle-fade 0.7s ease-out forwards;}
+  @keyframes sparkle-fade{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-200%) scale(0.3);}}
 
+  /* ── SIDEBAR ── */
+  .sidebar{width:250px;background:linear-gradient(160deg,#2D1B22 0%,#4A1E35 100%);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:1.8rem;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;box-shadow:4px 0 24px rgba(45,27,34,0.15);z-index:100;}
+  .main{margin-left:250px;flex:1;padding:2.5rem;max-width:1100px;}
   .brand-wrap{text-align:center;padding-bottom:0.5rem;}
   .brand-icon{font-size:28px;margin-bottom:6px;display:block;}
   .brand-name{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:0.3px;color:#fff;font-style:italic;}
   .brand-sub{font-size:10px;color:rgba(255,255,255,0.4);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;}
-
-  .nav{display:flex;flex-direction:column;gap:5px;}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--radius-sm);color:rgba(255,255,255,0.55);font-size:14px;cursor:pointer;transition:all 0.2s;border:none;background:none;width:100%;text-align:left;}
+  .nav{display:flex;flex-direction:column;gap:4px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--radius-sm);color:rgba(255,255,255,0.55);font-size:14px;cursor:none;transition:all 0.2s;border:none;background:none;width:100%;text-align:left;}
   .nav-item:hover{color:rgba(255,255,255,0.9);background:rgba(232,84,122,0.15);}
   .nav-item.active{color:#fff;background:rgba(232,84,122,0.25);font-weight:500;border-left:3px solid var(--pink);}
-
-  .sync-indicator{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.4);padding:6px 14px;}
+  .sync-indicator{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.4);padding:4px 14px;}
   .sync-dot{width:7px;height:7px;border-radius:50%;background:#4CAF50;flex-shrink:0;}
   .sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
   .sync-dot.error{background:var(--red);}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-
   .sidebar-stats{margin-top:auto;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;}
-  .ss-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+  .ss-item{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
   .ss-label{font-size:11px;color:rgba(255,255,255,0.4);}
   .ss-val{font-size:13px;font-weight:600;color:#fff;}
 
-  /* ── PAGE HEADER ── */
+  /* ── PAGE HEADERS ── */
   .page-header{margin-bottom:2rem;}
-  .page-title{font-family:'Playfair Display',serif;font-size:30px;color:var(--text);letter-spacing:-0.3px;}
-  .page-sub{font-size:14px;color:var(--text2);margin-top:5px;}
-
-  /* ── STATS ── */
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:2rem;}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;position:relative;overflow:hidden;}
-  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--mauve));}
-  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:6px;}
-  .stat-val{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-1px;}
-
+  .page-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--text);letter-spacing:-0.3px;}
+  .page-sub{font-size:13px;color:var(--text2);margin-top:4px;}
   .section{display:none;}.section.active{display:block;}
 
+  /* ── STATS ── */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:2rem;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--mauve));}
+  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:5px;}
+  .stat-val{font-size:26px;font-weight:600;color:var(--text);letter-spacing:-1px;}
+
   /* ── CARDS ── */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(219,112,147,0.06);}
-  .card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:1.2rem;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;margin-bottom:1rem;box-shadow:0 2px 10px rgba(219,112,147,0.05);}
+  .card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:1.1rem;}
 
   /* ── PASTE BOX ── */
-  .paste-textarea{width:100%;min-height:220px;padding:16px 18px;font-size:14px;font-family:'DM Sans',sans-serif;border:2px dashed var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);transition:border-color 0.2s,background 0.2s;outline:none;resize:vertical;line-height:1.7;}
+  .paste-textarea{width:100%;min-height:160px;max-height:320px;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;border:2px dashed var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);transition:border-color 0.2s,background 0.2s;outline:none;resize:vertical;line-height:1.7;}
   .paste-textarea:focus{border-color:var(--pink);background:#fff;border-style:solid;}
   .paste-textarea::placeholder{color:var(--text3);}
-  .paste-hint{font-size:11px;color:var(--text3);margin-top:6px;}
-
-  .extracted-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-  .ext-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:500;background:var(--surface);border:1px solid var(--border2);}
-  .ext-pill.extracted{background:var(--pink-light);border-color:var(--border2);}
+  .paste-hint{font-size:11px;color:var(--text3);margin-top:6px;display:flex;justify-content:space-between;align-items:center;}
+  .char-counter{font-size:11px;color:var(--text3);}
+  .char-counter.warn{color:var(--gold);}
+  .extracted-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .ext-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500;background:var(--surface);border:1px solid var(--border2);}
+  .ext-pill.extracted{background:var(--pink-light);}
   .ext-pill .pill-label{color:var(--text3);font-weight:400;}
   .ext-pill .pill-val{color:var(--pink);}
 
   /* ── FORMS ── */
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
   .form-group.full{grid-column:1 / -1;}
   label{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:0.3px;}
-  input[type=text],textarea,select{width:100%;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);transition:border-color 0.15s;outline:none;}
+  input[type=text],textarea,select{width:100%;padding:9px 13px;font-size:14px;font-family:'DM Sans',sans-serif;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);transition:border-color 0.15s;outline:none;}
   input[type=text]:focus,textarea:focus,select:focus{border-color:var(--pink);background:#fff;}
-  textarea{min-height:150px;resize:vertical;line-height:1.6;}
+  textarea{min-height:120px;resize:vertical;line-height:1.6;}
 
   /* ── BUTTONS ── */
-  .btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;}
-  .btn-primary{background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;box-shadow:0 3px 12px rgba(232,84,122,0.3);}
-  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(232,84,122,0.4);}
+  .btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:none;border:none;transition:all 0.2s;}
+  .btn-primary{background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;box-shadow:0 3px 10px rgba(232,84,122,0.28);}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(232,84,122,0.38);}
   .btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
   .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2);}
   .btn-outline:hover{background:var(--pink-light);border-color:var(--pink);color:var(--pink);}
-  .btn-green{background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;box-shadow:0 3px 12px rgba(45,106,79,0.25);}
+  .btn-green{background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;box-shadow:0 3px 10px rgba(45,106,79,0.22);}
   .btn-green:hover{transform:translateY(-1px);}
-  .btn-applied{background:linear-gradient(135deg,var(--purple),var(--mauve));color:#fff;box-shadow:0 3px 12px rgba(123,63,110,0.3);}
+  .btn-applied{background:linear-gradient(135deg,var(--purple),var(--mauve));color:#fff;box-shadow:0 3px 10px rgba(123,63,110,0.28);}
   .btn-applied:hover{transform:translateY(-1px);}
-  .btn-row{display:flex;gap:10px;align-items:center;margin-top:1.2rem;flex-wrap:wrap;}
+  .btn-row{display:flex;gap:8px;align-items:center;margin-top:1rem;flex-wrap:wrap;}
 
   /* ── BADGES ── */
   .badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:99px;font-size:12px;font-weight:500;}
   .badge-high{background:var(--green-light);color:var(--green);}
   .badge-medium{background:var(--gold-light);color:var(--gold);}
   .badge-low{background:var(--red-light);color:var(--red);}
-  .badge-pending{background:var(--surface2);color:var(--text3);}
+  .badge-saved{background:var(--pink-light);color:var(--pink);}
   .badge-applied{background:var(--purple-light);color:var(--purple);}
   .badge-interview{background:var(--green-light);color:var(--green);}
   .badge-rejected{background:var(--red-light);color:var(--red);}
   .badge-offer{background:var(--gold-light);color:var(--gold);}
-  .badge-analysed{background:var(--pink-light);color:var(--pink);}
 
   /* ── LOADER ── */
-  .loader-wrap{display:none;align-items:center;gap:12px;padding:1rem 0;color:var(--text2);font-size:14px;}
+  .loader-wrap{display:none;align-items:center;gap:10px;padding:0.8rem 0;color:var(--text2);font-size:13px;}
   .loader-wrap.show{display:flex;}
-  .spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--pink);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+  .spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--pink);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* ── AI BLOCKS ── */
-  .ai-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;font-size:13.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;}
+  /* ── RESULT PANEL ── */
+  .decision-banner{border-radius:var(--radius-sm);padding:1.2rem 1.4rem;margin-bottom:1rem;background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border:1px solid var(--border2);}
+  .decision-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .decision-rec{font-size:13px;font-weight:600;margin-bottom:10px;padding:8px 12px;background:rgba(255,255,255,0.7);border-radius:var(--radius-sm);}
+  .info-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 
-  /* ── RESULT METRICS ── */
-  .result-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:1.2rem;}
-  .metric-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;}
-  .metric-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;}
-  .metric-val{font-size:22px;font-weight:600;color:var(--text);}
-  .prob-track{height:6px;background:var(--pink-mid);border-radius:99px;overflow:hidden;margin-top:8px;}
-  .prob-fill{height:100%;border-radius:99px;transition:width 0.6s ease;}
+  /* ── SCORE CARDS ── */
+  .score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+  .score-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem 1rem;text-align:center;}
+  .score-card-label{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:4px;}
+  .score-card-val{font-size:22px;font-weight:700;color:var(--text);}
+
+  /* ── MATCH GRID ── */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+  .match-box{border-radius:var(--radius-sm);padding:0.9rem 1rem;}
+  .match-box-label{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin-bottom:8px;}
+  .match-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;font-size:12.5px;line-height:1.5;}
+  .match-icon{font-size:11px;margin-top:2px;flex-shrink:0;}
+  .match-tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;margin-left:4px;}
+
+  /* ── ACCORDION DETAILS ── */
+  details{margin-bottom:6px;}
+  details summary{cursor:none;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.65rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details[open] summary{border-radius:var(--radius-sm) var(--radius-sm) 0 0;}
+  details[open] summary .det-icon{transform:rotate(45deg);}
+  .det-icon{transition:transform 0.2s;font-size:16px;color:var(--pink);}
+  .det-body{font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:0.9rem 1.1rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);}
 
   /* ── JOB CARDS ── */
-  .jobs-list{display:flex;flex-direction:column;gap:12px;}
-  .job-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem 1.5rem;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;}
-  .job-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(219,112,147,0.12);}
-  .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-  .jc-title{font-size:16px;font-weight:600;color:var(--text);}
-  .jc-company{font-size:13px;color:var(--text2);margin-top:2px;}
-  .jc-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
-  .jc-meta{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap;}
+  .jobs-list{display:flex;flex-direction:column;gap:10px;}
+  .job-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;cursor:none;transition:border-color 0.15s,box-shadow 0.15s;}
+  .job-card:hover{border-color:var(--border2);box-shadow:0 4px 14px rgba(219,112,147,0.1);}
+  .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .jc-title{font-size:15px;font-weight:600;color:var(--text);}
+  .jc-company{font-size:12px;color:var(--text2);margin-top:2px;}
+  .jc-badges{display:flex;gap:5px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+  .jc-meta{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap;}
   .jc-meta-item{font-size:12px;color:var(--text3);}
-  .jc-prob{display:flex;align-items:center;gap:8px;flex:1;min-width:120px;}
-  .drawer{display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;}
+  .jc-prob{display:flex;align-items:center;gap:8px;flex:1;min-width:100px;}
+  .drawer{display:none;margin-top:0.9rem;border-top:1px solid var(--border);padding-top:0.9rem;}
   .drawer.open{display:block;}
-  .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .drawer-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;}
-  .drawer-content{font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap;}
+  .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .drawer-label{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:5px;}
+  .drawer-content{font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;}
   .drawer-full{grid-column:1 / -1;}
-  .transferable-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-  .tag{display:inline-flex;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:500;background:var(--purple-light);color:var(--purple);}
+  .transferable-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+  .tag{display:inline-flex;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:500;background:var(--purple-light);color:var(--purple);}
+
+  /* ── HISTORY VIEW in drawer ── */
+  .cv-preview-frame{width:100%;height:400px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;margin-top:8px;}
+  .cv-preview-text{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:8px;}
 
   /* ── CV OUTPUT ── */
-  .cv-output{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem;font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;font-family:'DM Sans',sans-serif;max-height:600px;overflow-y:auto;}
+  .cv-output{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.4rem;font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;font-family:'DM Sans',sans-serif;max-height:600px;overflow-y:auto;}
   .copy-bar{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap;}
 
   /* ── MISC ── */
-  .status-select{padding:5px 10px;font-size:12px;border:1px solid var(--border2);border-radius:99px;background:var(--surface);color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;}
-  .filter-bar{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
-  .filter-bar select{padding:8px 14px;font-size:13px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);}
-  .del-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);font-size:14px;transition:all 0.15s;}
+  .status-select{padding:4px 9px;font-size:12px;border:1px solid var(--border2);border-radius:99px;background:var(--surface);color:var(--text);cursor:none;font-family:'DM Sans',sans-serif;}
+  .filter-bar{display:flex;gap:8px;margin-bottom:1.4rem;flex-wrap:wrap;align-items:center;}
+  .filter-bar select{padding:7px 13px;font-size:13px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);cursor:none;}
+  .del-btn{background:none;border:none;color:var(--text3);cursor:none;padding:4px 7px;border-radius:var(--radius-sm);font-size:13px;transition:all 0.15s;}
   .del-btn:hover{background:var(--red-light);color:var(--red);}
-  .notes-input{width:100%;padding:8px 12px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;margin-top:6px;}
-  .empty-state{text-align:center;padding:4rem 2rem;color:var(--text3);}
-  .empty-title{font-size:16px;color:var(--text2);font-weight:500;margin-bottom:6px;}
-  .toast{position:fixed;bottom:2rem;right:2rem;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:999;box-shadow:0 4px 16px rgba(232,84,122,0.3);}
+  .notes-input{width:100%;padding:7px 11px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;margin-top:5px;}
+  .empty-state{text-align:center;padding:3.5rem 2rem;color:var(--text3);}
+  .empty-title{font-size:15px;color:var(--text2);font-weight:500;margin-bottom:5px;}
+  .toast{position:fixed;bottom:2rem;right:2rem;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;padding:10px 18px;border-radius:var(--radius-sm);font-size:13.5px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:99990;box-shadow:0 4px 14px rgba(232,84,122,0.3);}
   .toast.show{opacity:1;}
-  .inner-tabs{display:flex;gap:4px;margin-bottom:1.2rem;border-bottom:1px solid var(--border);}
-  .inner-tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+  .inner-tabs{display:flex;gap:3px;margin-bottom:1rem;border-bottom:1px solid var(--border);}
+  .inner-tab{padding:7px 15px;font-size:13px;font-weight:500;color:var(--text3);cursor:none;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
   .inner-tab.active{color:var(--pink);border-bottom-color:var(--pink);}
-
-  /* Divider */
-  .section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--pink-mid),transparent);margin:1.5rem 0;}
-
-  /* Applied banner */
-  .applied-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--purple-light);border:1px solid rgba(123,63,110,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--purple);margin-bottom:1rem;}
+  .applied-banner{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--purple-light);border:1px solid rgba(123,63,110,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--purple);margin-bottom:1rem;}
 
   @media(max-width:768px){
     .sidebar{width:100%;height:auto;position:relative;padding:1rem;}
     .main{margin-left:0;padding:1.5rem 1rem;}
     .app{flex-direction:column;}
-    .stats-row,.result-metrics{grid-template-columns:1fr 1fr;}
-    .form-grid,.drawer-grid{grid-template-columns:1fr;}
+    .stats-row{grid-template-columns:1fr 1fr;}
+    .score-cards,.match-grid,.form-grid,.drawer-grid{grid-template-columns:1fr;}
     .sidebar-stats{display:none;}
   }
 </style>
 </head>
 <body>
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
 <div class="app">
   <aside class="sidebar">
     <div class="brand-wrap">
@@ -203,7 +211,7 @@
     </nav>
     <div class="sync-indicator">
       <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-label">Synced</span>
+      <span id="sync-label">Connecting...</span>
     </div>
     <div class="sidebar-stats">
       <div class="ss-item"><span class="ss-label">Total applied</span><span class="ss-val" id="ss-total">0</span></div>
@@ -215,101 +223,89 @@
 
   <main class="main">
 
-    <!-- ANALYSE -->
+    <!-- ── ANALYSE ── -->
     <div id="sec-add" class="section active">
       <div class="page-header">
         <div class="page-title">Analyse a job 🌸</div>
-        <div class="page-sub">Paste the full job posting — AI extracts everything and tells you how well you fit</div>
+        <div class="page-sub">Paste the full job posting — AI reads everything and tells you exactly how well you fit</div>
       </div>
       <div class="card">
         <div class="card-title">Paste the job posting</div>
-        <textarea class="paste-textarea" id="inp-raw-paste" placeholder="Paste the entire job posting here — title, company, description, requirements, everything. Don't worry about formatting.&#10;&#10;AI will extract all the details automatically." oninput="onPasteInput()"></textarea>
-        <div class="paste-hint">✨ Tip: copy everything from the job ad — the more detail, the smarter the analysis</div>
+        <textarea class="paste-textarea" id="inp-raw-paste" maxlength="12000" placeholder="Paste the entire job ad here — title, company, responsibilities, requirements, everything. AI will extract and analyse automatically." oninput="onPasteInput()"></textarea>
+        <div class="paste-hint">
+          <span>✨ More detail = smarter analysis — include the full posting</span>
+          <span class="char-counter" id="char-counter">0 / 12,000</span>
+        </div>
         <div class="extracted-preview" id="extracted-preview"></div>
         <div class="btn-row">
           <button class="btn btn-primary" id="analyze-btn" onclick="analyzeJob()">Analyse fit →</button>
           <button class="btn btn-outline" onclick="clearForm()">Clear</button>
-          <span style="font-size:12px;color:var(--text3);">This does NOT save as an application — use "Mark as Applied" when you're ready</span>
         </div>
-        <div class="loader-wrap" id="loader-analyze"><div class="spinner"></div> Reading the job posting and analysing your fit...</div>
+        <div class="loader-wrap" id="loader-analyze"><div class="spinner"></div> Reading and analysing the job posting...</div>
       </div>
 
       <div id="result-panel" style="display:none;">
         <div class="card">
-
-          <!-- DECISION SUMMARY — top, big, immediate -->
-          <div id="decision-banner" style="border-radius:var(--radius-sm);padding:1.4rem 1.6rem;margin-bottom:1.2rem;background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border:1px solid var(--border2);">
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-              <span id="res-fit" class="badge" style="font-size:14px;padding:6px 16px;">—</span>
-              <span id="res-prob" style="font-size:28px;font-weight:700;color:var(--text);letter-spacing:-1px;">—</span>
-              <span style="font-size:13px;color:var(--text3);">interview probability</span>
-              <span style="margin-left:auto;font-size:22px;font-weight:700;color:var(--text);"><span id="res-score">—</span><span style="font-size:13px;color:var(--text3);font-weight:400;">/10</span></span>
+          <!-- TOP: scores + verdict + actions -->
+          <div class="decision-banner">
+            <div class="decision-top">
+              <span id="res-fit" class="badge" style="font-size:13px;padding:5px 14px;">—</span>
+              <span id="res-prob" style="font-size:30px;font-weight:700;color:var(--text);letter-spacing:-1.5px;">—</span>
+              <span style="font-size:12px;color:var(--text3);">interview chance</span>
+              <span style="margin-left:auto;font-weight:700;font-size:18px;color:var(--text);"><span id="res-score">—</span><span style="font-size:12px;color:var(--text3);font-weight:400;">/10</span></span>
             </div>
-            <div id="res-recommendation" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.65);border-radius:var(--radius-sm);"></div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="extracted-pills">
-              <span class="ext-pill extracted"><span class="pill-label">Title</span>&nbsp;<span class="pill-val" id="disp-title">—</span></span>
+            <div class="decision-rec" id="res-recommendation"></div>
+            <div class="info-pills" id="extracted-pills">
+              <span class="ext-pill extracted"><span class="pill-label">Role</span>&nbsp;<span class="pill-val" id="disp-title">—</span></span>
               <span class="ext-pill extracted"><span class="pill-label">Company</span>&nbsp;<span class="pill-val" id="disp-company">—</span></span>
               <span class="ext-pill extracted"><span class="pill-label">Location</span>&nbsp;<span class="pill-val" id="disp-location">—</span></span>
-              <span class="ext-pill extracted"><span class="pill-label">Source</span>&nbsp;<span class="pill-val" id="disp-source">—</span></span>
             </div>
-            <!-- ACTION BUTTONS — right here, high up -->
             <div class="btn-row" style="margin-top:0;">
               <button class="btn btn-primary" id="save-rewrite-btn" onclick="saveAndRewrite()">Save &amp; rewrite CV →</button>
-              <button class="btn btn-outline" onclick="saveOnly()">Save without CV</button>
+              <button class="btn btn-outline" onclick="saveOnly()">Save for later</button>
               <button class="btn btn-applied" onclick="saveAsApplied()">✓ Mark as Applied</button>
             </div>
             <div class="loader-wrap" id="loader-cv"><div class="spinner"></div> Writing your tailored CV...</div>
           </div>
 
-          <!-- VERDICT -->
-          <div style="margin-bottom:1rem;padding:1rem 1.2rem;background:var(--bg);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:5px;">What the AI thinks</div>
-            <div id="res-verdict" style="font-size:13.5px;color:var(--text2);line-height:1.7;"></div>
-          </div>
-
-          <!-- WHY YOU MATCH + GAPS — two columns -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
-            <div style="background:var(--green-light);border:1px solid rgba(45,106,79,0.15);border-radius:var(--radius-sm);padding:1rem 1.1rem;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--green);margin-bottom:8px;font-weight:600;">✓ Why you match</div>
-              <div id="res-transferable" style="font-size:12.5px;color:#1a4a34;line-height:1.75;white-space:pre-wrap;"></div>
+          <!-- WHY YOU MATCH + GAPS — visual, scannable -->
+          <div class="match-grid">
+            <div class="match-box" style="background:var(--green-light);border:1px solid rgba(45,106,79,0.15);">
+              <div class="match-box-label" style="color:var(--green);">✓ Why you match</div>
+              <div id="res-transferable-visual"></div>
             </div>
-            <div style="background:var(--rose-light);border:1px solid rgba(194,24,91,0.12);border-radius:var(--radius-sm);padding:1rem 1.1rem;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--rose);margin-bottom:8px;font-weight:600;">⚠ Gaps to address</div>
-              <div id="res-gaps" style="font-size:12.5px;color:#6b1a35;line-height:1.75;white-space:pre-wrap;"></div>
+            <div class="match-box" style="background:var(--rose-light);border:1px solid rgba(194,24,91,0.12);">
+              <div class="match-box-label" style="color:var(--rose);">⚠ Gaps to address</div>
+              <div id="res-gaps-visual"></div>
             </div>
           </div>
 
-          <!-- DETAILS — collapsed by default -->
-          <details style="margin-bottom:0.6rem;">
-            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
-              📋 What they actually want <span style="font-size:16px;color:var(--pink);">+</span>
-            </summary>
-            <div id="res-requirements" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          <!-- COLLAPSED DETAILS -->
+          <details>
+            <summary>💬 What the AI thinks <span class="det-icon">+</span></summary>
+            <div class="det-body" id="res-verdict"></div>
           </details>
-
-          <details style="margin-bottom:0.6rem;">
-            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
-              💅 Which CV version to send <span style="font-size:16px;color:var(--pink);">+</span>
-            </summary>
-            <div id="res-cv" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          <details>
+            <summary>📋 What they actually want <span class="det-icon">+</span></summary>
+            <div class="det-body" id="res-requirements"></div>
           </details>
-
-          <details style="margin-bottom:0;">
-            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
-              💬 When they reach out — what to say <span style="font-size:16px;color:var(--pink);">+</span>
-            </summary>
-            <div id="res-talkpoints" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          <details>
+            <summary>💅 Which CV version to send <span class="det-icon">+</span></summary>
+            <div class="det-body" id="res-cv"></div>
           </details>
-
+          <details>
+            <summary>💬 When they reach out — what to say <span class="det-icon">+</span></summary>
+            <div class="det-body" id="res-talkpoints"></div>
+          </details>
         </div>
       </div>
     </div>
 
-    <!-- TRACKER -->
+    <!-- ── TRACKER ── -->
     <div id="sec-tracker" class="section">
       <div class="page-header">
         <div class="page-title">Applications 💌</div>
-        <div class="page-sub">Click any card to expand the full breakdown</div>
+        <div class="page-sub">Your full application history — click any card to expand CV, analysis &amp; notes</div>
       </div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Total applied</div><div class="stat-val" id="t-total">0</div></div>
@@ -325,11 +321,11 @@
       <div id="jobs-list" class="jobs-list"></div>
     </div>
 
-    <!-- CV REWRITER -->
+    <!-- ── CV REWRITER ── -->
     <div id="sec-cv" class="section">
       <div class="page-header">
         <div class="page-title">CV Rewriter 💅</div>
-        <div class="page-sub">AI actively rewrites your CV for the specific role — not just picking a template</div>
+        <div class="page-sub">AI actively rewrites your CV for each specific role — not just filling a template</div>
       </div>
       <div class="inner-tabs">
         <button class="inner-tab active" onclick="cvTab('saved')">From saved jobs</button>
@@ -339,7 +335,7 @@
         <div class="card">
           <div class="card-title">Select saved job</div>
           <div class="form-group"><label>Job</label><select id="cv-job-select" style="border-radius:var(--radius-sm);"></select></div>
-          <div class="form-group" style="margin-top:1rem;">
+          <div class="form-group" style="margin-top:0.8rem;">
             <label>CV focus</label>
             <select id="cv-type-saved" style="border-radius:var(--radius-sm);">
               <option value="auto">AI decides best approach</option>
@@ -357,9 +353,9 @@
           <div class="card-title">Paste job posting</div>
           <div class="form-group full">
             <label>Full job posting</label>
-            <textarea id="cv-raw-m" style="min-height:200px;" placeholder="Paste the entire job posting here..."></textarea>
+            <textarea id="cv-raw-m" style="min-height:160px;" placeholder="Paste the entire job posting here..."></textarea>
           </div>
-          <div class="form-group" style="margin-top:0.5rem;">
+          <div class="form-group" style="margin-top:0.6rem;">
             <label>CV focus</label>
             <select id="cv-type-m" style="border-radius:var(--radius-sm);">
               <option value="auto">AI decides best approach</option>
@@ -374,7 +370,7 @@
       </div>
       <div id="cv-output-wrap" style="display:none;">
         <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
             <div>
               <div class="card-title" style="margin-bottom:2px;">Your tailored CV</div>
               <div id="cv-output-job-label" style="font-size:13px;color:var(--text2);"></div>
@@ -398,130 +394,148 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ── SPARKLE CURSOR ────────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+const sparkleChars = ['✦','✧','⋆','˚','·','✿','❀','✺','꩜','◌'];
+let lastSparkle = 0;
+
+document.addEventListener('mousemove', e => {
+  const x = e.clientX, y = e.clientY;
+  cursor.style.left = x + 'px';
+  cursor.style.top = y + 'px';
+  cursorRing.style.left = x + 'px';
+  cursorRing.style.top = y + 'px';
+  const now = Date.now();
+  if (now - lastSparkle > 60) {
+    lastSparkle = now;
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.textContent = sparkleChars[Math.floor(Math.random() * sparkleChars.length)];
+    s.style.left = (x + (Math.random() * 16 - 8)) + 'px';
+    s.style.top = (y + (Math.random() * 16 - 8)) + 'px';
+    s.style.color = ['#E8547A','#9C4D6E','#F9A8BE','#C2185B','#FFB6C1'][Math.floor(Math.random()*5)];
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+  }
+});
+
+document.addEventListener('mousedown', () => { cursor.style.transform = 'translate(-50%,-50%) scale(0.7)'; });
+document.addEventListener('mouseup', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; });
+
 // ── PROFILE & MASTER CV ───────────────────────────────────────────────────────
-const PROFILE = `
-MICAELA ABYDELLE HARRIPERSADH
+const PROFILE = `MICAELA ABYDELLE HARRIPERSADH
 Durban, South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053
 
 EDUCATION
-- Honours in Forensic Genetics, Cum Laude — University of KwaZulu-Natal, Feb 2025 – Nov 2025
-  Subjects: Forensic DNA Analysis, Study Design & Statistical Analysis, Quality Assurance in Forensic Genetics Laboratories, Scientific Reporting
-- Bachelor of Science in Biological Sciences — University of KwaZulu-Natal, Feb 2022 – Nov 2024
+- Honours in Forensic Genetics, Cum Laude — UKZN, Feb 2025–Nov 2025
+  Focus: Forensic DNA Analysis, Study Design & Statistical Analysis, QA in Forensic Genetics, Scientific Reporting
+- BSc Biological Sciences — UKZN, Feb 2022–Nov 2024
 
 AWARDS & CERTIFICATIONS
 - Dean's Commendation (top-performing students at UKZN)
 - Certificate of Merit: Forensic Genetics Research Project (GENE756)
 - Certificate of Merit: Forensic Genetics Analysis & Interpretation (GENE752)
-- Certificate of Merit: Quality Assurance in Forensic Genetics Laboratories (GENE753)
-- ICH-GCP E6 (R2) Certification — The Global Health Network, April 2025
-- Research Ethics Certificate, May 2025
-- Code 8 Driver's Licence
+- Certificate of Merit: QA in Forensic Genetics Laboratories (GENE753)
+- ICH-GCP E6 (R2) Certification — The Global Health Network, Apr 2025
+- Research Ethics Certificate, May 2025 | Code 8 Driver's Licence
 
 WORK EXPERIENCE
+Laboratory Demonstrator | UKZN | Jul–Dec 2025
+Ran lab practical sessions for first-year students. First point of contact for queries. Maintained accurate attendance and performance records. Explained complex biological/medical concepts to varied audiences. Collaborated with academic staff on coordination.
 
-Laboratory Demonstrator | University of KwaZulu-Natal | Jul 2025 – Dec 2025
-Ran lab practical sessions for first-year students. First point of contact for all student queries. Maintained accurate attendance and performance records. Explained complex biological/medical concepts clearly. Collaborated with academic staff on coordination.
+Honours Researcher (Primary Investigator) | UKZN | Jul 2024–Dec 2025
+Designed and ran a full year-long research project independently — literature review, methodology, data collection, statistical analysis, thesis. Managed digital file organisation using cloud tools. Produced formal written documentation and reports.
 
-Honours Researcher (Independent Primary Investigator) | UKZN | Jul 2024 – Dec 2025
-Designed and ran a full year-long research project completely independently — from literature review through methodology, data collection, statistical analysis, and thesis submission. Managed digital file organisation using cloud tools. Produced formal written documentation and reports.
+Research Assistant | UKZN | Jul 2024–Dec 2025
+Assisted in Moringa oleifera and HIV/HPV studies. Collected data with strict protocol compliance. Organised, labelled, and managed biological samples. Conducted literature reviews.
 
-Research Assistant | University of KwaZulu-Natal | Jul 2024 – Dec 2025
-Assisted in Moringa oleifera and HIV/HPV studies. Collected data with strict attention to accuracy and protocol compliance. Organised, labelled, and managed biological samples. Conducted literature reviews.
+Business Development Representative | RaysGM | Jun 2023–Feb 2024
+Promoted from Junior Sales Rep. Prospected new clients, ran consultative sales conversations, converted leads. Built long-term client relationships. Managed sales pipeline and deal tracking.
 
-Business Development Representative | RaysGM | Jun 2023 – Feb 2024
-Promoted from Junior Sales Rep within months. Prospected new clients, ran consultative sales conversations, converted leads. Built and maintained long-term client relationships. Managed sales pipeline and deal tracking.
+Junior Sales Rep / Customer Service | RaysGM | Jan–May 2023
+High-volume inbound/outbound communications. Maintained client interaction records. Supported admin tasks and CRM updates. Handled sensitive client information professionally.
 
-Junior Sales Representative / Customer Service | RaysGM | Jan 2023 – May 2023
-Handled high-volume inbound and outbound communications. Maintained detailed client interaction records. Supported admin tasks and CRM updates. Handled sensitive client information professionally.
-
-Luxury Perfume Promoter | Designer Scents | Jan 2022 – Dec 2022
-Promoted and sold luxury fragrance brands in retail. Personalised consultations. Consistently upsold premium products. Maintained product knowledge across multiple lines.
+Luxury Perfume Promoter | Designer Scents | Jan–Dec 2022
+Promoted luxury fragrances in retail. Personalised consultations. Consistently upsold premium products.
 
 TECHNICAL SKILLS
-- Laboratory: DNA extraction, touch DNA analysis, PCR, sample handling, GLP compliance
-- Data: Statistical analysis, data interpretation, scientific software
-- Admin: Microsoft Office, Google Workspace, CRM systems, OneDrive/cloud file management
-- Compliance: GCP certified, research ethics trained, quality assurance methodology
-`;
+Lab: DNA extraction, touch DNA analysis, PCR, sample handling, GLP compliance
+Data: Statistical analysis, data interpretation, scientific software
+Admin: Microsoft Office, Google Workspace, CRM, OneDrive/cloud file management
+Compliance: GCP certified, research ethics trained, quality assurance methodology`;
 
 const MASTER_CV = `MICAELA ABYDELLE HARRIPERSADH
 South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053 | linkedin.com/in/micaela-abydelle-harripersadh-a3a139238
 
---- FULL EXPERIENCE BANK (use this to build any CV version) ---
+PROFILE A SUMMARY (Admin/Healthcare/Sales):
+Detail-oriented candidate with Honours in Forensic Genetics (Cum Laude) and experience in academic, laboratory, and client-facing environments. Proven ability to maintain accurate records, manage digital documentation, support multidisciplinary teams, and communicate complex information clearly.
 
-PROFILE A SUMMARY (Admin/Healthcare/Sales angle):
-Detail-oriented candidate with an Honours degree in Forensic Genetics (Cum Laude) and hands-on experience in academic, laboratory, and client-facing environments. Proven ability to maintain accurate records, manage digital documentation, support multidisciplinary teams, and communicate complex information clearly. Strong written and verbal communication, high attention to detail, and comfortable working within structured or virtual environments.
+PROFILE B SUMMARY (Science/Lab/Research):
+Honours graduate (Cum Laude) in Forensic Genetics with BSc in Biological Sciences. Experienced in forensic DNA analysis, study design, statistical data analysis, and scientific reporting. Strong foundation in GLP, quality assurance, and research ethics. Dean's Commendation, three Certificates of Merit.
 
-PROFILE B SUMMARY (Science/Lab/Research angle):
-Honours graduate (Cum Laude) in Forensic Genetics with a BSc in Biological Sciences. Experienced in laboratory research, forensic DNA analysis, study design, statistical data analysis, and scientific reporting. Strong foundation in GLP, quality assurance, and research ethics. Awarded Dean's Commendation and three Certificates of Merit.
+EXPERIENCE BULLETS:
 
-EXPERIENCE BULLETS (pick and reorder based on role):
-
-Laboratory Demonstrator — University of KwaZulu-Natal | Jul 2025 – Dec 2025
+Laboratory Demonstrator — UKZN | Jul–Dec 2025
 • First point of contact for student queries in structured lab sessions
-• Explained complex biological and medical concepts clearly to people with varying backgrounds
+• Explained complex biological/medical concepts clearly to people with varying backgrounds
 • Maintained accurate attendance records, performance documentation, and session data
 • Collaborated with academic and lab staff on coordination and issue resolution
-• Demonstrated laboratory techniques and ensured GLP and safety compliance
+• Demonstrated lab techniques; ensured GLP and safety compliance
 
-Honours Researcher (Primary Investigator) — University of KwaZulu-Natal | Jul 2024 – Dec 2025
+Honours Researcher (Primary Investigator) — UKZN | Jul 2024–Dec 2025
 • Independently designed and executed a full Honours research project as primary investigator
 • Managed end-to-end study design, data collection, statistical analysis, and thesis writing
 • Produced detailed formal documentation and reports to a high standard of accuracy
-• Managed multiple concurrent deadlines and task prioritisation without supervision
-• Organised structured digital folders using cloud-based tools throughout the project lifecycle
+• Managed multiple concurrent deadlines independently
+• Organised structured digital folders using cloud-based tools throughout
 
-Research Assistant — University of KwaZulu-Natal | Jul 2024 – Dec 2025
+Research Assistant — UKZN | Jul 2024–Dec 2025
 • Assisted in Moringa oleifera and HIV/HPV research projects
 • Supported data collection ensuring accuracy, consistency, and strict protocol adherence
 • Organised, labelled, and managed biological samples and research materials
 • Conducted literature reviews to support research objectives
 
-Business Development Representative — RaysGM | Jun 2023 – Feb 2024
+Business Development Representative — RaysGM | Jun 2023–Feb 2024
 • Promoted from Junior Sales Representative based on consistent performance
 • Prospected and converted leads using a consultative approach tailored to client needs
 • Built and maintained long-term client relationships contributing to repeat business
 • Managed pipeline tracking, deal records, and client communication across multiple accounts
 
-Junior Sales Representative / Customer Service — RaysGM | Jan 2023 – May 2023
-• Handled high-volume inbound and outbound communications including bookings and inquiries
+Junior Sales Representative / Customer Service — RaysGM | Jan–May 2023
+• Handled high-volume inbound/outbound communications including bookings and inquiries
 • Maintained detailed records of client interactions and service histories in CRM
 • Supported admin tasks, reporting, and data entry
 • Handled sensitive client information with professionalism and confidentiality
 
-Luxury Perfume Promoter — Designer Scents | Jan 2022 – Dec 2022
+Luxury Perfume Promoter — Designer Scents | Jan–Dec 2022
 • Promoted luxury fragrance brands through personalised customer consultations
 • Consistently upsold premium products by highlighting features and benefits
-• Maintained product knowledge across multiple lines
 
 EDUCATION:
-Honours in Forensic Genetics (Cum Laude) — University of KwaZulu-Natal | Feb 2025 – Nov 2025
-  Focus areas: Forensic DNA Analysis | Study Design & Statistical Analysis | Quality Assurance | Scientific Reporting
-Bachelor of Science in Biological Sciences — University of KwaZulu-Natal | Feb 2022 – Nov 2024
+Honours in Forensic Genetics (Cum Laude) — UKZN | Feb 2025–Nov 2025
+  Focus: Forensic DNA Analysis | Study Design & Statistical Analysis | QA | Scientific Reporting
+BSc Biological Sciences — UKZN | Feb 2022–Nov 2024
 
 CERTIFICATIONS:
 • ICH-GCP E6 (R2) — The Global Health Network (Apr 2025)
 • Research Ethics Certificate (May 2025)
 
 HONOURS & AWARDS:
-• Dean's Commendation — University of KwaZulu-Natal
+• Dean's Commendation — UKZN
 • Certificate of Merit — Forensic Genetics Research Project (GENE756)
 • Certificate of Merit — Forensic Genetics Analysis & Interpretation (GENE752)
-• Certificate of Merit — Quality Assurance in Forensic Genetics Laboratories (GENE753)
+• Certificate of Merit — QA in Forensic Genetics Laboratories (GENE753)
 
-SKILLS:
-Laboratory: DNA extraction, touch DNA analysis, PCR, sample handling, GLP
-Data: Statistical analysis, data interpretation, scientific software
-Admin: Microsoft Office Suite, Google Workspace, CRM systems, cloud file management
-Other: Code 8 Driver's Licence`;
+SKILLS: Lab: DNA extraction, touch DNA analysis, PCR, sample handling, GLP | Data: Statistical analysis, scientific software | Admin: Microsoft Office Suite, Google Workspace, CRM, cloud file management | Code 8 Driver's Licence`;
 
 // ── PROMPTS ───────────────────────────────────────────────────────────────────
 function buildCombinedPrompt(rawPaste) {
-  return `You are a senior recruiter and hiring manager with deep experience placing early-career candidates into competitive roles. Your job has two parts:
+  return `You are a senior recruiter and hiring manager placing early-career candidates into competitive roles. Your job has two parts:
 PART 1: Extract structured information from the raw job posting.
-PART 2: Evaluate whether Micaela is a strong, realistic hire for this role — not whether she is a perfect match.
+PART 2: Evaluate whether Micaela is a strong, realistic hire — not whether she is a perfect match.
 
-CRITICAL: Do NOT evaluate against a "perfect candidate." Evaluate whether she is competitive given transferable skills, trainability, and real-world hiring behaviour.
+CRITICAL: Evaluate against transferable skills, trainability, and real-world hiring behaviour. Think like a hiring manager, NOT an ATS filter.
 
 == MICAELA'S FULL PROFILE ==
 ${PROFILE}
@@ -529,136 +543,53 @@ ${PROFILE}
 == RAW JOB POSTING ==
 ${rawPaste}
 
-== EVALUATION FRAMEWORK (MANDATORY) ==
+== EVALUATION FRAMEWORK ==
+1. Classify each requirement as Hard / Flexible / Trainable — do NOT treat all equally.
+2. For every gap: ask "Does she have something that proves she can do this in another context?" Valid substitutions: teaching students → educating professionals | sales → client relationship management | research project → project coordination | lab documentation → compliance documentation.
+3. Identify what this job ACTUALLY involves day-to-day (ignore buzzwords).
+4. Gap severity: Dealbreaker / Workable / Minor. Most gaps should NOT be dealbreakers.
+5. Factor in: Cum Laude, independent research project, sales + communication experience — these REDUCE gap severity.
+6. Years-of-experience requirements are guidelines, not strict rules.
+7. Before final scores ask: "Would I interview this candidate?" — if YES, fit cannot be Low.
 
-1. REQUIREMENT CLASSIFICATION
-For each requirement, mentally classify it as:
-- Hard requirement (cannot be substituted)
-- Flexible requirement (can be substituted with adjacent experience)
-- Trainable requirement (can be learned quickly on the job)
-Do NOT treat all requirements equally.
-
-2. SUBSTITUTION LOGIC
-For every missing requirement, ask: "Does she have something that proves she can do this in another context?"
-Valid substitutions: Teaching students → educating professionals | Sales → client relationship management | Research project → project coordination | Lab documentation → compliance/documentation work.
-If a substitution exists, treat the requirement as partially or fully covered.
-
-3. CORE FUNCTION ANALYSIS
-Identify what this job ACTUALLY involves day-to-day (ignore buzzwords).
-Evaluate her ability to perform the REAL job, not just match keywords.
-
-4. GAP SEVERITY (BE REALISTIC)
-Classify each gap as Dealbreaker / Significant but workable / Minor (trainable quickly).
-IMPORTANT: Most gaps should NOT be dealbreakers. Only mark as dealbreaker if it truly prevents her from doing the job.
-
-5. TRAINABILITY & SIGNALS
-Actively factor in: Cum Laude performance, independent research project, sales + communication experience.
-These signals REDUCE the severity of gaps.
-
-6. EXPERIENCE INTERPRETATION
-Treat years-of-experience requirements as a guideline, not a strict rule.
-If the job allows a Master's/Honours substitute, REDUCE penalties significantly.
-
-7. MARKET REALITY CHECK
-Ask: "Compared to typical applicants, is she strong?"
-Adjust score UP if she has a rare combination (science + sales + communication) or the role is niche/hybrid.
-
-8. INTERVIEW TEST (CRITICAL OVERRIDE)
-Before giving final scores, ask: "Would I interview this candidate if I saw this CV?"
-- If YES → Fit cannot be Low
-- If STRONG YES → Increase probability and score
-- If MAYBE → Keep Medium but justify clearly
-- If NO → Only then consider Low
-This step overrides overly harsh scoring.
-
-9. HARD DEALBREAKER EXCEPTIONS (apply ONLY when truly non-negotiable and explicitly stated)
-- A required spoken language she does not have AND it is mandatory (e.g. must speak German): cap probability at 20%, fit Low
-- A specific professional registration that is LEGALLY required to practise (e.g. HPCSA to practise medicine): cap at 20%
-- A degree that is legally required (e.g. LLB to practise law): cap at 20%
-Do NOT apply these caps for preferred skills, soft requirements, or things that can be learned.
-
-10. FINAL JUDGEMENT
-Balance: direct matches, transferable skills, gaps with realistic severity, trainability, market competitiveness.
-Do NOT default to low fit simply because experience is missing.
-
-== BEHAVIOUR RULES ==
-- Do NOT say "no experience = not suitable"
-- Do NOT overuse "dealbreaker"
-- ALWAYS search for transferable skills
-- Think like a hiring manager, not an ATS filter
-- Be realistic, not idealistic
-
-Return ONLY raw JSON — no markdown, no code blocks, nothing else.
+Return ONLY raw JSON — no markdown, no code blocks.
 
 {
   "extracted": {
-    "title": "job title or Not specified",
-    "company": "company name or Not specified",
-    "location": "location or Not specified",
-    "source": "job board if mentioned or Not specified",
-    "clean_jd": "core job description cleaned up — keep responsibilities, requirements, role context"
+    "title": "job title",
+    "company": "company name",
+    "location": "location or Remote",
+    "source": "job board if mentioned",
+    "clean_jd": "core responsibilities and requirements cleaned up"
   },
   "fit": "High or Medium or Low",
-  "probability": 0-100 integer,
-  "score": 1-10 integer,
-  "verdict": "3-4 sentences explaining your reasoning like a hiring manager. Mention transferable skills, not just gaps.",
-  "transferable_skills": "4-6 bullet points (use •). Each must clearly explain HOW her past experience applies to this role.",
-  "gaps": "2-4 bullet points (use •). For each gap: classify as Dealbreaker / Workable / Minor AND explain why realistically.",
-  "requirements": "Top 5 REAL requirements (use •, focus on what actually matters day-to-day)",
-  "cv_recommendation": "Which CV angle to use and WHY based on the role's true needs",
-  "talk_points": "4-5 specific talking points she should use when contacted, tied directly to this job"
+  "probability": 0-100,
+  "score": 1-10,
+  "verdict": "2-3 sentences max. Direct, hiring-manager tone. No fluff.",
+  "transferable_skills": "exactly 4 items as JSON array of strings — each max 10 words, punchy and specific. Example: [\"Lab documentation maps directly to compliance reporting\",\"Sales pipeline = CRM and client management experience\"]",
+  "gaps": "exactly 2-3 items as JSON array of objects: [{\"text\":\"gap description max 8 words\",\"severity\":\"Workable\"}]. Severity must be Dealbreaker, Workable, or Minor.",
+  "requirements": "Top 5 must-haves as JSON array of strings — max 8 words each",
+  "cv_recommendation": "One sentence: which CV angle and why.",
+  "talk_points": "3-4 items as JSON array of strings — each max 12 words, specific to this role"
 }`;
 }
 
 function buildCvPrompt(title, company, jd, cvType, analysis) {
   const typeInstruction = {
-    admin: 'Lead with the Admin/Healthcare/Sales angle — prioritise client-facing, admin, and communication bullets.',
-    science: 'Lead with the Science/Lab/Research angle — prioritise lab, research, and compliance bullets.',
-    hybrid: 'Blend both angles equally — mix the most relevant bullets from both.',
-    auto: 'Decide which angle or blend best serves this specific role based on the job description.'
+    admin: 'Lead with the Admin/Healthcare/Sales angle.',
+    science: 'Lead with the Science/Lab/Research angle.',
+    hybrid: 'Blend both angles equally.',
+    auto: 'Decide which angle or blend best serves this specific role.'
   }[cvType] || 'Decide which angle is best.';
 
   const htmlTemplate = [
     'Output the CV as a complete, valid HTML file.',
-    'Start directly with <!DOCTYPE html> — no preamble, no explanation, nothing before the doctype.',
-    'Use this CSS in a style tag in the head:',
-    '  body: font-family Calibri Arial sans-serif, font-size 11pt, color #1a1a1a, margin 2.5cm, line-height 1.5',
-    '  h1: font-size 20pt, bold, centered, color #1a1a1a, letter-spacing 1px',
-    '  .contact: centered, font-size 10pt, color #444, margin-bottom 4px',
-    '  hr: border none, border-top 2px solid #1a3a6b, margin 10px 0 14px 0',
-    '  h2: font-size 11pt, bold, color #1a3a6b, text-transform uppercase, letter-spacing 1.2px, border-bottom 1px solid #c8d8f0',
-    '  .job-title: font-size 11pt, bold, color #1a1a1a, margin 10px 0 1px 0',
-    '  .job-meta: font-size 10pt, italic, color #555, margin 0 0 4px 0',
-    '  ul: margin 4px 0 8px 20px',
-    '  li: margin-bottom 3px, font-size 11pt',
-    '  p: margin 3px 0 6px 0, font-size 11pt',
-    'Structure:',
-    '  - h1 for full name',
-    '  - div.contact for email, phone, location, linkedin separated by |',
-    '  - hr divider after contact',
-    '  - h2 for each section heading (PROFESSIONAL SUMMARY, CORE COMPETENCIES, PROFESSIONAL EXPERIENCE, EDUCATION, CERTIFICATIONS, HONOURS AND AWARDS)',
-    '  - div.job-title for each job title',
-    '  - div.job-meta for company, location, and date range',
-    '  - ul and li for all bullet points',
-    '  - p for paragraph text like the summary'
+    'Start directly with <!DOCTYPE html> — no preamble.',
+    'CSS: body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a1a;margin:2.5cm;line-height:1.5} h1{font-size:20pt;font-weight:bold;text-align:center;letter-spacing:1px} .contact{text-align:center;font-size:10pt;color:#444;margin-bottom:4px} hr{border:none;border-top:2px solid #1a3a6b;margin:10px 0 14px 0} h2{font-size:11pt;font-weight:bold;color:#1a3a6b;text-transform:uppercase;letter-spacing:1.2px;border-bottom:1px solid #c8d8f0;margin-top:14px} .job-title{font-size:11pt;font-weight:bold;margin:10px 0 1px 0} .job-meta{font-size:10pt;font-style:italic;color:#555;margin:0 0 4px 0} ul{margin:4px 0 8px 20px} li{margin-bottom:3px;font-size:11pt} p{margin:3px 0 6px 0;font-size:11pt}',
+    'Structure: h1 name | div.contact email|phone|location|linkedin | hr | h2 sections | div.job-title + div.job-meta + ul/li for each role | p for summary text'
   ].join('\n');
 
-  return 'You are an expert CV writer. Actively REWRITE Micaela\'s CV from scratch for this specific role.\n\n'
-    + typeInstruction + '\n\n'
-    + '== EXPERIENCE BANK ==\n' + MASTER_CV + '\n\n'
-    + '== HER FULL PROFILE ==\n' + PROFILE + '\n\n'
-    + '== TARGET ROLE ==\n'
-    + 'Title: ' + title + '\nCompany: ' + company + '\nJob Description:\n' + jd + '\n\n'
-    + (analysis ? '== PRIOR ANALYSIS ==\nVerdict: ' + (analysis.verdict||'') + '\nTransferable skills: ' + (analysis.transferable_skills||'') + '\nKey requirements: ' + (analysis.requirements||'') + '\n\n' : '')
-    + '== REWRITING RULES ==\n'
-    + '1. Fresh Professional Summary — first sentence names what she is and why she fits THIS role.\n'
-    + '2. Select and reorder bullets — most relevant to this role appears first.\n'
-    + '3. Use this industry\'s vocabulary throughout — without inventing anything.\n'
-    + '4. Inject keywords from the job description naturally for ATS.\n'
-    + '5. Make transferable skills explicit.\n'
-    + '6. Remove experience that adds no value for this role.\n\n'
-    + '== OUTPUT FORMAT ==\n'
-    + htmlTemplate;
+  return `You are an expert CV writer. REWRITE Micaela's CV from scratch for this specific role.\n\n${typeInstruction}\n\n== EXPERIENCE BANK ==\n${MASTER_CV}\n\n== HER FULL PROFILE ==\n${PROFILE}\n\n== TARGET ROLE ==\nTitle: ${title}\nCompany: ${company}\nJob Description:\n${jd}\n\n${analysis ? `== PRIOR ANALYSIS ==\nVerdict: ${analysis.verdict||''}\nTransferable skills: ${typeof analysis.transferable_skills==='string'?analysis.transferable_skills:JSON.stringify(analysis.transferable_skills||[])}\nKey requirements: ${typeof analysis.requirements==='string'?analysis.requirements:JSON.stringify(analysis.requirements||[])}\n\n` : ''}== REWRITING RULES ==\n1. Fresh Professional Summary — first sentence names what she is and why she fits THIS role.\n2. Select and reorder bullets — most relevant to this role appears first.\n3. Use this industry's vocabulary throughout — without inventing anything.\n4. Inject keywords naturally for ATS.\n5. Make transferable skills explicit.\n6. Remove irrelevant experience.\n\n== OUTPUT FORMAT ==\n${htmlTemplate}`;
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -679,44 +610,39 @@ async function callClaude(messages, maxTokens = 2000) {
 // ── SYNC ──────────────────────────────────────────────────────────────────────
 let apps = [];
 let syncTimer = null;
+let isOnline = false;
 
 function setSyncStatus(status) {
   const dot = document.getElementById('sync-dot');
   const label = document.getElementById('sync-label');
   if (!dot || !label) return;
+  isOnline = (status === 'synced');
   dot.className = 'sync-dot' + (status === 'syncing' ? ' syncing' : status === 'error' ? ' error' : '');
-  label.textContent = status === 'syncing' ? 'Syncing...' : status === 'error' ? 'Sync error' : 'Synced';
+  label.textContent = status === 'syncing' ? 'Syncing...' : status === 'error' ? 'Sync error — retrying' : 'Synced ✓';
 }
 
-async function loadApps(retries = 2) {
+async function loadApps() {
   try {
     setSyncStatus('syncing');
-    const resp = await fetch('/api/apps');
+    const resp = await fetch('/api/apps', { cache: 'no-store' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    apps = await resp.json();
+    const data = await resp.json();
+    apps = Array.isArray(data) ? data : [];
     setSyncStatus('synced');
     updateStats();
     renderTracker();
   } catch (e) {
-    if (retries > 0) {
-      setTimeout(() => loadApps(retries - 1), 2000);
-    } else {
-      setSyncStatus('error');
-      console.error('Load error:', e);
-      // Fall back to whatever is in memory rather than showing nothing
-      updateStats();
-      renderTracker();
-    }
+    setSyncStatus('error');
+    console.error('Load error:', e);
+    // Keep whatever is in memory — don't wipe it
+    updateStats();
+    renderTracker();
+    // Retry in 5s
+    setTimeout(loadApps, 5000);
   }
 }
 
-async function saveApps() {
-  clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => pushApps(), 600);
-  updateStats();
-}
-
-async function pushApps(retries = 2) {
+async function pushApps() {
   try {
     setSyncStatus('syncing');
     const resp = await fetch('/api/apps', {
@@ -727,38 +653,40 @@ async function pushApps(retries = 2) {
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     setSyncStatus('synced');
   } catch (e) {
-    if (retries > 0) {
-      setTimeout(() => pushApps(retries - 1), 2000);
-    } else {
-      setSyncStatus('error');
-      console.error('Save error after retries:', e);
-    }
+    setSyncStatus('error');
+    console.error('Push error:', e);
+    // Retry once after 3s
+    setTimeout(async () => {
+      try {
+        await fetch('/api/apps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apps }) });
+        setSyncStatus('synced');
+      } catch(e2) { setSyncStatus('error'); }
+    }, 3000);
   }
+}
+
+async function saveApps() {
+  clearTimeout(syncTimer);
+  updateStats();
+  syncTimer = setTimeout(pushApps, 400);
 }
 
 async function patchApp(id, changes) {
   const idx = apps.findIndex(a => a.id === id);
   if (idx === -1) return;
   apps[idx] = { ...apps[idx], ...changes };
-  updateStats();
   renderTracker();
-  // Persist via full save (simpler and more reliable than individual patch)
-  await pushApps();
+  await saveApps();
 }
 
 async function deleteAppById(id) {
   apps = apps.filter(a => a.id !== id);
-  try {
-    setSyncStatus('syncing');
-    await fetch(`/api/apps/${id}`, { method: 'DELETE' });
-    setSyncStatus('synced');
-  } catch (e) { setSyncStatus('error'); }
-  updateStats();
   renderTracker();
+  saveApps();
 }
 
-// Poll for updates every 30 seconds so both devices stay in sync
-setInterval(loadApps, 30000);
+// Poll every 20s so both devices stay in sync
+setInterval(loadApps, 20000);
 
 function updateStats() {
   const applied = apps.filter(a => a.status !== 'Saved').length;
@@ -798,10 +726,14 @@ function populateCvJobSelect() {
 
 // ── PASTE INPUT ───────────────────────────────────────────────────────────────
 function onPasteInput() {
-  const val = document.getElementById('inp-raw-paste').value.trim();
+  const val = document.getElementById('inp-raw-paste').value;
+  const counter = document.getElementById('char-counter');
+  const len = val.length;
+  counter.textContent = len.toLocaleString() + ' / 12,000';
+  counter.className = 'char-counter' + (len > 10000 ? ' warn' : '');
   const preview = document.getElementById('extracted-preview');
-  preview.innerHTML = val.length > 50
-    ? `<span class="ext-pill"><span class="pill-label">Characters</span>&nbsp;<span class="pill-val">${val.length.toLocaleString()}</span></span><span class="ext-pill extracted"><span class="pill-val">✓ Ready to analyse</span></span>`
+  preview.innerHTML = len > 50
+    ? `<span class="ext-pill extracted"><span class="pill-val">✓ ${len.toLocaleString()} characters — ready to analyse</span></span>`
     : '';
 }
 
@@ -810,7 +742,7 @@ let pending = null;
 
 async function analyzeJob() {
   const raw = document.getElementById('inp-raw-paste').value.trim();
-  if (!raw || raw.length < 50) { alert('Please paste the job posting first.'); return; }
+  if (!raw || raw.length < 50) { toast('Please paste the job posting first ✨'); return; }
   setLoading('analyze', true);
   document.getElementById('result-panel').style.display = 'none';
   try {
@@ -822,24 +754,28 @@ async function analyzeJob() {
     pending = { ...parsed, _raw: raw };
     const ext = parsed.extracted || {};
     const setDisp = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
-    setDisp('disp-title', ext.title); setDisp('disp-company', ext.company);
-    setDisp('disp-location', ext.location); setDisp('disp-source', ext.source);
+    setDisp('disp-title', ext.title); setDisp('disp-company', ext.company); setDisp('disp-location', ext.location);
     showAnalysis(parsed);
   } catch (e) {
     console.error('Analysis error:', e);
     const msg = e.message || '';
-    if (msg.includes('413') || msg.includes('too large') || msg.toLowerCase().includes('token')) {
-      alert('The job description is too long. Try trimming it to just the key requirements and responsibilities, then try again.');
-    } else if (msg.includes('401') || msg.includes('403')) {
-      alert('API key error — check that your ANTHROPIC_API_KEY is set correctly in Railway variables.');
-    } else if (msg.includes('500')) {
-      alert('Server error — the Railway server had an issue. Try again in a moment.');
-    } else if (msg.includes('parse')) {
-      alert('The AI returned an unexpected response. Try again — it usually works on the second attempt.');
-    } else {
-      alert('Analysis failed: ' + (msg || 'Unknown error. Open the browser console (F12) for details.'));
-    }
+    if (msg.includes('401') || msg.includes('403')) toast('API key error — check Railway environment variables');
+    else if (msg.includes('500')) toast('Server error — try again in a moment');
+    else if (msg.includes('parse')) toast('AI returned unexpected response — try again');
+    else toast('Analysis failed: ' + (msg || 'Unknown error'));
   } finally { setLoading('analyze', false); }
+}
+
+function parseArray(val) {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    // Try to extract array from string
+    const m = val.match(/\[[\s\S]*\]/);
+    if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
+    // Fall back: split by bullet points
+    return val.split('\n').filter(l => l.trim()).map(l => l.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+  }
+  return [];
 }
 
 function showAnalysis(r) {
@@ -848,35 +784,45 @@ function showAnalysis(r) {
   f.className = 'badge ' + (fitMap[r.fit] || 'badge-medium');
   f.textContent = r.fit + ' fit';
   document.getElementById('res-prob').textContent = r.probability + '%';
-  const pc = r.probability >= 70 ? '#2D6A4F' : r.probability >= 50 ? '#B5830A' : '#C0392B';
-
   document.getElementById('res-score').textContent = r.score;
-  document.getElementById('res-verdict').textContent = r.verdict || '';
-  document.getElementById('res-transferable').textContent = r.transferable_skills || '';
-  document.getElementById('res-gaps').textContent = r.gaps || '';
-  document.getElementById('res-requirements').textContent = r.requirements || '';
-  document.getElementById('res-cv').textContent = r.cv_recommendation || '';
-  document.getElementById('res-talkpoints').textContent = r.talk_points || '';
-  // Recommendation sentence
+
+  // Recommendation
   const rec = document.getElementById('res-recommendation');
   if (rec) {
-    let msg, color;
-    if (r.probability >= 70) {
-      msg = '🟢 You should apply — strong match. Get the CV rewritten and send it.';
-      color = 'var(--green)';
-    } else if (r.probability >= 50) {
-      msg = '🟡 Worth applying — solid transferable skills. Tailor the CV carefully.';
-      color = 'var(--gold)';
-    } else if (r.probability >= 30) {
-      msg = '🟠 Borderline — apply if you are targeting stretch roles, but manage expectations.';
-      color = '#c05a00';
-    } else {
-      msg = '🔴 Hard match — a key requirement is missing. Only apply if you have a strong reason to.';
-      color = 'var(--red)';
-    }
-    rec.textContent = msg;
-    rec.style.color = color;
+    const p = r.probability;
+    rec.textContent = p >= 70 ? '🟢 Strong match — get the CV rewritten and apply.' :
+      p >= 50 ? '🟡 Worth applying — tailor the CV carefully.' :
+      p >= 30 ? '🟠 Borderline — only if targeting stretch roles.' :
+      '🔴 Difficult match — a key requirement is missing.';
+    rec.style.color = p >= 70 ? 'var(--green)' : p >= 50 ? 'var(--gold)' : p >= 30 ? '#c05a00' : 'var(--red)';
   }
+
+  // Transferable skills — visual chips
+  const tsEl = document.getElementById('res-transferable-visual');
+  const tsItems = parseArray(r.transferable_skills);
+  tsEl.innerHTML = tsItems.map(t =>
+    `<div class="match-item"><span class="match-icon" style="color:var(--green);">✓</span><span style="font-size:12.5px;color:#1a4a34;">${esc(String(t))}</span></div>`
+  ).join('');
+
+  // Gaps — visual chips with severity
+  const gapsEl = document.getElementById('res-gaps-visual');
+  const gapItems = parseArray(r.gaps);
+  gapsEl.innerHTML = gapItems.map(g => {
+    const isObj = typeof g === 'object' && g !== null;
+    const text = isObj ? g.text : String(g).replace(/^(Dealbreaker|Workable|Minor)[:\s]*/i, '');
+    const sev = isObj ? g.severity : (String(g).match(/^(Dealbreaker|Workable|Minor)/i)||['','Workable'])[1];
+    const sevColor = sev==='Dealbreaker'?'var(--red)':sev==='Minor'?'var(--green)':'var(--gold)';
+    return `<div class="match-item"><span class="match-icon" style="color:var(--rose);">⚠</span><span style="font-size:12.5px;color:#6b1a35;">${esc(text)}<span class="match-tag" style="background:rgba(0,0,0,0.06);color:${sevColor};">${esc(sev||'Workable')}</span></span></div>`;
+  }).join('');
+
+  // Text fields for collapsed sections
+  document.getElementById('res-verdict').textContent = r.verdict || '';
+  const reqs = parseArray(r.requirements);
+  document.getElementById('res-requirements').textContent = reqs.map(r => '• ' + r).join('\n');
+  document.getElementById('res-cv').textContent = r.cv_recommendation || '';
+  const tps = parseArray(r.talk_points);
+  document.getElementById('res-talkpoints').textContent = tps.map(t => '• ' + t).join('\n');
+
   document.getElementById('result-panel').style.display = 'block';
   document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -887,16 +833,20 @@ function mkApp(status = 'Saved') {
   return {
     id: Date.now(),
     date: new Date().toLocaleDateString('en-ZA'),
+    appliedDate: status === 'Applied' ? new Date().toLocaleDateString('en-ZA') : '',
     title: ext.title && ext.title !== 'Not specified' ? ext.title : 'Untitled role',
     company: ext.company && ext.company !== 'Not specified' ? ext.company : 'Unknown',
     location: ext.location && ext.location !== 'Not specified' ? ext.location : '',
     source: ext.source && ext.source !== 'Not specified' ? ext.source : '',
     jd: ext.clean_jd || (pending && pending._raw) || '',
     fit: pending.fit, probability: pending.probability, score: pending.score,
-    verdict: pending.verdict || '', transferable_skills: pending.transferable_skills || '',
-    gaps: pending.gaps || '', requirements: pending.requirements || '',
-    cv_recommendation: pending.cv_recommendation || '', talk_points: pending.talk_points || '',
-    status, notes: '', cv: ''
+    verdict: pending.verdict || '',
+    transferable_skills: pending.transferable_skills || [],
+    gaps: pending.gaps || [],
+    requirements: pending.requirements || [],
+    cv_recommendation: pending.cv_recommendation || '',
+    talk_points: pending.talk_points || [],
+    status, notes: '', cv: '', cvHtml: ''
   };
 }
 
@@ -909,14 +859,14 @@ async function saveAndRewrite() {
   document.getElementById('save-rewrite-btn').disabled = true;
   try {
     const cvText = await callClaude([{ role: 'user', content: buildCvPrompt(app.title, app.company, app.jd, 'auto', pending) }], 2800);
-    app.cv = cvText;
+    const isHtml = cvText.trim().startsWith('<!DOCTYPE') || cvText.trim().startsWith('<html');
+    app.cv = isHtml ? cvText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim() : cvText;
+    app.cvHtml = isHtml ? cvText : '';
     await saveApps();
     clearForm();
     nav('cv');
-    showCvOutput(cvText, app.title + ' — ' + app.company, app.id);
-  } catch (e) {
-    alert('CV rewrite failed — job was saved. Try rewriting from the CV tab.');
-  }
+    showCvOutput(app.cvHtml || app.cv, app.title + ' — ' + app.company, app.id);
+  } catch (e) { toast('CV rewrite failed — job was saved. Try rewriting from the CV tab.'); }
   setLoading('cv', false);
   document.getElementById('save-rewrite-btn').disabled = false;
 }
@@ -927,8 +877,7 @@ async function saveOnly() {
   await saveApps();
   clearForm();
   nav('tracker');
-  renderTracker();
-  toast('Saved! Mark as Applied when you send it. 🌸');
+  toast('Saved! Mark as Applied when you send it 🌸');
 }
 
 async function saveAsApplied() {
@@ -937,49 +886,41 @@ async function saveAsApplied() {
   await saveApps();
   clearForm();
   nav('tracker');
-  renderTracker();
   toast('Marked as Applied! Good luck! 💌');
 }
 
 function clearForm() {
   document.getElementById('inp-raw-paste').value = '';
   document.getElementById('extracted-preview').innerHTML = '';
+  document.getElementById('char-counter').textContent = '0 / 12,000';
   document.getElementById('result-panel').style.display = 'none';
   pending = null;
 }
 
 // ── CV REWRITER ───────────────────────────────────────────────────────────────
-let currentCvText = '';
-let currentCvTitle = '';
-let currentCvHtml = '';
-let currentCvAppId = null;
+let currentCvText = '', currentCvTitle = '', currentCvHtml = '', currentCvAppId = null;
 
-function showCvOutput(text, title, appId) {
+function showCvOutput(rawOrHtml, title, appId) {
   currentCvTitle = title;
   currentCvAppId = appId || null;
-  // Show/hide the applied button based on whether we have a linked app
   const apWrapper = document.getElementById('cv-applied-wrap');
   if (apWrapper) apWrapper.style.display = appId ? 'block' : 'none';
   const jobLabel = document.getElementById('cv-output-job-label');
   if (jobLabel) jobLabel.textContent = title || '';
-  // Check if the output is HTML
-  const isHtml = text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html');
+  const isHtml = rawOrHtml.trim().startsWith('<!DOCTYPE') || rawOrHtml.trim().startsWith('<html');
   if (isHtml) {
-    currentCvHtml = text;
-    // Strip HTML tags for the plain text version (for copy/download)
-    currentCvText = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/[ \t]{2,}/g, ' ').trim();
-    // Show preview in iframe so it renders properly
+    currentCvHtml = rawOrHtml;
+    currentCvText = rawOrHtml.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
     const output = document.getElementById('cv-output');
     output.innerHTML = '';
     const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'width:100%;height:700px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;';
-    iframe.srcdoc = text;
+    iframe.style.cssText = 'width:100%;height:680px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;';
+    iframe.srcdoc = rawOrHtml;
     output.appendChild(iframe);
   } else {
-    // Fallback for plain text
-    currentCvText = text;
+    currentCvText = rawOrHtml;
     currentCvHtml = '';
-    document.getElementById('cv-output').textContent = text;
+    document.getElementById('cv-output').textContent = rawOrHtml;
   }
   document.getElementById('cv-output-wrap').style.display = 'block';
   document.getElementById('cv-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -993,22 +934,24 @@ async function rewriteFromSaved() {
   setLoading('cv-saved', true);
   try {
     const text = await callClaude([{ role: 'user', content: buildCvPrompt(app.title, app.company, app.jd, cvType, app) }], 2800);
-    app.cv = text;
+    const isHtml = text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html');
+    app.cv = isHtml ? text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim() : text;
+    app.cvHtml = isHtml ? text : '';
     await saveApps();
-    showCvOutput(text, app.title + ' — ' + app.company, app.id);
-  } catch (e) { alert('Rewrite failed — please try again.'); }
+    showCvOutput(app.cvHtml || app.cv, app.title + ' — ' + app.company, app.id);
+  } catch (e) { toast('Rewrite failed — please try again.'); }
   setLoading('cv-saved', false);
 }
 
 async function rewriteManual() {
   const raw = document.getElementById('cv-raw-m').value.trim();
-  if (!raw) { alert('Please paste a job posting.'); return; }
+  if (!raw) { toast('Please paste a job posting first'); return; }
   const cvType = document.getElementById('cv-type-m').value;
   setLoading('cv-manual', true);
   try {
     const text = await callClaude([{ role: 'user', content: buildCvPrompt('Role', 'Company', raw, cvType, null) }], 2800);
     showCvOutput(text, 'Custom CV');
-  } catch (e) { alert('Rewrite failed — please try again.'); }
+  } catch (e) { toast('Rewrite failed — please try again.'); }
   setLoading('cv-manual', false);
 }
 
@@ -1018,23 +961,15 @@ function downloadCv() {
   const a = Object.assign(document.createElement('a'), {
     href: URL.createObjectURL(new Blob([currentCvText], { type: 'text/plain' })),
     download: 'Micaela_CV_' + (currentCvTitle || 'tailored').replace(/[^a-zA-Z0-9]/g, '_') + '.txt'
-  });
-  a.click();
+  }); a.click();
 }
 
 function openAsGoogleDoc() {
-  if (!currentCvHtml) {
-    toast('No CV to open — generate a CV first.');
-    return;
-  }
-  // Open the HTML CV in a new tab — user selects all, copies, pastes into Google Docs
-  const blob = new Blob([currentCvHtml], { type: 'text/html;charset=utf-8' });
+  if (!currentCvHtml && !currentCvText) { toast('Generate a CV first'); return; }
+  const blob = new Blob([currentCvHtml || currentCvText], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  if (win) {
-    win.onload = () => setTimeout(() => URL.revokeObjectURL(url), 5000);
-  }
-  toast('📄 CV opened in new tab — press Ctrl+A, Ctrl+C, then paste into a new Google Doc at docs.new');
+  window.open(url, '_blank');
+  toast('📄 Opened in new tab — Ctrl+A, Ctrl+C, paste into docs.new');
 }
 
 // ── TRACKER ───────────────────────────────────────────────────────────────────
@@ -1050,7 +985,7 @@ function renderTracker() {
   const el = document.getElementById('jobs-list');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div style="font-size:40px;margin-bottom:1rem;">🌸</div><div class="empty-title">No applications ${fitF || statusF ? 'match your filters' : 'yet'}</div><div>${fitF || statusF ? 'Try clearing filters' : 'Analyse a job to get started'}</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div style="font-size:36px;margin-bottom:1rem;">🌸</div><div class="empty-title">No applications ${fitF || statusF ? 'match your filters' : 'yet'}</div><div>${fitF || statusF ? 'Try clearing filters' : 'Analyse a job to get started'}</div></div>`;
     return;
   }
   el.innerHTML = list.map(renderJobCard).join('');
@@ -1060,21 +995,49 @@ function renderJobCard(a) {
   const fitClass = 'badge-' + (a.fit || 'medium').toLowerCase();
   const statusClass = 'badge-' + (a.status || 'saved').toLowerCase();
   const pc = a.probability >= 70 ? '#2D6A4F' : a.probability >= 50 ? '#B5830A' : '#C0392B';
-  const cvBtn = a.cv ? `<button class="btn btn-outline" style="padding:5px 12px;font-size:12px;" onclick="event.stopPropagation();viewSavedCv(${a.id})">View CV</button>` : '';
-  const tsLines = (a.transferable_skills || '').split('\n').filter(l => l.trim().startsWith('•'));
-  const tsTags = tsLines.map(l => `<span class="tag">${esc(l.replace(/^•\s*/, '').split('→')[0].trim().slice(0, 45))}</span>`).join('');
+  const hasCv = !!(a.cvHtml || a.cv);
+
+  // Build transferable skill tags
+  const tsItems = parseArray(a.transferable_skills);
+  const tsTags = tsItems.slice(0,3).map(t => `<span class="tag">${esc(String(typeof t==='object'?t.text||'':t).slice(0,40))}</span>`).join('');
+
+  // Requirements list
+  const reqs = parseArray(a.requirements);
+  const reqHtml = reqs.map(r => `<div style="font-size:12px;color:var(--text2);padding:2px 0;">• ${esc(String(r))}</div>`).join('');
+
+  // Talk points
+  const tps = parseArray(a.talk_points);
+  const tpHtml = tps.map(t => `<div style="font-size:12px;color:var(--text2);padding:2px 0;">• ${esc(String(t))}</div>`).join('');
+
+  // CV history section
+  const cvSection = hasCv ? `
+    <div class="drawer-full" style="margin-top:4px;">
+      <div class="drawer-label">📄 CV used for this application</div>
+      ${a.cvHtml
+        ? `<iframe class="cv-preview-frame" srcdoc="${esc(a.cvHtml)}"></iframe>`
+        : `<div class="cv-preview-text">${esc(a.cv)}</div>`
+      }
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline" style="padding:6px 14px;font-size:12px;" onclick="event.stopPropagation();copyAppCv(${a.id})">Copy CV</button>
+        <button class="btn btn-outline" style="padding:6px 14px;font-size:12px;" onclick="event.stopPropagation();rewriteAppCv(${a.id})">Rewrite CV</button>
+      </div>
+    </div>` : `
+    <div class="drawer-full" style="margin-top:4px;">
+      <div class="drawer-label">📄 CV</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">No CV saved for this application yet.</div>
+      <button class="btn btn-outline" style="padding:6px 14px;font-size:12px;" onclick="event.stopPropagation();rewriteAppCv(${a.id})">Generate CV now →</button>
+    </div>`;
 
   return `<div class="job-card" onclick="toggleDrawer(${a.id})">
     <div class="jc-top">
       <div>
         <div class="jc-title">${esc(a.title)}</div>
-        <div class="jc-company">${esc(a.company)}${a.location ? ' · ' + esc(a.location) : ''}</div>
+        <div class="jc-company">${esc(a.company)}${a.location ? ' · ' + esc(a.location) : ''}${a.appliedDate ? ' · Applied ' + esc(a.appliedDate) : ''}</div>
       </div>
       <div class="jc-badges">
         <span class="badge ${fitClass}">${a.fit || '—'}</span>
         <span class="badge ${statusClass}">${a.status}</span>
-        ${cvBtn}
-        ${a.status === 'Saved' ? `<button class="btn btn-applied" style="padding:4px 12px;font-size:12px;" onclick="event.stopPropagation();markApplied(${a.id})">✓ Applied</button>` : ''}
+        ${a.status === 'Saved' ? `<button class="btn btn-applied" style="padding:3px 10px;font-size:12px;" onclick="event.stopPropagation();markApplied(${a.id})">✓ Applied</button>` : ''}
         <button class="del-btn" onclick="event.stopPropagation();deleteApp(${a.id})">✕</button>
       </div>
     </div>
@@ -1089,44 +1052,80 @@ function renderJobCard(a) {
       </div>
       <div class="jc-meta-item">Score: <strong style="color:var(--text);">${a.score}/10</strong></div>
       <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus(${a.id},this.value)">
-        ${['Saved', 'Applied', 'Interview', 'Rejected', 'Offer'].map(s => `<option ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+        ${['Saved','Applied','Interview','Rejected','Offer'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}
       </select>
     </div>
+    ${tsTags ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">${tsTags}</div>` : ''}
     <div id="drawer-${a.id}" class="drawer">
       <div class="drawer-grid">
-        <div><div class="drawer-label">Verdict</div><div class="drawer-content">${esc(a.verdict)}</div></div>
-        <div><div class="drawer-label">Key requirements</div><div class="drawer-content">${esc(a.requirements)}</div></div>
-        <div><div class="drawer-label">Gaps &amp; how to handle</div><div class="drawer-content">${esc(a.gaps)}</div></div>
-        <div><div class="drawer-label">CV recommended</div><div class="drawer-content">${esc(a.cv_recommendation)}</div></div>
-        <div class="drawer-full"><div class="drawer-label">When they reach out</div><div class="drawer-content">${esc(a.talk_points)}</div></div>
-        ${tsTags ? `<div class="drawer-full"><div class="drawer-label">Transferable skills</div><div class="transferable-tags">${tsTags}</div></div>` : ''}
-        <div class="drawer-full"><div class="drawer-label">Notes</div>
-          <input class="notes-input" type="text" placeholder="Add notes..." value="${(a.notes || '').replace(/"/g, '&quot;')}" onchange="patchApp(${a.id},{notes:this.value})" onclick="event.stopPropagation()">
+        <div>
+          <div class="drawer-label">What the AI thinks</div>
+          <div class="drawer-content">${esc(a.verdict)}</div>
         </div>
+        <div>
+          <div class="drawer-label">Key requirements</div>
+          ${reqHtml || '<div class="drawer-content">—</div>'}
+        </div>
+        <div>
+          <div class="drawer-label">Gaps &amp; severity</div>
+          <div>${parseArray(a.gaps).map(g=>{const isObj=typeof g==='object'&&g!==null;const text=isObj?g.text:String(g).replace(/^(Dealbreaker|Workable|Minor)[:\s]*/i,'');const sev=isObj?g.severity:'Workable';return `<div style="font-size:12px;color:var(--text2);padding:2px 0;">⚠ ${esc(text)} <em style="color:var(--text3);font-size:11px;">(${esc(sev)})</em></div>`;}).join('')||'<div class="drawer-content">—</div>'}</div>
+        </div>
+        <div>
+          <div class="drawer-label">When they reach out</div>
+          ${tpHtml || '<div class="drawer-content">—</div>'}
+        </div>
+        <div class="drawer-full">
+          <div class="drawer-label">Notes</div>
+          <input class="notes-input" type="text" placeholder="Add notes..." value="${(a.notes||'').replace(/"/g,'&quot;')}" onchange="patchApp(${a.id},{notes:this.value})" onclick="event.stopPropagation()">
+        </div>
+        ${cvSection}
       </div>
     </div>
   </div>`;
 }
 
-function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function markApplied(id) { patchApp(id, { status: 'Applied' }); toast('Marked as Applied! Good luck! 💌'); }
+function copyAppCv(id) {
+  const a = apps.find(x => x.id === id);
+  if (!a) return;
+  const text = a.cv || '';
+  navigator.clipboard.writeText(text).then(() => toast('CV copied! 💅'));
+}
+
+function rewriteAppCv(id) {
+  nav('cv');
+  const sel = document.getElementById('cv-job-select');
+  if (sel) { sel.value = id; }
+  document.getElementById('cv-type-saved').value = 'auto';
+}
+
+function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function markApplied(id) { patchApp(id, { status: 'Applied', appliedDate: new Date().toLocaleDateString('en-ZA') }); toast('Marked as Applied! Good luck! 💌'); }
 function markCurrentCvApplied() {
   if (!currentCvAppId) return;
-  patchApp(currentCvAppId, { status: 'Applied' });
+  patchApp(currentCvAppId, { status: 'Applied', appliedDate: new Date().toLocaleDateString('en-ZA') });
   document.getElementById('cv-applied-wrap').style.display = 'none';
   toast('Marked as Applied! Good luck! 💌');
 }
 function toggleDrawer(id) { document.getElementById('drawer-' + id)?.classList.toggle('open'); }
-function updateStatus(id, status) { patchApp(id, { status }); }
+function updateStatus(id, status) {
+  const changes = { status };
+  if (status === 'Applied') changes.appliedDate = new Date().toLocaleDateString('en-ZA');
+  patchApp(id, changes);
+}
 function deleteApp(id) { if (!confirm('Remove this job?')) return; deleteAppById(id); }
-function viewSavedCv(id) { const a = apps.find(x => x.id === id); if (!a || !a.cv) return; nav('cv'); showCvOutput(a.cv, a.title + ' — ' + a.company); }
+function viewSavedCv(id) { const a = apps.find(x => x.id === id); if (!a) return; nav('cv'); showCvOutput(a.cvHtml || a.cv, a.title + ' — ' + a.company, a.id); }
 
 function setLoading(id, on) {
   const l = document.getElementById('loader-' + id);
   if (l) l.classList.toggle('show', on);
   if (id === 'analyze') { const b = document.getElementById('analyze-btn'); if (b) b.disabled = on; }
 }
-function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadApps();
