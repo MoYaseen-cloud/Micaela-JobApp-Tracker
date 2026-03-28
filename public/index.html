@@ -653,8 +653,41 @@ Key requirements: ${analysis.requirements || ''}` : ''}
 4. Inject keywords from the job description naturally throughout for ATS.
 5. Make transferable skills explicit — don't make the reader guess.
 6. Remove or shrink experience that doesn't help this application.
-7. Output the COMPLETE rewritten CV from her name to the last line. No preamble, no commentary, no "Here is your CV" — start directly with her name.
-8. Format it cleanly with clear section headings, consistent spacing, and bullet points.`;
+
+== OUTPUT FORMAT — CRITICAL ==
+Output the CV as clean HTML using EXACTLY this structure. No preamble, no explanation, start directly with <!DOCTYPE html>.
+
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2.5cm; line-height: 1.5; }
+  h1 { font-size: 20pt; font-weight: bold; text-align: center; margin: 0 0 4px 0; color: #1a1a1a; letter-spacing: 1px; }
+  .contact { text-align: center; font-size: 10pt; color: #444; margin-bottom: 4px; }
+  .contact a { color: #1a3a6b; text-decoration: none; }
+  hr { border: none; border-top: 2px solid #1a3a6b; margin: 10px 0 14px 0; }
+  h2 { font-size: 11pt; font-weight: bold; color: #1a3a6b; text-transform: uppercase; letter-spacing: 1.2px; margin: 16px 0 2px 0; border-bottom: 1px solid #c8d8f0; padding-bottom: 3px; }
+  .job-title { font-size: 11pt; font-weight: bold; color: #1a1a1a; margin: 10px 0 1px 0; }
+  .job-meta { font-size: 10pt; font-style: italic; color: #555; margin: 0 0 4px 0; }
+  ul { margin: 4px 0 8px 20px; padding: 0; }
+  li { margin-bottom: 3px; font-size: 11pt; }
+  p { margin: 3px 0 6px 0; font-size: 11pt; }
+  .competencies { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .comp-item { background: #f0f4ff; border: 1px solid #c8d8f0; border-radius: 3px; padding: 2px 8px; font-size: 10pt; color: #1a3a6b; }
+</style>
+</head><body>
+
+[NAME as h1]
+[Contact line as .contact with | separators]
+<hr>
+
+[Each section as h2]
+[Job titles as .job-title, company/dates as .job-meta]
+[Bullets as ul/li]
+[Competencies as .competencies with individual .comp-item spans]
+
+</body></html>
+
+Use real content — this is just the structure guide. Output valid complete HTML only.`;
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -910,10 +943,31 @@ function clearForm() {
 // ── CV REWRITER ───────────────────────────────────────────────────────────────
 let currentCvText = '';
 let currentCvTitle = '';
+let currentCvHtml = '';
 
 function showCvOutput(text, title) {
-  currentCvText = text; currentCvTitle = title;
-  document.getElementById('cv-output').textContent = text;
+  currentCvTitle = title;
+  // Check if the output is HTML
+  const isHtml = text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html');
+  if (isHtml) {
+    currentCvHtml = text;
+    // Strip HTML tags for the plain text version (for copy/download)
+    currentCvText = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, '
+').trim();
+    // Show preview in iframe so it renders properly
+    const output = document.getElementById('cv-output');
+    output.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:100%;height:700px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;';
+    iframe.srcdoc = text;
+    output.appendChild(iframe);
+  } else {
+    // Fallback for plain text
+    currentCvText = text;
+    currentCvHtml = '';
+    document.getElementById('cv-output').textContent = text;
+  }
   document.getElementById('cv-output-wrap').style.display = 'block';
   document.getElementById('cv-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -955,116 +1009,19 @@ function downloadCv() {
   a.click();
 }
 
-function cvTextToHtml(text) {
-  // Convert plain text CV into nicely formatted HTML that Google Docs renders well
-  const lines = text.split('\n');
-  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <style>
-    body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2cm; line-height: 1.4; }
-    h1 { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 2px; color: #1a1a1a; }
-    .contact { text-align: center; font-size: 10pt; color: #444; margin-bottom: 16px; }
-    hr { border: none; border-top: 1.5px solid #333; margin: 10px 0; }
-    h2 { font-size: 12pt; font-weight: bold; color: #1a3a6b; margin-top: 14px; margin-bottom: 2px; border-bottom: 1px solid #c8d8f0; padding-bottom: 2px; }
-    h3 { font-size: 11pt; font-weight: bold; margin: 8px 0 0 0; color: #1a1a1a; }
-    .company { font-size: 10pt; font-style: italic; color: #555; margin-bottom: 4px; }
-    ul { margin: 4px 0 8px 18px; padding: 0; }
-    li { margin-bottom: 2px; font-size: 11pt; }
-    p { margin: 3px 0; font-size: 11pt; }
-    .cert { margin-bottom: 2px; }
-  </style></head><body>`;
-
-  let inList = false;
-  let isFirst = true;
-  let nameWritten = false;
-  let contactLines = [];
-  let collectingContact = false;
-
-  const sectionKeywords = ['PROFESSIONAL SUMMARY','CORE COMPETENCIES','PROFESSIONAL EXPERIENCE',
-    'EXPERIENCE','EDUCATION','CERTIFICATIONS','HONOURS','AWARDS','TECHNICAL','SKILLS','ADDITIONAL','PROFILE'];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) {
-      if (inList) { html += '</ul>'; inList = false; }
-      continue;
-    }
-
-    // First non-empty line = name
-    if (isFirst && !nameWritten) {
-      html += `<h1>${line}</h1>`;
-      nameWritten = true; isFirst = false; collectingContact = true; continue;
-    }
-
-    // Collect contact lines (next 1-2 lines after name)
-    if (collectingContact && contactLines.length < 3 && !sectionKeywords.some(k => line.toUpperCase().includes(k))) {
-      contactLines.push(line);
-      if (contactLines.length >= 2 || lines[i+1] && sectionKeywords.some(k => lines[i+1].toUpperCase().includes(k))) {
-        html += `<div class="contact">${contactLines.join(' | ')}</div><hr>`;
-        collectingContact = false;
-      }
-      continue;
-    }
-    collectingContact = false;
-
-    // Section headings
-    if (sectionKeywords.some(k => line.toUpperCase() === k || line.toUpperCase().startsWith(k + ':') || line.toUpperCase().startsWith('==='))) {
-      if (inList) { html += '</ul>'; inList = false; }
-      const cleanHead = line.replace(/^===+|===+$/g,'').replace(/:/g,'').trim();
-      html += `<h2>${cleanHead}</h2>`; continue;
-    }
-
-    // Job title lines (bold, no bullet, followed by italic company line)
-    if (!line.startsWith('•') && !line.startsWith('-') && !line.startsWith('*') &&
-        line === line && /[A-Z]/.test(line[0]) &&
-        i+1 < lines.length && (lines[i+1].includes('|') || lines[i+1].includes('–') || lines[i+1].includes('-'))) {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += `<h3>${line}</h3>`; continue;
-    }
-
-    // Company/date line (italic)
-    if ((line.includes('|') || line.includes('–')) && !line.startsWith('•') &&
-        (line.includes('20') || line.includes('University') || line.includes('Ltd') || line.includes('Inc'))) {
-      html += `<div class="company">${line}</div>`; continue;
-    }
-
-    // Bullet points
-    if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
-      if (!inList) { html += '<ul>'; inList = true; }
-      const txt = line.replace(/^[•\-\*]\s*/,'');
-      html += `<li>${txt}</li>`; continue;
-    }
-
-    // Regular paragraph
-    if (inList) { html += '</ul>'; inList = false; }
-    html += `<p>${line}</p>`;
-  }
-
-  if (inList) html += '</ul>';
-  html += '</body></html>';
-  return html;
-}
-
 function openAsGoogleDoc() {
-  const htmlContent = cvTextToHtml(currentCvText);
-  const blob = new Blob([htmlContent], { type: 'text/html' });
+  if (!currentCvHtml) {
+    toast('No CV to open — generate a CV first.');
+    return;
+  }
+  // Open the HTML CV in a new tab — user selects all, copies, pastes into Google Docs
+  const blob = new Blob([currentCvHtml], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-
-  // Open the formatted HTML in a new tab — user can then File > Save and import to Google Docs
-  // OR we encode it as a data URI for direct open
-  const encoded = encodeURIComponent(htmlContent);
-  const dataUri = 'data:text/html;charset=utf-8,' + encoded;
-
-  // Create a download of the HTML file — user opens it in browser, copies all, pastes into Google Doc
-  const a = document.createElement('a');
-  a.href = url;
-  const safeName = (currentCvTitle || 'CV').replace(/[^a-zA-Z0-9 _-]/g, '').trim();
-  a.download = 'Micaela_CV_' + safeName.replace(/\s+/g,'_') + '.html';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  toast('📄 HTML file downloaded! Open it in your browser, select all (Ctrl+A), copy, paste into a Google Doc.');
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.onload = () => setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  toast('📄 CV opened in new tab — press Ctrl+A, Ctrl+C, then paste into a new Google Doc at docs.new');
 }
 
 // ── TRACKER ───────────────────────────────────────────────────────────────────
