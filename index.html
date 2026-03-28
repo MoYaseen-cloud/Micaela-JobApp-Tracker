@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micaela — Job Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F5F0;--surface:#FFFFFF;--surface2:#F2F0EB;
+    --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+    --text:#1A1814;--text2:#6B6860;--text3:#9E9C97;
+    --accent:#2D5016;--accent-light:#EAF0E2;
+    --amber:#8B5E1A;--amber-light:#FDF3E3;
+    --red:#8B1A1A;--red-light:#FDE8E8;
+    --teal:#0F5C52;--teal-light:#E2F4F2;
+    --purple:#3D2B7A;--purple-light:#EDEAF8;
+    --radius:12px;--radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:240px;background:var(--text);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;}
+  .main{margin-left:240px;flex:1;padding:2.5rem;max-width:1100px;}
+  .brand-name{font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:-0.3px;color:#fff;}
+  .brand-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;letter-spacing:0.5px;text-transform:uppercase;}
+  .nav{display:flex;flex-direction:column;gap:4px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);color:rgba(255,255,255,0.55);font-size:14px;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;}
+  .nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.07);}
+  .nav-item.active{color:#fff;background:rgba(255,255,255,0.12);font-weight:500;}
+  .sidebar-stats{margin-top:auto;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:10px;}
+  .ss-item{display:flex;justify-content:space-between;align-items:center;}
+  .ss-label{font-size:12px;color:rgba(255,255,255,0.45);}
+  .ss-val{font-size:13px;font-weight:600;color:#fff;}
+  .page-header{margin-bottom:2rem;}
+  .page-title{font-family:'DM Serif Display',serif;font-size:30px;color:var(--text);letter-spacing:-0.5px;}
+  .page-sub{font-size:14px;color:var(--text2);margin-top:4px;}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:2rem;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;}
+  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:6px;}
+  .stat-val{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-1px;}
+  .section{display:none;}.section.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;}
+  .card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text2);margin-bottom:1.2rem;}
+
+  /* ── SMART PASTE BOX ── */
+  .paste-zone{position:relative;}
+  .paste-textarea{width:100%;min-height:220px;padding:16px 18px;font-size:14px;font-family:'DM Sans',sans-serif;border:2px dashed var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);transition:border-color 0.2s,background 0.2s;outline:none;resize:vertical;line-height:1.7;}
+  .paste-textarea:focus{border-color:var(--accent);background:#fff;border-style:solid;}
+  .paste-textarea::placeholder{color:var(--text3);}
+  .paste-hint{font-size:11px;color:var(--text3);margin-top:6px;letter-spacing:0.2px;}
+
+  /* Extracted preview pills */
+  .extracted-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-height:0;}
+  .ext-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;background:var(--surface);border:1px solid var(--border2);}
+  .ext-pill .pill-label{color:var(--text3);font-weight:400;}
+  .ext-pill .pill-val{color:var(--text);}
+  .ext-pill.extracted{background:var(--accent-light);border-color:rgba(45,80,22,0.2);}
+  .ext-pill.extracted .pill-label{color:var(--accent);opacity:0.7;}
+  .ext-pill.extracted .pill-val{color:var(--accent);}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.full{grid-column:1 / -1;}
+  label{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:0.3px;}
+  input[type=text],textarea,select{width:100%;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);transition:border-color 0.15s;outline:none;}
+  input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent);background:#fff;}
+  textarea{min-height:150px;resize:vertical;line-height:1.6;}
+  .btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;}
+  .btn-primary{background:var(--text);color:#fff;}.btn-primary:hover{background:#2c2b28;}.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);}.btn-outline:hover{background:var(--surface2);}
+  .btn-green{background:var(--accent);color:#fff;}.btn-green:hover{background:#3a6a1e;}
+  .btn-row{display:flex;gap:10px;align-items:center;margin-top:1.2rem;flex-wrap:wrap;}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500;}
+  .badge-high{background:var(--accent-light);color:var(--accent);}
+  .badge-medium{background:var(--amber-light);color:var(--amber);}
+  .badge-low{background:var(--red-light);color:var(--red);}
+  .badge-pending{background:var(--surface2);color:var(--text2);}
+  .badge-applied{background:var(--purple-light);color:var(--purple);}
+  .badge-interview{background:var(--teal-light);color:var(--teal);}
+  .badge-rejected{background:var(--red-light);color:var(--red);}
+  .badge-offer{background:var(--accent-light);color:var(--accent);}
+  .loader-wrap{display:none;align-items:center;gap:12px;padding:1rem 0;color:var(--text2);font-size:14px;}
+  .loader-wrap.show{display:flex;}
+  .spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .ai-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;font-size:13.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;}
+  .result-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:1.2rem;}
+  .metric-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;}
+  .metric-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;}
+  .metric-val{font-size:22px;font-weight:600;color:var(--text);}
+  .prob-track{height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:8px;}
+  .prob-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
+  .jobs-list{display:flex;flex-direction:column;gap:12px;}
+  .job-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem 1.5rem;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;}
+  .job-card:hover{border-color:var(--border2);box-shadow:0 2px 12px rgba(0,0,0,0.05);}
+  .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .jc-title{font-size:16px;font-weight:600;color:var(--text);}
+  .jc-company{font-size:13px;color:var(--text2);margin-top:2px;}
+  .jc-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+  .jc-meta{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap;}
+  .jc-meta-item{font-size:12px;color:var(--text3);}
+  .jc-prob{display:flex;align-items:center;gap:8px;flex:1;min-width:120px;}
+  .jc-prob-label{font-size:12px;font-weight:600;min-width:32px;}
+  .drawer{display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;}
+  .drawer.open{display:block;}
+  .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .drawer-section{margin-bottom:0;}
+  .drawer-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;}
+  .drawer-content{font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap;}
+  .drawer-full{grid-column:1 / -1;}
+  .transferable-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .tag{display:inline-flex;align-items:center;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:500;background:var(--purple-light);color:var(--purple);}
+  .cv-output{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem;font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;font-family:'DM Sans',sans-serif;max-height:600px;overflow-y:auto;}
+  .copy-bar{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;}
+  .status-select{padding:5px 10px;font-size:12px;border:1px solid var(--border2);border-radius:99px;background:var(--surface);color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .filter-bar{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+  .filter-bar select{padding:8px 14px;font-size:13px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);}
+  .sync-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;padding:1rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);}
+  .sync-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);}
+  .sync-note{font-size:12px;color:var(--text3);}
+  .del-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);font-size:14px;transition:all 0.15s;}
+  .del-btn:hover{background:var(--red-light);color:var(--red);}
+  .notes-input{width:100%;padding:8px 12px;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;margin-top:6px;}
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--text3);}
+  .empty-title{font-size:16px;color:var(--text2);font-weight:500;margin-bottom:6px;}
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--text);color:#fff;padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;}
+  .inner-tabs{display:flex;gap:4px;margin-bottom:1.2rem;border-bottom:1px solid var(--border);}
+  .inner-tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+  .inner-tab.active{color:var(--text);border-bottom-color:var(--text);}
+
+  /* Step indicator */
+  .step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:1.4rem;}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:background 0.2s;}
+  .step-dot.done{background:var(--accent);}
+  .step-dot.active{background:var(--text);width:24px;border-radius:99px;}
+  .step-label{font-size:12px;color:var(--text3);}
+
+  /* Extract status banner */
+  .extract-banner{display:none;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1rem;border:1px solid;}
+  .extract-banner.show{display:flex;}
+  .extract-banner.success{background:var(--accent-light);border-color:rgba(45,80,22,0.2);color:var(--accent);}
+  .extract-banner.error{background:var(--red-light);border-color:rgba(139,26,26,0.2);color:var(--red);}
+
+  @media(max-width:768px){
+    .sidebar{width:100%;height:auto;position:relative;padding:1rem;flex-direction:row;flex-wrap:wrap;}
+    .main{margin-left:0;padding:1.5rem 1rem;}
+    .app{flex-direction:column;}
+    .stats-row,.result-metrics{grid-template-columns:1fr 1fr;}
+    .form-grid,.drawer-grid{grid-template-columns:1fr;}
+    .sidebar-stats{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand-name">Micaela</div>
+      <div class="brand-sub">Job tracker</div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" onclick="nav('add')"><span style="width:18px;text-align:center;">+</span> Add application</button>
+      <button class="nav-item" onclick="nav('tracker')"><span style="width:18px;text-align:center;">≡</span> Tracker</button>
+      <button class="nav-item" onclick="nav('cv')"><span style="width:18px;text-align:center;">✦</span> CV rewriter</button>
+    </nav>
+    <div class="sidebar-stats">
+      <div class="ss-item"><span class="ss-label">Total applied</span><span class="ss-val" id="ss-total">0</span></div>
+      <div class="ss-item"><span class="ss-label">Interviews</span><span class="ss-val" id="ss-int">0</span></div>
+      <div class="ss-item"><span class="ss-label">Avg probability</span><span class="ss-val" id="ss-prob">—</span></div>
+      <div class="ss-item"><span class="ss-label">Offers</span><span class="ss-val" id="ss-offers">0</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ADD APPLICATION -->
+    <div id="sec-add" class="section active">
+      <div class="page-header">
+        <div class="page-title">New application</div>
+        <div class="page-sub">Paste the entire job posting — AI extracts the details and analyses your fit automatically</div>
+      </div>
+
+      <!-- STEP 1: SMART PASTE -->
+      <div class="card" id="step-paste-card">
+        <div class="card-title">Step 1 — Paste the job posting</div>
+        <div class="paste-zone">
+          <textarea
+            class="paste-textarea"
+            id="inp-raw-paste"
+            placeholder="Paste the entire job posting here — job title, company name, description, requirements, everything. Don't worry about formatting.&#10;&#10;AI will automatically extract the details and analyse your fit in one step."
+            oninput="onPasteInput()"
+          ></textarea>
+          <div class="paste-hint">Tip: Copy everything from the job ad — more context = smarter analysis</div>
+        </div>
+
+        <!-- Extracted preview pills -->
+        <div class="extracted-preview" id="extracted-preview"></div>
+
+        <div id="extract-banner" class="extract-banner"></div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="analyze-btn" onclick="analyzeJob()">Extract &amp; Analyse →</button>
+          <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+          <span style="font-size:12px;color:var(--text3);">Claude extracts title, company, location, source — then deeply analyses your fit</span>
+        </div>
+        <div class="loader-wrap" id="loader-analyze"><div class="spinner"></div> <span id="loader-analyze-msg">Claude is reading the job posting and reasoning about your fit...</span></div>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div id="result-panel" style="display:none;">
+        <div class="card">
+          <div class="card-title">AI analysis</div>
+
+          <!-- Extracted fields display -->
+          <div id="extracted-fields-display" style="margin-bottom:1.4rem;padding:1rem 1.2rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:10px;">Extracted from posting</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+              <span class="ext-pill extracted"><span class="pill-label">Title</span>&nbsp;<span class="pill-val" id="disp-title">—</span></span>
+              <span class="ext-pill extracted"><span class="pill-label">Company</span>&nbsp;<span class="pill-val" id="disp-company">—</span></span>
+              <span class="ext-pill extracted"><span class="pill-label">Location</span>&nbsp;<span class="pill-val" id="disp-location">—</span></span>
+              <span class="ext-pill extracted"><span class="pill-label">Source</span>&nbsp;<span class="pill-val" id="disp-source">—</span></span>
+            </div>
+          </div>
+
+          <div class="result-metrics">
+            <div class="metric-box">
+              <div class="metric-label">Fit match</div>
+              <span id="res-fit" class="badge" style="font-size:15px;padding:5px 14px;">—</span>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Interview probability</div>
+              <div class="metric-val" id="res-prob">—</div>
+              <div class="prob-track"><div class="prob-fill" id="res-prob-bar" style="width:0%"></div></div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Ranking score</div>
+              <div class="metric-val"><span id="res-score">—</span><span style="font-size:14px;color:var(--text3);font-weight:400;"> /10</span></div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Honest verdict</label>
+            <div class="ai-block" id="res-verdict"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Transferable skills — exactly how her background maps to this role</label>
+            <div class="ai-block" id="res-transferable"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Gaps — what she's missing and how to handle it at interview</label>
+            <div class="ai-block" id="res-gaps"></div>
+          </div>
+          <div class="form-grid" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label>Key requirements</label>
+              <div class="ai-block" id="res-requirements"></div>
+            </div>
+            <div class="form-group">
+              <label>Which CV version to use</label>
+              <div class="ai-block" id="res-cv"></div>
+            </div>
+            <div class="form-group full">
+              <label>When they reach out — what to say</label>
+              <div class="ai-block" id="res-talkpoints"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-green" id="save-rewrite-btn" onclick="saveAndRewrite()">Save &amp; rewrite CV →</button>
+            <button class="btn btn-outline" onclick="saveOnly()">Save without rewriting</button>
+          </div>
+          <div class="loader-wrap" id="loader-cv"><div class="spinner"></div> Crafting a fully tailored CV for this exact role...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACKER -->
+    <div id="sec-tracker" class="section">
+      <div class="page-header">
+        <div class="page-title">Application tracker</div>
+        <div class="page-sub">Click any card to expand the full breakdown, gaps, and talking points</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val" id="t-total">0</div></div>
+        <div class="stat-card"><div class="stat-label">Interviews</div><div class="stat-val" id="t-int">0</div></div>
+        <div class="stat-card"><div class="stat-label">Avg probability</div><div class="stat-val" id="t-prob">—</div></div>
+        <div class="stat-card"><div class="stat-label">Offers</div><div class="stat-val" id="t-offers">0</div></div>
+      </div>
+
+      <div class="sync-bar">
+        <span class="sync-label">Sync</span>
+        <button class="btn btn-outline" style="padding:7px 14px;font-size:13px;" onclick="exportData()">Export data</button>
+        <label class="btn btn-outline" style="padding:7px 14px;font-size:13px;cursor:pointer;">
+          Import &amp; merge
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+        </label>
+        <span class="sync-note">Export on one device → WhatsApp/email the file → Import on the other. Merges without overwriting.</span>
+      </div>
+
+      <div class="filter-bar">
+        <select id="f-fit" onchange="renderTracker()"><option value="">All fits</option><option>High</option><option>Medium</option><option>Low</option></select>
+        <select id="f-status" onchange="renderTracker()"><option value="">All statuses</option><option>Pending</option><option>Applied</option><option>Interview</option><option>Rejected</option><option>Offer</option></select>
+        <select id="f-sort" onchange="renderTracker()"><option value="date">Newest first</option><option value="prob">Highest probability</option><option value="score">Highest score</option></select>
+      </div>
+      <div id="jobs-list" class="jobs-list"></div>
+    </div>
+
+    <!-- CV REWRITER -->
+    <div id="sec-cv" class="section">
+      <div class="page-header">
+        <div class="page-title">CV rewriter</div>
+        <div class="page-sub">Full tailored CV — copy-paste ready or download as a file</div>
+      </div>
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="cvTab('saved')">From saved applications</button>
+        <button class="inner-tab" onclick="cvTab('manual')">New job description</button>
+      </div>
+      <div id="cv-saved">
+        <div class="card">
+          <div class="card-title">Select application</div>
+          <div class="form-group"><label>Saved job</label><select id="cv-job-select" style="border-radius:var(--radius-sm);"></select></div>
+          <div class="form-group" style="margin-top:1rem;">
+            <label>CV type</label>
+            <select id="cv-type-saved" style="border-radius:var(--radius-sm);">
+              <option value="auto">AI decides best version</option>
+              <option value="admin">Admin / Healthcare / Sales CV</option>
+              <option value="science">Science / Lab / Research CV</option>
+              <option value="hybrid">Hybrid — merge both</option>
+            </select>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" onclick="rewriteFromSaved()">Rewrite CV →</button></div>
+          <div class="loader-wrap" id="loader-cv-saved"><div class="spinner"></div> Writing your tailored CV...</div>
+        </div>
+      </div>
+      <div id="cv-manual" style="display:none;">
+        <div class="card">
+          <div class="card-title">Paste job posting</div>
+          <div class="form-group full">
+            <label>Full job posting — paste everything, AI will extract what it needs</label>
+            <textarea id="cv-raw-m" style="min-height:200px;" placeholder="Paste the entire job posting here..."></textarea>
+          </div>
+          <div class="form-group" style="margin-top:0.5rem;">
+            <label>CV type</label>
+            <select id="cv-type-m" style="border-radius:var(--radius-sm);">
+              <option value="auto">AI decides best version</option>
+              <option value="admin">Admin / Healthcare / Sales CV</option>
+              <option value="science">Science / Lab / Research CV</option>
+              <option value="hybrid">Hybrid — merge both</option>
+            </select>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" onclick="rewriteManual()">Rewrite CV →</button></div>
+          <div class="loader-wrap" id="loader-cv-manual"><div class="spinner"></div> Writing your tailored CV...</div>
+        </div>
+      </div>
+      <div id="cv-output-wrap" style="display:none;">
+        <div class="card">
+          <div class="card-title">Tailored CV — copy &amp; paste ready</div>
+          <div class="cv-output" id="cv-output"></div>
+          <div class="copy-bar">
+            <button class="btn btn-outline" onclick="copyCv()">Copy to clipboard</button>
+            <button class="btn btn-green" onclick="downloadCv()">Download as .txt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── MICAELA'S FULL PROFILE ────────────────────────────────────────────────────
+const PROFILE = `
+MICAELA ABYDELLE HARRIPERSADH
+Durban, South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053
+
+EDUCATION
+- Honours in Forensic Genetics, Cum Laude — University of KwaZulu-Natal, Feb 2025 – Nov 2025
+  Subjects: Forensic DNA Analysis, Study Design & Statistical Analysis, Quality Assurance in Forensic Genetics Laboratories, Scientific Reporting
+- Bachelor of Science in Biological Sciences — University of KwaZulu-Natal, Feb 2022 – Nov 2024
+
+AWARDS & CERTIFICATIONS
+- Dean's Commendation (awarded to top-performing students at UKZN)
+- Certificate of Merit: Forensic Genetics Research Project (GENE756)
+- Certificate of Merit: Forensic Genetics Analysis & Interpretation (GENE752)
+- Certificate of Merit: Quality Assurance in Forensic Genetics Laboratories (GENE753)
+- ICH-GCP E6 (R2) Certification — The Global Health Network, April 2025
+- Research Ethics Certificate, May 2025
+- Code 8 Driver's Licence
+
+WORK EXPERIENCE
+
+Laboratory Demonstrator | University of KwaZulu-Natal | Jul 2025 – Dec 2025
+Ran lab practical sessions for first-year students. First point of contact for all student queries. Maintained accurate attendance and performance records. Explained complex biological/medical concepts clearly. Collaborated with academic staff on coordination.
+
+Honours Researcher (Independent Primary Investigator) | UKZN | Jul 2024 – Dec 2025
+Designed and ran a full year-long research project completely independently — from literature review through methodology, data collection, statistical analysis, and thesis submission. Managed digital file organisation using cloud tools. Produced formal written documentation and reports.
+
+Research Assistant | University of KwaZulu-Natal | Jul 2024 – Dec 2025
+Assisted in Moringa oleifera and HIV/HPV studies. Collected data with strict attention to accuracy and protocol compliance. Organised, labelled, and managed biological samples. Conducted literature reviews.
+
+Business Development Representative | RaysGM | Jun 2023 – Feb 2024
+Promoted from Junior Sales Rep within months. Prospected new clients, ran consultative sales conversations, converted leads. Built and maintained long-term client relationships. Managed sales pipeline and deal tracking.
+
+Junior Sales Representative / Customer Service | RaysGM | Jan 2023 – May 2023
+Handled high-volume inbound and outbound communications. Maintained detailed client interaction records. Supported admin tasks and CRM updates. Handled sensitive client information professionally.
+
+Luxury Perfume Promoter | Designer Scents | Jan 2022 – Dec 2022
+Promoted and sold luxury fragrance brands in retail. Personalised consultations. Consistently upsold premium products. Maintained product knowledge across multiple lines.
+
+TECHNICAL SKILLS
+- Laboratory: DNA extraction, touch DNA analysis, PCR, sample handling, GLP compliance
+- Data: Statistical analysis, data interpretation, scientific software
+- Admin: Microsoft Office, Google Workspace, CRM systems, OneDrive/cloud file management
+- Compliance: GCP certified, research ethics trained, quality assurance methodology
+`;
+
+const MASTER_CV = `MICAELA ABYDELLE HARRIPERSADH
+South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053 | linkedin.com/in/micaela-abydelle-harripersadh-a3a139238
+
+=== PROFILE A: ADMIN / HEALTHCARE / SALES ===
+
+PROFESSIONAL SUMMARY
+Detail-oriented healthcare administration candidate with an Honours degree in Forensic Genetics (Cum Laude) and hands-on experience supporting academic, laboratory, and client-facing environments. Proven ability to maintain accurate records, manage schedules, organise digital documentation, and support multidisciplinary teams. Strong written and verbal communication, high attention to detail, and comfortable working within structured healthcare settings and virtual environments.
+
+CORE COMPETENCIES
+Healthcare Administration | Digital File Management | Scheduling & Calendar Coordination | Record-Keeping & Documentation | Client & Staff Profile Management | Administrative Support for Clinical Teams | Written & Verbal Communication | Time Management | Attention to Detail | Confidential Information Handling | CRM Proficiency
+
+PROFESSIONAL EXPERIENCE
+
+Laboratory Demonstrator — University of KwaZulu-Natal | Jul 2025 – Dec 2025
+• First point of contact for student queries in structured lab sessions
+• Explained complex biological and medical concepts clearly to individuals with varying levels of understanding
+• Maintained accurate attendance records, performance documentation, and session data
+• Collaborated with academic and lab staff to ensure smooth coordination and issue resolution
+
+Honours Researcher (Primary Investigator) — University of KwaZulu-Natal | Jul 2024 – Dec 2025
+• Independently managed a full-year research project including digital file organisation, version control, and data documentation
+• Produced detailed formal documentation, reports, and academic submissions to a high standard of accuracy
+• Managed multiple concurrent deadlines and task prioritisation without supervision
+• Organised structured digital folders using cloud-based tools throughout the project lifecycle
+
+Business Development Representative — RaysGM | Jun 2023 – Feb 2024
+• Promoted from Junior Sales Representative based on consistent performance and client engagement
+• Prospected and converted leads using a consultative approach tailored to client needs
+• Built and maintained long-term client relationships contributing to repeat business and retention
+• Managed pipeline tracking, deal records, and client communication across multiple accounts
+
+Junior Sales Representative / Customer Service — RaysGM | Jan 2023 – May 2023
+• Handled high-volume inbound and outbound communications including bookings, inquiries, and follow-ups
+• Maintained detailed records of client interactions and service histories in CRM
+• Supported admin tasks, reporting, and data entry
+• Handled sensitive client information with professionalism and confidentiality
+
+Luxury Perfume Promoter — Designer Scents | Jan 2022 – Dec 2022
+• Promoted luxury fragrance brands through personalised customer consultations
+• Consistently upsold premium products by highlighting features, benefits, and brand value
+• Maintained product knowledge across multiple lines to support confident client engagement
+
+EDUCATION
+Honours in Forensic Genetics (Cum Laude) — University of KwaZulu-Natal | Feb 2025 – Nov 2025
+Bachelor of Science in Biological Sciences — University of KwaZulu-Natal | Feb 2022 – Nov 2024
+
+ADDITIONAL
+Microsoft Office Suite | Google Workspace | CRM systems | Cloud file management | Code 8 Driver's Licence
+
+=== PROFILE B: SCIENCE / LAB / RESEARCH ===
+
+PROFESSIONAL SUMMARY
+Detail-oriented and highly motivated Honours graduate (Cum Laude) in Forensic Genetics with a BSc in Biological Sciences. Experienced in laboratory research, forensic DNA analysis, study design, statistical data analysis, and scientific reporting. Strong foundation in Good Laboratory Practice, quality assurance, and research ethics. Awarded Dean's Commendation and three Certificates of Merit for academic excellence.
+
+CORE COMPETENCIES
+Laboratory Techniques & Sample Processing | DNA Extraction & Forensic DNA Analysis | Good Laboratory Practice (GLP) | Quality Assurance & Compliance | Research Design & Data Analysis | Scientific Reporting & Documentation | Research Ethics & GCP | Communication & Team Collaboration
+
+PROFESSIONAL EXPERIENCE
+
+Research Assistant — University of KwaZulu-Natal | Jul 2024 – Dec 2025
+• Assisted in Moringa oleifera and HIV/HPV research projects
+• Supported data collection ensuring accuracy, consistency, and strict protocol adherence
+• Organised, labelled, and managed biological samples and research materials
+• Conducted literature reviews to support research objectives and methodology development
+
+Laboratory Demonstrator — University of KwaZulu-Natal | Jul 2025 – Dec 2025
+• Guided first-year students through lab practical sessions ensuring GLP and safety compliance
+• Demonstrated laboratory techniques and clarified complex biological and genetic concepts
+• Supported students in data recording, interpretation, and practical assessments
+
+Honours Researcher (Primary Investigator) — University of KwaZulu-Natal | Jul 2024 – Dec 2025
+• Designed and independently executed a full Honours research project as primary investigator
+• Managed end-to-end study design, data collection, statistical analysis, and thesis writing
+• Produced formal scientific reports and submissions to a high academic standard
+
+EDUCATION
+Honours in Forensic Genetics (Cum Laude) — University of KwaZulu-Natal | Feb 2025 – Nov 2025
+Bachelor of Science in Biological Sciences — University of KwaZulu-Natal | Feb 2022 – Nov 2024
+
+CERTIFICATIONS
+• ICH-GCP E6 (R2) — The Global Health Network (Apr 2025)
+• Research Ethics Certificate (May 2025)
+
+HONOURS & AWARDS
+• Dean's Commendation — University of KwaZulu-Natal
+• Certificate of Merit — Forensic Genetics Research Project (GENE756)
+• Certificate of Merit — Forensic Genetics Analysis & Interpretation (GENE752)
+• Certificate of Merit — Quality Assurance in Forensic Genetics Laboratories (GENE753)
+
+TECHNICAL PROFICIENCY
+Laboratory: DNA extraction, touch DNA analysis, PCR, sample handling
+Data: Statistical analysis, data interpretation, scientific software
+Documentation: Scientific reports, research records, compliance documentation
+Tools: Microsoft Office, Google Workspace | Code 8 Driver's Licence`;
+
+// ── PROMPTS ───────────────────────────────────────────────────────────────────
+function buildCombinedPrompt(rawPaste) {
+  return `You are a world-class career strategist and senior recruiter. Your job has two parts:
+PART 1: Extract structured information from the raw job posting.
+PART 2: Deeply analyse whether Micaela is a good fit — going far beyond keyword matching to reason about transferable skills, mindset signals, and the hidden value she brings.
+
+Important framing: Micaela is a Cum Laude Honours graduate who independently ran a full research project, has sales and CRM experience, lab and compliance experience, and administrative exposure. She is NOT just a science grad — she is a versatile, high-potential entry-level candidate with a rare combination of skills. Think creatively about how her background applies.
+
+== MICAELA'S FULL PROFILE ==
+${PROFILE}
+
+== RAW JOB POSTING (extract AND analyse this) ==
+${rawPaste}
+
+== YOUR TASK ==
+Return ONLY raw JSON — no markdown, no code blocks, nothing before or after the JSON.
+
+{
+  "extracted": {
+    "title": "job title extracted from posting, or 'Not specified'",
+    "company": "company name extracted from posting, or 'Not specified'",
+    "location": "location/remote info extracted, or 'Not specified'",
+    "source": "job board or platform if mentioned in the posting (e.g. LinkedIn, Indeed, Careers24), or 'Not specified'",
+    "clean_jd": "the core job description text, cleaned up — remove any application instructions, recruiter contact details, or boilerplate. Keep responsibilities, requirements, and role context."
+  },
+  "fit": "High or Medium or Low",
+  "probability": 0-100 integer,
+  "score": 1-10 integer,
+  "verdict": "3-4 sentences. Be specific — name actual skills and experiences from her background.",
+  "transferable_skills": "4-6 bullet points (use • as bullet). For each, explain specifically HOW it transfers.",
+  "gaps": "2-4 bullet points (use •). For each: name it, say whether dealbreaker or workable, give one concrete way to address at interview.",
+  "requirements": "The 5 most critical things this employer wants (bullet list with •)",
+  "cv_recommendation": "Which CV version (Admin/Healthcare or Science/Lab or Hybrid) and specific explanation why",
+  "talk_points": "4-5 highly specific talking points tied directly to this job description"
+}`;
+}
+
+function buildCvPrompt(title, company, jd, cvType, analysis) {
+  const typeInstruction = {
+    admin: 'Use Profile A (Admin/Healthcare/Sales) as your primary base.',
+    science: 'Use Profile B (Science/Lab/Research) as your primary base.',
+    hybrid: 'Intelligently merge the strongest elements of both profiles based on what this role needs most.',
+    auto: 'Read the job description carefully and decide which profile (or hybrid combination) best serves this application, then use that as your base.'
+  }[cvType] || 'Decide which profile is best.';
+
+  return `You are an expert CV writer and career strategist. Rewrite Micaela's CV so it feels like she was purpose-built for this specific role. Be bold and deliberate — this is not a light edit, it is a strategic rewrite.
+
+${typeInstruction}
+
+== HER MASTER CV (both profiles) ==
+${MASTER_CV}
+
+== HER DEEPER PROFILE ==
+${PROFILE}
+
+== TARGET ROLE ==
+Title: ${title}
+Company: ${company}
+Job Description:
+${jd}
+
+${analysis ? `== PRIOR ANALYSIS ==
+Verdict: ${analysis.verdict || ''}
+Transferable skills identified: ${analysis.transferable_skills || ''}
+Key requirements: ${analysis.requirements || ''}` : ''}
+
+== REWRITING INSTRUCTIONS ==
+1. Rewrite the Professional Summary so the FIRST sentence immediately names what she is and why she fits THIS role specifically. Mirror the language from the job description.
+2. Within each role, reorder bullet points so the most relevant ones for THIS job appear first.
+3. Reframe experience language to use the vocabulary of this industry — without inventing or exaggerating anything.
+4. Inject keywords from the job description naturally throughout (ATS optimisation).
+5. Highlight transferable skills explicitly — don't assume the reader will connect the dots themselves.
+6. Trim or remove experience that adds no value for this specific role.
+7. Keep the format clean and scannable.
+8. Output the FULL rewritten CV — not a summary, not a snippet. Everything from name to the last line.
+9. No commentary, no preamble — just the CV itself, starting with her name.`;
+}
+
+// ── API CALL (via backend) ────────────────────────────────────────────────────
+async function callClaude(messages, maxTokens = 1800) {
+  const resp = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || `Server error ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.content.map(i => i.text || '').join('');
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let apps = JSON.parse(localStorage.getItem('mica_apps_v3') || '[]');
+let pending = null;
+let currentCvText = '';
+let currentCvTitle = '';
+
+function saveApps() {
+  localStorage.setItem('mica_apps_v3', JSON.stringify(apps));
+  updateStats();
+}
+
+function updateStats() {
+  const total = apps.length;
+  const ints = apps.filter(a => a.status === 'Interview').length;
+  const offers = apps.filter(a => a.status === 'Offer').length;
+  const probs = apps.map(a => parseInt(a.probability) || 0).filter(Boolean);
+  const avgP = probs.length ? Math.round(probs.reduce((a, b) => a + b, 0) / probs.length) + '%' : '—';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('ss-total', total); set('ss-int', ints); set('ss-prob', avgP); set('ss-offers', offers);
+  set('t-total', total); set('t-int', ints); set('t-prob', avgP); set('t-offers', offers);
+  populateCvJobSelect();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function nav(s) {
+  document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', ['add', 'tracker', 'cv'][i] === s));
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.getElementById('sec-' + s).classList.add('active');
+  if (s === 'tracker') { updateStats(); renderTracker(); }
+  if (s === 'cv') populateCvJobSelect();
+}
+
+function cvTab(t) {
+  document.querySelectorAll('.inner-tab').forEach((b, i) => b.classList.toggle('active', ['saved', 'manual'][i] === t));
+  document.getElementById('cv-saved').style.display = t === 'saved' ? 'block' : 'none';
+  document.getElementById('cv-manual').style.display = t === 'manual' ? 'block' : 'none';
+  document.getElementById('cv-output-wrap').style.display = 'none';
+}
+
+function populateCvJobSelect() {
+  const sel = document.getElementById('cv-job-select');
+  if (!sel) return;
+  sel.innerHTML = apps.length
+    ? apps.map(a => `<option value="${a.id}">${esc(a.title)} — ${esc(a.company)}</option>`).join('')
+    : '<option value="">No saved applications yet</option>';
+}
+
+// ── PASTE INPUT HANDLER ───────────────────────────────────────────────────────
+function onPasteInput() {
+  const val = document.getElementById('inp-raw-paste').value.trim();
+  const preview = document.getElementById('extracted-preview');
+  if (val.length > 50) {
+    preview.innerHTML = `<span class="ext-pill"><span class="pill-label">Characters</span>&nbsp;<span class="pill-val">${val.length.toLocaleString()}</span></span><span class="ext-pill" style="color:var(--accent);font-size:12px;">✓ Ready to analyse</span>`;
+  } else {
+    preview.innerHTML = '';
+  }
+}
+
+// ── ANALYSE ───────────────────────────────────────────────────────────────────
+async function analyzeJob() {
+  const raw = document.getElementById('inp-raw-paste').value.trim();
+  if (!raw || raw.length < 50) {
+    alert('Please paste the job posting first.');
+    return;
+  }
+
+  setLoading('analyze', true);
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('loader-analyze-msg').textContent = 'Claude is reading the job posting and reasoning about your fit...';
+
+  try {
+    const text = await callClaude([{ role: 'user', content: buildCombinedPrompt(raw) }], 2000);
+
+    let parsed;
+    try { parsed = JSON.parse(text.replace(/```json|```/g, '').trim()); }
+    catch (e) { const m = text.match(/\{[\s\S]*\}/); parsed = m ? JSON.parse(m[0]) : null; }
+    if (!parsed) throw new Error('parse');
+
+    // Merge extracted fields into pending
+    pending = parsed;
+    pending._raw = raw;
+
+    // Show extracted fields
+    const ext = parsed.extracted || {};
+    const setDisp = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    setDisp('disp-title', ext.title);
+    setDisp('disp-company', ext.company);
+    setDisp('disp-location', ext.location);
+    setDisp('disp-source', ext.source);
+
+    showAnalysis(parsed);
+  } catch (e) {
+    console.error(e);
+    alert('Analysis failed — make sure the server is running and your API key is set in .env');
+  } finally {
+    setLoading('analyze', false);
+  }
+}
+
+function showAnalysis(r) {
+  const fitMap = { High: 'badge-high', Medium: 'badge-medium', Low: 'badge-low' };
+  const f = document.getElementById('res-fit');
+  f.className = 'badge ' + (fitMap[r.fit] || 'badge-medium');
+  f.textContent = r.fit + ' fit';
+  document.getElementById('res-prob').textContent = r.probability + '%';
+  const pc = r.probability >= 70 ? '#3D7A1A' : r.probability >= 50 ? '#8B5E1A' : '#8B1A1A';
+  document.getElementById('res-prob-bar').style.cssText = `width:${r.probability}%;background:${pc}`;
+  document.getElementById('res-score').textContent = r.score;
+  document.getElementById('res-verdict').textContent = r.verdict || '';
+  document.getElementById('res-transferable').textContent = r.transferable_skills || '';
+  document.getElementById('res-gaps').textContent = r.gaps || '';
+  document.getElementById('res-requirements').textContent = r.requirements || '';
+  document.getElementById('res-cv').textContent = r.cv_recommendation || '';
+  document.getElementById('res-talkpoints').textContent = r.talk_points || '';
+  document.getElementById('result-panel').style.display = 'block';
+  document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+function mkApp() {
+  const ext = pending.extracted || {};
+  return {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('en-ZA'),
+    title: ext.title && ext.title !== 'Not specified' ? ext.title : 'Untitled role',
+    company: ext.company && ext.company !== 'Not specified' ? ext.company : 'Unknown',
+    location: ext.location && ext.location !== 'Not specified' ? ext.location : '',
+    source: ext.source && ext.source !== 'Not specified' ? ext.source : '',
+    jd: ext.clean_jd || pending._raw || '',
+    fit: pending.fit,
+    probability: pending.probability,
+    score: pending.score,
+    verdict: pending.verdict || '',
+    transferable_skills: pending.transferable_skills || '',
+    gaps: pending.gaps || '',
+    requirements: pending.requirements || '',
+    cv_recommendation: pending.cv_recommendation || '',
+    talk_points: pending.talk_points || '',
+    status: 'Pending',
+    notes: '',
+    cv: ''
+  };
+}
+
+async function saveAndRewrite() {
+  if (!pending) return;
+  const app = mkApp();
+  apps.unshift(app);
+  saveApps();
+  setLoading('cv', true);
+  document.getElementById('save-rewrite-btn').disabled = true;
+  try {
+    const cvText = await callClaude(
+      [{ role: 'user', content: buildCvPrompt(app.title, app.company, app.jd, 'auto', pending) }],
+      2500
+    );
+    app.cv = cvText;
+    saveApps();
+    clearForm();
+    nav('cv');
+    showCvOutput(cvText, app.title + ' — ' + app.company);
+  } catch (e) {
+    alert('CV rewrite failed — the application was saved. Try rewriting from the CV tab.');
+  }
+  setLoading('cv', false);
+  document.getElementById('save-rewrite-btn').disabled = false;
+}
+
+function saveOnly() {
+  if (!pending) return;
+  apps.unshift(mkApp());
+  saveApps();
+  clearForm();
+  nav('tracker');
+  renderTracker();
+}
+
+function clearForm() {
+  document.getElementById('inp-raw-paste').value = '';
+  document.getElementById('extracted-preview').innerHTML = '';
+  document.getElementById('result-panel').style.display = 'none';
+  pending = null;
+}
+
+// ── CV REWRITER ───────────────────────────────────────────────────────────────
+function showCvOutput(text, title) {
+  currentCvText = text;
+  currentCvTitle = title;
+  document.getElementById('cv-output').textContent = text;
+  document.getElementById('cv-output-wrap').style.display = 'block';
+  document.getElementById('cv-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function rewriteFromSaved() {
+  const id = parseInt(document.getElementById('cv-job-select').value);
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  const cvType = document.getElementById('cv-type-saved').value;
+  setLoading('cv-saved', true);
+  try {
+    const text = await callClaude(
+      [{ role: 'user', content: buildCvPrompt(app.title, app.company, app.jd, cvType, { verdict: app.verdict, transferable_skills: app.transferable_skills, requirements: app.requirements }) }],
+      2500
+    );
+    app.cv = text;
+    saveApps();
+    showCvOutput(text, app.title + ' — ' + app.company);
+  } catch (e) {
+    alert('Rewrite failed — please try again.');
+  }
+  setLoading('cv-saved', false);
+}
+
+async function rewriteManual() {
+  const raw = document.getElementById('cv-raw-m').value.trim();
+  if (!raw) { alert('Please paste a job posting.'); return; }
+  const cvType = document.getElementById('cv-type-m').value;
+  setLoading('cv-manual', true);
+  try {
+    // Quick extract for title/company then rewrite
+    const text = await callClaude(
+      [{ role: 'user', content: buildCvPrompt('Role from posting', 'Company', raw, cvType, null) }],
+      2500
+    );
+    showCvOutput(text, 'Custom CV');
+  } catch (e) {
+    alert('Rewrite failed — please try again.');
+  }
+  setLoading('cv-manual', false);
+}
+
+function copyCv() { navigator.clipboard.writeText(currentCvText).then(() => toast('Copied to clipboard')); }
+function downloadCv() {
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([currentCvText], { type: 'text/plain' })),
+    download: 'Micaela_CV_' + (currentCvTitle || 'tailored').replace(/[^a-zA-Z0-9]/g, '_') + '.txt'
+  });
+  a.click();
+}
+
+// ── SYNC ──────────────────────────────────────────────────────────────────────
+function exportData() {
+  if (!apps.length) { alert('No applications to export yet.'); return; }
+  const payload = JSON.stringify({ version: 3, exported: new Date().toISOString(), apps }, null, 2);
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([payload], { type: 'application/json' })),
+    download: 'micaela-tracker-' + new Date().toISOString().slice(0, 10) + '.json'
+  });
+  a.click();
+  toast('Exported! Send this file to the other device, then use Import & merge there.');
+}
+
+function importData(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const incoming = Array.isArray(data) ? data : (data.apps || []);
+      if (!incoming.length) throw new Error('empty');
+      const statusOrder = ['Pending', 'Applied', 'Interview', 'Rejected', 'Offer'];
+      const existingIds = new Set(apps.map(a => a.id));
+      const newApps = [];
+      incoming.forEach(inc => {
+        if (!existingIds.has(inc.id)) {
+          newApps.push(inc);
+        } else {
+          const ex = apps.find(a => a.id === inc.id);
+          if (statusOrder.indexOf(inc.status) > statusOrder.indexOf(ex.status)) ex.status = inc.status;
+          if (inc.notes && !ex.notes) ex.notes = inc.notes;
+          if (inc.cv && !ex.cv) ex.cv = inc.cv;
+        }
+      });
+      apps = [...apps, ...newApps];
+      saveApps(); renderTracker();
+      toast(`Merged! ${newApps.length} new application${newApps.length !== 1 ? 's' : ''} added.`);
+    } catch (err) {
+      alert('Could not read the file. Make sure it is a valid export from this tracker.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── TRACKER RENDER ────────────────────────────────────────────────────────────
+function renderTracker() {
+  const fitF = document.getElementById('f-fit')?.value || '';
+  const statusF = document.getElementById('f-status')?.value || '';
+  const sortBy = document.getElementById('f-sort')?.value || 'date';
+  let list = [...apps];
+  if (fitF) list = list.filter(a => a.fit === fitF);
+  if (statusF) list = list.filter(a => a.status === statusF);
+  if (sortBy === 'prob') list.sort((a, b) => b.probability - a.probability);
+  else if (sortBy === 'score') list.sort((a, b) => b.score - a.score);
+  const el = document.getElementById('jobs-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div style="font-size:36px;margin-bottom:1rem;">○</div><div class="empty-title">No applications ${fitF || statusF ? 'match your filters' : 'yet'}</div><div>${fitF || statusF ? 'Try clearing filters' : 'Add the first one in the Add application tab'}</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map(renderJobCard).join('');
+}
+
+function renderJobCard(a) {
+  const fitClass = 'badge-' + (a.fit || 'medium').toLowerCase();
+  const statusClass = 'badge-' + (a.status || 'pending').toLowerCase();
+  const pc = a.probability >= 70 ? '#3D7A1A' : a.probability >= 50 ? '#8B5E1A' : '#8B1A1A';
+  const cvBtn = a.cv ? `<button class="btn btn-outline" style="padding:5px 12px;font-size:12px;" onclick="event.stopPropagation();viewSavedCv(${a.id})">View CV</button>` : '';
+  const tsLines = (a.transferable_skills || '').split('\n').filter(l => l.trim().startsWith('•'));
+  const tsTags = tsLines.map(l => {
+    const full = l.replace(/^•\s*/, '').trim();
+    const short = full.split('→')[0].trim().slice(0, 45);
+    return `<span class="tag">${esc(short)}</span>`;
+  }).join('');
+
+  return `<div class="job-card" onclick="toggleDrawer(${a.id})">
+    <div class="jc-top">
+      <div>
+        <div class="jc-title">${esc(a.title)}</div>
+        <div class="jc-company">${esc(a.company)}${a.location ? ' · ' + esc(a.location) : ''}</div>
+      </div>
+      <div class="jc-badges">
+        <span class="badge ${fitClass}">${a.fit}</span>
+        <span class="badge ${statusClass}">${a.status}</span>
+        ${cvBtn}
+        <button class="del-btn" onclick="event.stopPropagation();deleteApp(${a.id})">✕</button>
+      </div>
+    </div>
+    <div class="jc-meta">
+      <div class="jc-meta-item">${a.date}</div>
+      ${a.source ? `<div class="jc-meta-item">via ${esc(a.source)}</div>` : ''}
+      <div class="jc-prob">
+        <div style="flex:1;height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;">
+          <div style="width:${a.probability}%;height:100%;background:${pc};border-radius:99px;"></div>
+        </div>
+        <span class="jc-prob-label" style="color:${pc};">${a.probability}%</span>
+      </div>
+      <div class="jc-meta-item">Score: <strong style="color:var(--text);margin-left:2px;">${a.score}/10</strong></div>
+      <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus(${a.id},this.value)">
+        ${['Pending', 'Applied', 'Interview', 'Rejected', 'Offer'].map(s => `<option ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div id="drawer-${a.id}" class="drawer">
+      <div class="drawer-grid">
+        <div class="drawer-section"><div class="drawer-label">Verdict</div><div class="drawer-content">${esc(a.verdict)}</div></div>
+        <div class="drawer-section"><div class="drawer-label">Key requirements</div><div class="drawer-content">${esc(a.requirements)}</div></div>
+        <div class="drawer-section"><div class="drawer-label">Gaps &amp; how to handle them</div><div class="drawer-content">${esc(a.gaps)}</div></div>
+        <div class="drawer-section"><div class="drawer-label">CV recommended</div><div class="drawer-content">${esc(a.cv_recommendation)}</div></div>
+        <div class="drawer-section drawer-full"><div class="drawer-label">When they reach out</div><div class="drawer-content">${esc(a.talk_points)}</div></div>
+        ${tsTags ? `<div class="drawer-section drawer-full"><div class="drawer-label">Transferable skills mapped</div><div class="transferable-tags">${tsTags}</div></div>` : ''}
+        <div class="drawer-section drawer-full"><div class="drawer-label">Your notes</div>
+          <input class="notes-input" type="text" placeholder="Add notes..." value="${(a.notes || '').replace(/"/g, '&quot;')}" onchange="updateNotes(${a.id},this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function toggleDrawer(id) { document.getElementById('drawer-' + id)?.classList.toggle('open'); }
+function updateStatus(id, status) { const a = apps.find(x => x.id === id); if (a) { a.status = status; saveApps(); renderTracker(); } }
+function updateNotes(id, notes) { const a = apps.find(x => x.id === id); if (a) { a.notes = notes; saveApps(); } }
+function deleteApp(id) { if (!confirm('Remove this application?')) return; apps = apps.filter(a => a.id !== id); saveApps(); renderTracker(); }
+function viewSavedCv(id) { const a = apps.find(x => x.id === id); if (!a || !a.cv) return; nav('cv'); showCvOutput(a.cv, a.title + ' — ' + a.company); }
+
+function setLoading(id, on) {
+  const l = document.getElementById('loader-' + id);
+  if (l) l.classList.toggle('show', on);
+  if (id === 'analyze') { const b = document.getElementById('analyze-btn'); if (b) b.disabled = on; }
+}
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+updateStats();
+</script>
+</body>
+</html>
