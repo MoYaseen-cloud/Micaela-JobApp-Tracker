@@ -238,6 +238,7 @@
         <div class="card">
           <div class="card-title">Analysis result</div>
 
+          <!-- Extracted pills -->
           <div style="margin-bottom:1.4rem;padding:1rem 1.2rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:10px;">Extracted from posting</div>
             <div style="display:flex;flex-wrap:wrap;gap:10px;">
@@ -248,6 +249,7 @@
             </div>
           </div>
 
+          <!-- Score strip -->
           <div class="result-metrics">
             <div class="metric-box">
               <div class="metric-label">Fit match</div>
@@ -264,43 +266,54 @@
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label>Honest verdict</label>
-            <div class="ai-block" id="res-verdict"></div>
+          <!-- Verdict -->
+          <div style="margin-bottom:1.2rem;padding:1rem 1.2rem;background:var(--bg);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:6px;">Verdict</div>
+            <div id="res-verdict" style="font-size:13.5px;color:var(--text2);line-height:1.7;"></div>
           </div>
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label>Transferable skills — how your background maps to this role</label>
-            <div class="ai-block" id="res-transferable"></div>
-          </div>
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label>Gaps — what's missing and how to handle it at interview</label>
-            <div class="ai-block" id="res-gaps"></div>
-          </div>
-          <div class="form-grid" style="margin-bottom:1rem;">
-            <div class="form-group">
-              <label>Key requirements</label>
-              <div class="ai-block" id="res-requirements"></div>
+
+          <!-- Two column: skills + gaps -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.2rem;">
+            <div style="background:var(--green-light);border:1px solid rgba(45,106,79,0.15);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--green);margin-bottom:8px;font-weight:600;">✓ What transfers</div>
+              <div id="res-transferable" style="font-size:13px;color:#1a4a34;line-height:1.75;white-space:pre-wrap;"></div>
             </div>
-            <div class="form-group">
-              <label>CV recommendation</label>
-              <div class="ai-block" id="res-cv"></div>
-            </div>
-            <div class="form-group full">
-              <label>When they reach out — what to say</label>
-              <div class="ai-block" id="res-talkpoints"></div>
+            <div style="background:var(--rose-light);border:1px solid rgba(194,24,91,0.12);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--rose);margin-bottom:8px;font-weight:600;">⚠ Gaps to address</div>
+              <div id="res-gaps" style="font-size:13px;color:#6b1a35;line-height:1.75;white-space:pre-wrap;"></div>
             </div>
           </div>
+
+          <!-- Two column: requirements + CV rec -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.2rem;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:8px;font-weight:600;">📋 What they want</div>
+              <div id="res-requirements" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;"></div>
+            </div>
+            <div style="background:var(--purple-light);border:1px solid rgba(123,63,110,0.15);border-radius:var(--radius-sm);padding:1rem 1.2rem;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--purple);margin-bottom:8px;font-weight:600;">💅 CV to use</div>
+              <div id="res-cv" style="font-size:13px;color:var(--purple);line-height:1.75;white-space:pre-wrap;"></div>
+            </div>
+          </div>
+
+          <!-- Talk points — collapsible -->
+          <details style="margin-bottom:1.2rem;">
+            <summary style="cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);padding:0.75rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);list-style:none;display:flex;justify-content:space-between;align-items:center;">
+              💬 When they reach out — what to say <span style="font-size:16px;color:var(--pink);">+</span>
+            </summary>
+            <div id="res-talkpoints" style="font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap;padding:1rem 1.2rem;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:var(--surface);"></div>
+          </details>
 
           <div class="section-divider"></div>
 
-          <div style="background:var(--pink-light);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1rem;font-size:13px;color:var(--text2);">
-            <strong style="color:var(--pink);">Ready to apply?</strong> Click "Save & rewrite CV" to save this job and get a tailored CV. Or click "Save without CV" to just track it. Click "Mark as Applied" only once you've actually sent the application.
+          <div style="background:var(--pink-light);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:var(--text2);">
+            <strong style="color:var(--pink);">Ready to apply?</strong> Save &amp; rewrite CV now, then mark as Applied once you've sent it. You can always mark as Applied from the tracker too.
           </div>
 
           <div class="btn-row">
             <button class="btn btn-primary" id="save-rewrite-btn" onclick="saveAndRewrite()">Save &amp; rewrite CV →</button>
             <button class="btn btn-outline" onclick="saveOnly()">Save without CV</button>
-            <button class="btn btn-applied" onclick="saveAsApplied()">✓ Mark as Applied</button>
+            <button class="btn btn-applied" onclick="saveAsApplied()">✓ Mark as Applied now</button>
           </div>
           <div class="loader-wrap" id="loader-cv"><div class="spinner"></div> Writing your tailored CV...</div>
         </div>
@@ -942,17 +955,116 @@ function downloadCv() {
   a.click();
 }
 
+function cvTextToHtml(text) {
+  // Convert plain text CV into nicely formatted HTML that Google Docs renders well
+  const lines = text.split('\n');
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1a1a1a; margin: 2cm; line-height: 1.4; }
+    h1 { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 2px; color: #1a1a1a; }
+    .contact { text-align: center; font-size: 10pt; color: #444; margin-bottom: 16px; }
+    hr { border: none; border-top: 1.5px solid #333; margin: 10px 0; }
+    h2 { font-size: 12pt; font-weight: bold; color: #1a3a6b; margin-top: 14px; margin-bottom: 2px; border-bottom: 1px solid #c8d8f0; padding-bottom: 2px; }
+    h3 { font-size: 11pt; font-weight: bold; margin: 8px 0 0 0; color: #1a1a1a; }
+    .company { font-size: 10pt; font-style: italic; color: #555; margin-bottom: 4px; }
+    ul { margin: 4px 0 8px 18px; padding: 0; }
+    li { margin-bottom: 2px; font-size: 11pt; }
+    p { margin: 3px 0; font-size: 11pt; }
+    .cert { margin-bottom: 2px; }
+  </style></head><body>`;
+
+  let inList = false;
+  let isFirst = true;
+  let nameWritten = false;
+  let contactLines = [];
+  let collectingContact = false;
+
+  const sectionKeywords = ['PROFESSIONAL SUMMARY','CORE COMPETENCIES','PROFESSIONAL EXPERIENCE',
+    'EXPERIENCE','EDUCATION','CERTIFICATIONS','HONOURS','AWARDS','TECHNICAL','SKILLS','ADDITIONAL','PROFILE'];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      if (inList) { html += '</ul>'; inList = false; }
+      continue;
+    }
+
+    // First non-empty line = name
+    if (isFirst && !nameWritten) {
+      html += `<h1>${line}</h1>`;
+      nameWritten = true; isFirst = false; collectingContact = true; continue;
+    }
+
+    // Collect contact lines (next 1-2 lines after name)
+    if (collectingContact && contactLines.length < 3 && !sectionKeywords.some(k => line.toUpperCase().includes(k))) {
+      contactLines.push(line);
+      if (contactLines.length >= 2 || lines[i+1] && sectionKeywords.some(k => lines[i+1].toUpperCase().includes(k))) {
+        html += `<div class="contact">${contactLines.join(' | ')}</div><hr>`;
+        collectingContact = false;
+      }
+      continue;
+    }
+    collectingContact = false;
+
+    // Section headings
+    if (sectionKeywords.some(k => line.toUpperCase() === k || line.toUpperCase().startsWith(k + ':') || line.toUpperCase().startsWith('==='))) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const cleanHead = line.replace(/^===+|===+$/g,'').replace(/:/g,'').trim();
+      html += `<h2>${cleanHead}</h2>`; continue;
+    }
+
+    // Job title lines (bold, no bullet, followed by italic company line)
+    if (!line.startsWith('•') && !line.startsWith('-') && !line.startsWith('*') &&
+        line === line && /[A-Z]/.test(line[0]) &&
+        i+1 < lines.length && (lines[i+1].includes('|') || lines[i+1].includes('–') || lines[i+1].includes('-'))) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<h3>${line}</h3>`; continue;
+    }
+
+    // Company/date line (italic)
+    if ((line.includes('|') || line.includes('–')) && !line.startsWith('•') &&
+        (line.includes('20') || line.includes('University') || line.includes('Ltd') || line.includes('Inc'))) {
+      html += `<div class="company">${line}</div>`; continue;
+    }
+
+    // Bullet points
+    if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      const txt = line.replace(/^[•\-\*]\s*/,'');
+      html += `<li>${txt}</li>`; continue;
+    }
+
+    // Regular paragraph
+    if (inList) { html += '</ul>'; inList = false; }
+    html += `<p>${line}</p>`;
+  }
+
+  if (inList) html += '</ul>';
+  html += '</body></html>';
+  return html;
+}
+
 function openAsGoogleDoc() {
-  // Encode the CV text and open in Google Docs via the "create from URL" trick
-  // We'll use a data URI approach — copy to clipboard and open Google Docs new doc
-  navigator.clipboard.writeText(currentCvText).then(() => {
-    // Open a blank Google Doc
-    window.open('https://docs.new', '_blank');
-    toast('CV copied! Paste it into the Google Doc that just opened (Ctrl+V or Cmd+V) 📄');
-  }).catch(() => {
-    window.open('https://docs.new', '_blank');
-    toast('Paste your CV into the Google Doc — use the Copy button first 📄');
-  });
+  const htmlContent = cvTextToHtml(currentCvText);
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
+  // Open the formatted HTML in a new tab — user can then File > Save and import to Google Docs
+  // OR we encode it as a data URI for direct open
+  const encoded = encodeURIComponent(htmlContent);
+  const dataUri = 'data:text/html;charset=utf-8,' + encoded;
+
+  // Create a download of the HTML file — user opens it in browser, copies all, pastes into Google Doc
+  const a = document.createElement('a');
+  a.href = url;
+  const safeName = (currentCvTitle || 'CV').replace(/[^a-zA-Z0-9 _-]/g, '').trim();
+  a.download = 'Micaela_CV_' + safeName.replace(/\s+/g,'_') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  toast('📄 HTML file downloaded! Open it in your browser, select all (Ctrl+A), copy, paste into a Google Doc.');
 }
 
 // ── TRACKER ───────────────────────────────────────────────────────────────────
@@ -992,6 +1104,7 @@ function renderJobCard(a) {
         <span class="badge ${fitClass}">${a.fit || '—'}</span>
         <span class="badge ${statusClass}">${a.status}</span>
         ${cvBtn}
+        ${a.status === 'Saved' ? `<button class="btn btn-applied" style="padding:4px 12px;font-size:12px;" onclick="event.stopPropagation();markApplied(${a.id})">✓ Applied</button>` : ''}
         <button class="del-btn" onclick="event.stopPropagation();deleteApp(${a.id})">✕</button>
       </div>
     </div>
@@ -1026,6 +1139,7 @@ function renderJobCard(a) {
 }
 
 function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function markApplied(id) { patchApp(id, { status: 'Applied' }); toast('Marked as Applied! Good luck! 💌'); }
 function toggleDrawer(id) { document.getElementById('drawer-' + id)?.classList.toggle('open'); }
 function updateStatus(id, status) { patchApp(id, { status }); }
 function deleteApp(id) { if (!confirm('Remove this job?')) return; deleteAppById(id); }
