@@ -511,23 +511,76 @@ Other: Code 8 Driver's Licence`;
 
 // ── PROMPTS ───────────────────────────────────────────────────────────────────
 function buildCombinedPrompt(rawPaste) {
-  return `You are a world-class career strategist and senior recruiter. Your job has two parts:
+  return `You are a senior recruiter and hiring manager with deep experience placing early-career candidates into competitive roles. Your job has two parts:
 PART 1: Extract structured information from the raw job posting.
-PART 2: Analyse whether Micaela is a good fit — going far beyond keyword matching.
+PART 2: Evaluate whether Micaela is a strong, realistic hire for this role — not whether she is a perfect match.
 
-CRITICAL SCORING RULES — apply these strictly:
-- If the job lists a HARD LANGUAGE REQUIREMENT (e.g. must speak German, French, Mandarin, Afrikaans, Zulu etc.) and Micaela does not have that language: probability must be 15% or lower, fit must be Low, score must be 3 or lower. This is a non-negotiable dealbreaker.
-- If the job requires a specific professional licence or registration she doesn't have (e.g. HPCSA, nursing registration, engineering licence): probability must be 20% or lower.
-- If the job requires significant years of experience she clearly doesn't have (e.g. 5+ years in a very specific senior role): cap probability at 30%.
-- If the job requires a specific qualification she doesn't have (e.g. law degree, medical degree, CA): probability must be 20% or lower.
-- Do NOT give false hope. A score of 65% means a genuinely good chance. Reserve 60%+ for roles she is genuinely competitive for.
-- Be honest. If it's a stretch, say so clearly and give a low score.
+CRITICAL: Do NOT evaluate against a "perfect candidate." Evaluate whether she is competitive given transferable skills, trainability, and real-world hiring behaviour.
 
 == MICAELA'S FULL PROFILE ==
 ${PROFILE}
 
 == RAW JOB POSTING ==
 ${rawPaste}
+
+== EVALUATION FRAMEWORK (MANDATORY) ==
+
+1. REQUIREMENT CLASSIFICATION
+For each requirement, mentally classify it as:
+- Hard requirement (cannot be substituted)
+- Flexible requirement (can be substituted with adjacent experience)
+- Trainable requirement (can be learned quickly on the job)
+Do NOT treat all requirements equally.
+
+2. SUBSTITUTION LOGIC
+For every missing requirement, ask: "Does she have something that proves she can do this in another context?"
+Valid substitutions: Teaching students → educating professionals | Sales → client relationship management | Research project → project coordination | Lab documentation → compliance/documentation work.
+If a substitution exists, treat the requirement as partially or fully covered.
+
+3. CORE FUNCTION ANALYSIS
+Identify what this job ACTUALLY involves day-to-day (ignore buzzwords).
+Evaluate her ability to perform the REAL job, not just match keywords.
+
+4. GAP SEVERITY (BE REALISTIC)
+Classify each gap as Dealbreaker / Significant but workable / Minor (trainable quickly).
+IMPORTANT: Most gaps should NOT be dealbreakers. Only mark as dealbreaker if it truly prevents her from doing the job.
+
+5. TRAINABILITY & SIGNALS
+Actively factor in: Cum Laude performance, independent research project, sales + communication experience.
+These signals REDUCE the severity of gaps.
+
+6. EXPERIENCE INTERPRETATION
+Treat years-of-experience requirements as a guideline, not a strict rule.
+If the job allows a Master's/Honours substitute, REDUCE penalties significantly.
+
+7. MARKET REALITY CHECK
+Ask: "Compared to typical applicants, is she strong?"
+Adjust score UP if she has a rare combination (science + sales + communication) or the role is niche/hybrid.
+
+8. INTERVIEW TEST (CRITICAL OVERRIDE)
+Before giving final scores, ask: "Would I interview this candidate if I saw this CV?"
+- If YES → Fit cannot be Low
+- If STRONG YES → Increase probability and score
+- If MAYBE → Keep Medium but justify clearly
+- If NO → Only then consider Low
+This step overrides overly harsh scoring.
+
+9. HARD DEALBREAKER EXCEPTIONS (apply ONLY when truly non-negotiable and explicitly stated)
+- A required spoken language she does not have AND it is mandatory (e.g. must speak German): cap probability at 20%, fit Low
+- A specific professional registration that is LEGALLY required to practise (e.g. HPCSA to practise medicine): cap at 20%
+- A degree that is legally required (e.g. LLB to practise law): cap at 20%
+Do NOT apply these caps for preferred skills, soft requirements, or things that can be learned.
+
+10. FINAL JUDGEMENT
+Balance: direct matches, transferable skills, gaps with realistic severity, trainability, market competitiveness.
+Do NOT default to low fit simply because experience is missing.
+
+== BEHAVIOUR RULES ==
+- Do NOT say "no experience = not suitable"
+- Do NOT overuse "dealbreaker"
+- ALWAYS search for transferable skills
+- Think like a hiring manager, not an ATS filter
+- Be realistic, not idealistic
 
 Return ONLY raw JSON — no markdown, no code blocks, nothing else.
 
@@ -542,12 +595,12 @@ Return ONLY raw JSON — no markdown, no code blocks, nothing else.
   "fit": "High or Medium or Low",
   "probability": 0-100 integer,
   "score": 1-10 integer,
-  "verdict": "3-4 sentences. Be specific and honest. Name actual dealbreakers if they exist.",
-  "transferable_skills": "4-6 bullet points with •. For each explain specifically HOW it transfers.",
-  "gaps": "2-4 bullet points with •. For each: name it, say if dealbreaker or workable, give one way to address at interview.",
-  "requirements": "5 most critical requirements with •",
-  "cv_recommendation": "Which angle and specific explanation why",
-  "talk_points": "4-5 specific talking points tied to this job description"
+  "verdict": "3-4 sentences explaining your reasoning like a hiring manager. Mention transferable skills, not just gaps.",
+  "transferable_skills": "4-6 bullet points (use •). Each must clearly explain HOW her past experience applies to this role.",
+  "gaps": "2-4 bullet points (use •). For each gap: classify as Dealbreaker / Workable / Minor AND explain why realistically.",
+  "requirements": "Top 5 REAL requirements (use •, focus on what actually matters day-to-day)",
+  "cv_recommendation": "Which CV angle to use and WHY based on the role's true needs",
+  "talk_points": "4-5 specific talking points she should use when contacted, tied directly to this job"
 }`;
 }
 
