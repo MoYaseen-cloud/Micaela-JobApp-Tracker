@@ -849,7 +849,7 @@ function showAnalysis(r) {
   f.textContent = r.fit + ' fit';
   document.getElementById('res-prob').textContent = r.probability + '%';
   const pc = r.probability >= 70 ? '#2D6A4F' : r.probability >= 50 ? '#B5830A' : '#C0392B';
-  document.getElementById('res-prob-bar').style.cssText = `width:${r.probability}%;background:${pc}`;
+
   document.getElementById('res-score').textContent = r.score;
   document.getElementById('res-verdict').textContent = r.verdict || '';
   document.getElementById('res-transferable').textContent = r.transferable_skills || '';
