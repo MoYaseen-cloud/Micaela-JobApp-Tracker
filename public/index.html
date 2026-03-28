@@ -688,56 +688,62 @@ function setSyncStatus(status) {
   label.textContent = status === 'syncing' ? 'Syncing...' : status === 'error' ? 'Sync error' : 'Synced';
 }
 
-async function loadApps() {
+async function loadApps(retries = 2) {
   try {
     setSyncStatus('syncing');
     const resp = await fetch('/api/apps');
-    if (resp.ok) {
-      apps = await resp.json();
-      setSyncStatus('synced');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    apps = await resp.json();
+    setSyncStatus('synced');
+    updateStats();
+    renderTracker();
+  } catch (e) {
+    if (retries > 0) {
+      setTimeout(() => loadApps(retries - 1), 2000);
+    } else {
+      setSyncStatus('error');
+      console.error('Load error:', e);
+      // Fall back to whatever is in memory rather than showing nothing
       updateStats();
       renderTracker();
     }
-  } catch (e) {
-    setSyncStatus('error');
-    console.error('Load error:', e);
   }
 }
 
 async function saveApps() {
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(async () => {
-    try {
-      setSyncStatus('syncing');
-      await fetch('/api/apps', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apps })
-      });
-      setSyncStatus('synced');
-    } catch (e) {
-      setSyncStatus('error');
-      console.error('Save error:', e);
-    }
-  }, 500);
+  syncTimer = setTimeout(() => pushApps(), 600);
   updateStats();
+}
+
+async function pushApps(retries = 2) {
+  try {
+    setSyncStatus('syncing');
+    const resp = await fetch('/api/apps', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apps })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    setSyncStatus('synced');
+  } catch (e) {
+    if (retries > 0) {
+      setTimeout(() => pushApps(retries - 1), 2000);
+    } else {
+      setSyncStatus('error');
+      console.error('Save error after retries:', e);
+    }
+  }
 }
 
 async function patchApp(id, changes) {
   const idx = apps.findIndex(a => a.id === id);
   if (idx === -1) return;
   apps[idx] = { ...apps[idx], ...changes };
-  try {
-    setSyncStatus('syncing');
-    await fetch(`/api/apps/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(changes)
-    });
-    setSyncStatus('synced');
-  } catch (e) { setSyncStatus('error'); }
   updateStats();
   renderTracker();
+  // Persist via full save (simpler and more reliable than individual patch)
+  await pushApps();
 }
 
 async function deleteAppById(id) {
@@ -808,7 +814,7 @@ async function analyzeJob() {
   setLoading('analyze', true);
   document.getElementById('result-panel').style.display = 'none';
   try {
-    const text = await callClaude([{ role: 'user', content: buildCombinedPrompt(raw) }], 2200);
+    const text = await callClaude([{ role: 'user', content: buildCombinedPrompt(raw) }], 3000);
     let parsed;
     try { parsed = JSON.parse(text.replace(/```json|```/g, '').trim()); }
     catch (e) { const m = text.match(/\{[\s\S]*\}/); parsed = m ? JSON.parse(m[0]) : null; }
@@ -820,8 +826,19 @@ async function analyzeJob() {
     setDisp('disp-location', ext.location); setDisp('disp-source', ext.source);
     showAnalysis(parsed);
   } catch (e) {
-    console.error(e);
-    alert('Analysis failed — check your internet connection and try again.');
+    console.error('Analysis error:', e);
+    const msg = e.message || '';
+    if (msg.includes('413') || msg.includes('too large') || msg.toLowerCase().includes('token')) {
+      alert('The job description is too long. Try trimming it to just the key requirements and responsibilities, then try again.');
+    } else if (msg.includes('401') || msg.includes('403')) {
+      alert('API key error — check that your ANTHROPIC_API_KEY is set correctly in Railway variables.');
+    } else if (msg.includes('500')) {
+      alert('Server error — the Railway server had an issue. Try again in a moment.');
+    } else if (msg.includes('parse')) {
+      alert('The AI returned an unexpected response. Try again — it usually works on the second attempt.');
+    } else {
+      alert('Analysis failed: ' + (msg || 'Unknown error. Open the browser console (F12) for details.'));
+    }
   } finally { setLoading('analyze', false); }
 }
 
