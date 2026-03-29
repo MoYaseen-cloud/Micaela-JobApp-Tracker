@@ -349,6 +349,10 @@
         <button class="btn btn-outline" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="refreshPicks()">Refresh now</button>
       </div>
       <div id="picks-last-fetch" class="last-fetch" style="display:none;"></div>
+      <div id="picks-debug-panel" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);font-family:monospace;white-space:pre-wrap;"></div>
+      <div style="margin-bottom:1rem;">
+        <button class="btn btn-outline" style="padding:4px 12px;font-size:11px;" onclick="showPicksDebug()">🔍 Show diagnostics</button>
+      </div>
 
       <!-- Source tabs -->
       <div class="src-tabs">
@@ -1266,6 +1270,39 @@ function filterPicks(f, el) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderPicks();
+}
+
+async function showPicksDebug() {
+  const panel = document.getElementById('picks-debug-panel');
+  if (!panel) return;
+  try {
+    const resp = await fetch('/api/picks/diag');
+    const d = await resp.json();
+    panel.style.display = 'block';
+    panel.textContent = [
+      '=== DIAGNOSTICS ===',
+      'Status: ' + d.status,
+      'Last fetch: ' + (d.fetchedAt || 'never'),
+      '',
+      '=== RAW FETCHED (before scoring) ===',
+      'RemoteOK: ' + (d.rawCounts?.remoteok ?? '?') + ' jobs',
+      'Adzuna:   ' + (d.rawCounts?.adzuna ?? '?') + ' jobs',
+      'JSearch:  ' + (d.rawCounts?.jsearch ?? '?') + ' jobs',
+      '',
+      '=== AFTER SCORING (shown in tabs) ===',
+      'RemoteOK: ' + d.counts.remoteok + ' jobs',
+      'Adzuna:   ' + d.counts.adzuna + ' jobs',
+      'JSearch:  ' + d.counts.jsearch + ' jobs',
+      '',
+      '=== ENV KEYS SET ===',
+      'Adzuna:    ' + (d.envCheck?.adzuna ? '✅' : '❌ MISSING'),
+      'JSearch:   ' + (d.envCheck?.jsearch ? '✅' : '❌ MISSING'),
+      'Anthropic: ' + (d.envCheck?.anthropic ? '✅' : '❌ MISSING'),
+      d.error ? '\n=== ERROR ===\n' + d.error : '',
+    ].filter(Boolean).join('\n');
+  } catch(e) {
+    if (panel) { panel.style.display = 'block'; panel.textContent = 'Could not load diagnostics: ' + e.message; }
+  }
 }
 
 async function refreshPicks() {
