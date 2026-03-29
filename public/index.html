@@ -14,9 +14,9 @@
   .app{display:flex;min-height:100vh;position:relative;z-index:1;}
 
   /* ── CUSTOM CURSOR ── */
-  .cursor-arrow{position:fixed;pointer-events:none;z-index:99999;width:24px;height:24px;transform-origin:top left;}
-  .sparkle{position:fixed;pointer-events:none;z-index:99997;font-size:13px;animation:sparkle-fade 0.8s ease-out forwards;}
-  @keyframes sparkle-fade{0%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);}100%{opacity:0;transform:translate(-50%,-260%) scale(0.2) rotate(30deg);}}
+  .cursor-arrow{position:fixed;pointer-events:none;z-index:99999;width:22px;height:22px;transform-origin:2px 2px;}
+  .sparkle{position:fixed;pointer-events:none;z-index:99997;font-size:13px;animation:sparkle-fade 0.85s ease-out forwards;}
+  @keyframes sparkle-fade{0%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);}100%{opacity:0;transform:translate(-50%,-280%) scale(0.15) rotate(25deg);}}
 
   /* ── SIDEBAR ── */
   .sidebar{width:250px;background:linear-gradient(160deg,#2D1B22 0%,#4A1E35 100%);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:1.8rem;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;box-shadow:4px 0 24px rgba(45,27,34,0.15);z-index:100;}
@@ -115,31 +115,36 @@
   .info-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 
   /* ── DISCOVER TAB ── */
-  .picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;}
-  .pick-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;transition:box-shadow 0.15s,border-color 0.15s;display:flex;flex-direction:column;gap:10px;}
+  .src-tabs{display:flex;gap:0;margin-bottom:1.4rem;border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;width:fit-content;}
+  .src-tab{padding:8px 20px;font-size:13px;font-weight:500;color:var(--text2);background:var(--surface);border:none;cursor:none;transition:all 0.15s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+  .src-tab:not(:last-child){border-right:1px solid var(--border2);}
+  .src-tab.active{background:var(--pink);color:#fff;}
+  .src-tab:hover:not(.active){background:var(--pink-light);color:var(--pink);}
+  .picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .pick-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.3rem;display:flex;flex-direction:column;gap:9px;transition:box-shadow 0.15s,border-color 0.15s;}
   .pick-card:hover{border-color:var(--border2);box-shadow:0 4px 18px rgba(219,112,147,0.12);}
   .pick-card.high-fit{border-left:3px solid var(--green);}
   .pick-card.medium-fit{border-left:3px solid var(--gold);}
   .pick-card.low-fit{border-left:3px solid var(--red);}
-  .pick-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.3;}
-  .pick-company{font-size:13px;color:var(--text2);}
-  .pick-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-  .pick-tag{padding:2px 8px;border-radius:99px;font-size:11px;background:var(--surface2);color:var(--text3);}
-  .pick-source{padding:2px 8px;border-radius:99px;font-size:11px;background:var(--pink-light);color:var(--pink);}
-  .pick-reason{font-size:12px;color:var(--text2);font-style:italic;line-height:1.5;}
-  .pick-score{display:flex;align-items:center;gap:8px;}
-  .pick-prob{font-size:20px;font-weight:700;letter-spacing:-0.5px;}
-  .pick-actions{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
-  .status-banner{display:flex;align-items:center;gap:12px;padding:1rem 1.2rem;border-radius:var(--radius-sm);margin-bottom:1.2rem;font-size:13px;flex-wrap:wrap;}
+  .pick-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;}
+  .pick-company{font-size:12px;color:var(--text2);margin-top:1px;}
+  .pick-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+  .pick-tag{padding:2px 7px;border-radius:99px;font-size:10px;background:var(--surface2);color:var(--text3);}
+  .pick-source-badge{padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:var(--pink-light);color:var(--pink);}
+  .pick-score-row{display:flex;align-items:center;gap:8px;}
+  .pick-prob{font-size:19px;font-weight:700;letter-spacing:-0.5px;}
+  .pick-reason{font-size:11.5px;color:var(--text2);font-style:italic;line-height:1.5;}
+  .pick-actions{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap;}
+  .status-banner{display:flex;align-items:center;gap:12px;padding:0.9rem 1.1rem;border-radius:var(--radius-sm);margin-bottom:1.2rem;font-size:13px;flex-wrap:wrap;}
   .status-banner.loading{background:var(--gold-light);border:1px solid rgba(181,131,10,0.2);color:var(--gold);}
   .status-banner.ready{background:var(--green-light);border:1px solid rgba(45,106,79,0.2);color:var(--green);}
   .status-banner.error{background:var(--red-light);border:1px solid rgba(192,57,43,0.2);color:var(--red);}
   .status-banner.never{background:var(--pink-light);border:1px solid var(--border2);color:var(--pink);}
   .last-fetch{font-size:11px;color:var(--text3);margin-bottom:1rem;}
   .filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
-  .chip{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:none;transition:all 0.15s;}
+  .chip{padding:5px 13px;border-radius:99px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:none;transition:all 0.15s;}
   .chip.active{background:var(--pink);border-color:var(--pink);color:#fff;}
-  .empty-picks{text-align:center;padding:3rem 2rem;color:var(--text3);}
+  .empty-picks{text-align:center;padding:3rem 2rem;color:var(--text3);grid-column:1/-1;}
 
   /* ── SCORE CARDS ── */
   .score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
@@ -219,16 +224,10 @@
 </style>
 </head>
 <body>
-<!-- Custom cursor -->
-<svg class="cursor-arrow" id="cursor-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <defs>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-  </defs>
-  <path d="M2 2 L2 18 L7 13 L11 21 L14 19.5 L10 12 L17 12 Z"
-        fill="#E8547A" stroke="#fff" stroke-width="1" stroke-linejoin="round" filter="url(#glow)"/>
+<!-- Custom cursor arrow -->
+<svg class="cursor-arrow" id="cursor-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="left:-100px;top:-100px;">
+  <defs><filter id="cglow"><feGaussianBlur stdDeviation="1.2" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter></defs>
+  <path d="M3 2 L3 17 L7.5 12.5 L11 20 L13.5 18.8 L10 11.5 L16 11.5 Z" fill="#E8547A" stroke="rgba(255,255,255,0.8)" stroke-width="0.8" stroke-linejoin="round" filter="url(#cglow)"/>
 </svg>
 
 <div class="app">
@@ -341,21 +340,30 @@
     <div id="sec-discover" class="section">
       <div class="page-header">
         <div class="page-title">Discover jobs 🔍</div>
-        <div class="page-sub">Auto-ranked jobs from RemoteOK &amp; Adzuna — refreshed every 6 hours</div>
+        <div class="page-sub">Auto-ranked jobs from 3 sources — refreshed every 6 hours. Deduplicated across platforms.</div>
       </div>
+
       <div id="picks-status-banner" class="status-banner never">
         <span id="picks-status-icon">🌸</span>
         <span id="picks-status-text">Jobs haven't been fetched yet — click Refresh to start.</span>
         <button class="btn btn-outline" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="refreshPicks()">Refresh now</button>
       </div>
       <div id="picks-last-fetch" class="last-fetch" style="display:none;"></div>
+
+      <!-- Source tabs -->
+      <div class="src-tabs">
+        <button class="src-tab active" id="stab-adzuna" onclick="switchSource('adzuna')">🏢 Adzuna <span id="stab-adzuna-count" style="opacity:0.6;font-size:11px;"></span></button>
+        <button class="src-tab" id="stab-remoteok" onclick="switchSource('remoteok')">🌍 RemoteOK <span id="stab-remoteok-count" style="opacity:0.6;font-size:11px;"></span></button>
+        <button class="src-tab" id="stab-jsearch" onclick="switchSource('jsearch')">🔎 JSearch <span id="stab-jsearch-count" style="opacity:0.6;font-size:11px;"></span></button>
+      </div>
+
+      <!-- Fit filter chips -->
       <div class="filter-chips">
-        <span class="chip active" onclick="filterPicks('all',this)">All</span>
+        <span class="chip active" onclick="filterPicks('all',this)">All fits</span>
         <span class="chip" onclick="filterPicks('High',this)">High fit</span>
         <span class="chip" onclick="filterPicks('Medium',this)">Medium fit</span>
-        <span class="chip" onclick="filterPicks('remote',this)">Remote only</span>
-        <span class="chip" onclick="filterPicks('local',this)">South Africa</span>
       </div>
+
       <div id="picks-grid" class="picks-grid">
         <div class="empty-picks">
           <div style="font-size:36px;margin-bottom:1rem;">🌸</div>
@@ -459,55 +467,46 @@
 <script>
 // ── SPARKLE CURSOR ────────────────────────────────────────────────────────────
 const cursorArrow = document.getElementById('cursor-arrow');
-const sparkleChars = ['✦','✧','⋆','˚','·','✿','❋','✺','★','◇','⬥','✵','❆','✴'];
+const sparkleChars = ['✦','✧','⋆','˚','·','✿','❋','✺','★','◇','⬥','✵','❆','✴','꩜'];
 const goldPalette = ['#FFD700','#D4AF37','#FFDF00','#BF9B30','#FFB6C1'];
-let lastSparkle = 0;
-let mouseX = -100, mouseY = -100;
+let lastSparkle = 0, mouseX = -100, mouseY = -100;
 
 document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  // Position arrow tip at exact cursor point
+  mouseX = e.clientX; mouseY = e.clientY;
   cursorArrow.style.left = mouseX + 'px';
   cursorArrow.style.top = mouseY + 'px';
-
   const now = Date.now();
-  if (now - lastSparkle > 35) {
+  if (now - lastSparkle > 30) {
     lastSparkle = now;
-    // Spawn 1-2 sparkles per movement for a denser trail
-    const count = Math.random() > 0.5 ? 2 : 1;
+    const count = Math.random() > 0.45 ? 2 : 1;
     for (let i = 0; i < count; i++) {
       const s = document.createElement('span');
       s.className = 'sparkle';
       s.textContent = sparkleChars[Math.floor(Math.random() * sparkleChars.length)];
-      // Trail offset — spread around and slightly behind the arrow tip
-      const ox = Math.random() * 20 - 10;
-      const oy = Math.random() * 14 - 4;
-      s.style.left = (mouseX + ox) + 'px';
-      s.style.top = (mouseY + oy) + 'px';
+      s.style.left = (mouseX + Math.random() * 22 - 6) + 'px';
+      s.style.top = (mouseY + Math.random() * 16 - 2) + 'px';
       s.style.color = goldPalette[Math.floor(Math.random() * goldPalette.length)];
-      s.style.fontSize = (10 + Math.random() * 8) + 'px';
+      s.style.fontSize = (9 + Math.random() * 9) + 'px';
       document.body.appendChild(s);
-      setTimeout(() => s.remove(), 820);
+      setTimeout(() => s.remove(), 880);
     }
   }
 });
 
-// Click burst — explode sparkles outward on click
 document.addEventListener('mousedown', () => {
-  cursorArrow.style.transform = 'scale(0.8)';
+  cursorArrow.style.transform = 'scale(0.75)';
   for (let i = 0; i < 8; i++) {
     const s = document.createElement('span');
     s.className = 'sparkle';
     s.textContent = sparkleChars[Math.floor(Math.random() * sparkleChars.length)];
     const angle = (i / 8) * Math.PI * 2;
-    const dist = 20 + Math.random() * 15;
+    const dist = 18 + Math.random() * 14;
     s.style.left = (mouseX + Math.cos(angle) * dist) + 'px';
     s.style.top = (mouseY + Math.sin(angle) * dist) + 'px';
     s.style.color = goldPalette[Math.floor(Math.random() * goldPalette.length)];
-    s.style.fontSize = (12 + Math.random() * 6) + 'px';
+    s.style.fontSize = (11 + Math.random() * 7) + 'px';
     document.body.appendChild(s);
-    setTimeout(() => s.remove(), 800);
+    setTimeout(() => s.remove(), 850);
   }
 });
 document.addEventListener('mouseup', () => { cursorArrow.style.transform = 'scale(1)'; });
@@ -1222,6 +1221,7 @@ function toast(msg) {
 
 // ── PICKS / DISCOVER ─────────────────────────────────────────────────────────
 let picksData = null;
+let currentSource = 'adzuna';
 let picksFilter = 'all';
 
 async function loadPicks() {
@@ -1229,19 +1229,50 @@ async function loadPicks() {
     const resp = await fetch('/api/picks');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     picksData = await resp.json();
+    updateSourceCounts();
     renderPicks();
   } catch(e) {
     console.error('loadPicks:', e);
     const b = document.getElementById('picks-status-banner');
-    if (b) { b.className = 'status-banner error'; document.getElementById('picks-status-icon').textContent = '❌'; document.getElementById('picks-status-text').textContent = 'Could not load picks — ' + e.message; }
+    if (b) {
+      b.className = 'status-banner error';
+      document.getElementById('picks-status-icon').textContent = '❌';
+      document.getElementById('picks-status-text').textContent = 'Could not load picks: ' + e.message;
+    }
   }
+}
+
+function updateSourceCounts() {
+  if (!picksData) return;
+  ['adzuna','remoteok','jsearch'].forEach(src => {
+    const el = document.getElementById('stab-' + src + '-count');
+    if (el) {
+      const count = (picksData[src]||[]).length;
+      el.textContent = count ? '(' + count + ')' : '';
+    }
+  });
+}
+
+function switchSource(src) {
+  currentSource = src;
+  document.querySelectorAll('.src-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('stab-' + src);
+  if (tab) tab.classList.add('active');
+  renderPicks();
+}
+
+function filterPicks(f, el) {
+  picksFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderPicks();
 }
 
 async function refreshPicks() {
   const banner = document.getElementById('picks-status-banner');
   banner.className = 'status-banner loading';
   document.getElementById('picks-status-icon').textContent = '⏳';
-  document.getElementById('picks-status-text').textContent = 'Starting job discovery... takes 2–4 minutes. Browse other tabs!';
+  document.getElementById('picks-status-text').textContent = 'Starting job discovery... takes 3–5 minutes. Browse other tabs!';
   try {
     await fetch('/api/picks/refresh', { method: 'POST' });
     let attempts = 0;
@@ -1250,8 +1281,11 @@ async function refreshPicks() {
       try {
         const resp = await fetch('/api/picks');
         const data = await resp.json();
-        if (data.status === 'ready' || data.status === 'error' || data.status === 'no_jobs' || attempts > 36) {
-          clearInterval(poll); picksData = data; renderPicks();
+        if (data.status === 'ready' || data.status === 'error' || data.status === 'no_jobs' || attempts > 40) {
+          clearInterval(poll);
+          picksData = data;
+          updateSourceCounts();
+          renderPicks();
         } else {
           document.getElementById('picks-status-text').textContent = 'Evaluating jobs with AI... (' + (attempts * 10) + 's elapsed)';
         }
@@ -1263,77 +1297,82 @@ async function refreshPicks() {
   }
 }
 
-function filterPicks(f, el) {
-  picksFilter = f;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderPicks();
-}
-
 function renderPicks() {
   if (!picksData) return;
   const banner = document.getElementById('picks-status-banner');
   const grid = document.getElementById('picks-grid');
   const lastFetch = document.getElementById('picks-last-fetch');
+
   const statusMap = {
     fetching: ['loading','⏳','Fetching and scoring jobs... check back in a few minutes.'],
-    ready: ['ready','✅', (picksData.jobs?.length||0) + ' jobs ranked for you — refreshes every 6 hours.'],
+    ready: ['ready','✅','Jobs ranked across 3 sources — refreshes every 6 hours.'],
     error: ['error','❌','Something went wrong. Try refreshing.'],
-    no_jobs: ['error','😕','No matching jobs found this cycle. Try again later.'],
-    never: ['never','🌸',"Jobs haven't been fetched yet — click Refresh to start."]
+    no_jobs: ['error','😕','No matching jobs found this cycle. Try refreshing later.'],
+    never: ['never','🌸',"Jobs haven't been fetched yet — click Refresh to start."],
   };
   const [cls, icon, text] = statusMap[picksData.status] || statusMap.never;
   banner.className = 'status-banner ' + cls;
   document.getElementById('picks-status-icon').textContent = icon;
   document.getElementById('picks-status-text').textContent = text;
+
   if (picksData.fetchedAt) {
     lastFetch.style.display = 'block';
     lastFetch.textContent = 'Last updated: ' + new Date(picksData.fetchedAt).toLocaleString('en-ZA');
   }
-  let jobs = picksData.jobs || [];
+
+  let jobs = picksData[currentSource] || [];
   if (picksFilter === 'High') jobs = jobs.filter(j => j.fit === 'High');
   else if (picksFilter === 'Medium') jobs = jobs.filter(j => j.fit === 'Medium');
-  else if (picksFilter === 'remote') jobs = jobs.filter(j => (j.location||'').toLowerCase().includes('remote'));
-  else if (picksFilter === 'local') jobs = jobs.filter(j => !(j.location||'').toLowerCase().includes('remote'));
+
   if (!jobs.length) {
-    grid.innerHTML = '<div class="empty-picks"><div style="font-size:36px;margin-bottom:1rem;">🌸</div><div style="font-size:15px;color:var(--text2);font-weight:500;margin-bottom:6px;">No jobs match this filter</div><div>Try a different filter or refresh</div></div>';
+    grid.innerHTML = '<div class="empty-picks"><div style="font-size:36px;margin-bottom:1rem;">🌸</div><div style="font-size:15px;color:var(--text2);font-weight:500;margin-bottom:6px;">No jobs here yet</div><div>Try a different filter or click Refresh now</div></div>';
     return;
   }
+
   grid.innerHTML = jobs.map((j, idx) => {
     const fitClass = (j.fit||'medium').toLowerCase() + '-fit';
     const pc = j.probability >= 70 ? 'var(--green)' : j.probability >= 50 ? 'var(--gold)' : 'var(--red)';
     const alreadySaved = apps.some(a => a.discoveryId === j.id);
+    const srcShort = j.source ? j.source.replace('JSearch (','').replace(')','') : currentSource;
     return '<div class="pick-card ' + fitClass + '">' +
-      '<div><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
-      '<div class="pick-title">' + esc(j.title) + '</div>' +
-      '<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--text3);flex-shrink:0;">#' + (idx+1) + '</span></div>' +
-      '<div class="pick-company">' + esc(j.company) + ' · ' + esc(j.location) + '</div></div>' +
-      '<div class="pick-meta"><span class="pick-source">' + esc(j.source) + '</span>' +
-      '<span class="badge badge-' + (j.fit||'medium').toLowerCase() + '">' + (j.fit||'—') + '</span>' +
-      (j.salary ? '<span class="pick-tag">' + esc(j.salary) + '</span>' : '') +
-      (j.tags||[]).slice(0,3).map(t => '<span class="pick-tag">' + esc(t) + '</span>').join('') + '</div>' +
-      '<div class="pick-score"><span class="pick-prob" style="color:' + pc + ';">' + j.probability + '%</span>' +
-      '<div style="flex:1;height:5px;background:var(--pink-mid);border-radius:99px;overflow:hidden;"><div style="width:' + j.probability + '%;height:100%;background:' + pc + ';border-radius:99px;"></div></div>' +
-      '<span style="font-size:12px;color:var(--text3);">' + j.score + '/10</span></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">' +
+        '<div><div class="pick-title">' + esc(j.title) + '</div>' +
+        '<div class="pick-company">' + esc(j.company) + ' · ' + esc(j.location) + '</div></div>' +
+        '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);flex-shrink:0;margin-top:2px;">#' + (idx+1) + '</span>' +
+      '</div>' +
+      '<div class="pick-meta">' +
+        '<span class="pick-source-badge">' + esc(srcShort) + '</span>' +
+        '<span class="badge badge-' + (j.fit||'medium').toLowerCase() + '" style="font-size:11px;padding:2px 9px;">' + (j.fit||'—') + '</span>' +
+        (j.salary ? '<span class="pick-tag">' + esc(j.salary) + '</span>' : '') +
+        (j.tags||[]).slice(0,2).map(t => '<span class="pick-tag">' + esc(t) + '</span>').join('') +
+      '</div>' +
+      '<div class="pick-score-row">' +
+        '<span class="pick-prob" style="color:' + pc + ';">' + j.probability + '%</span>' +
+        '<div style="flex:1;height:5px;background:var(--pink-mid);border-radius:99px;overflow:hidden;">' +
+          '<div style="width:' + j.probability + '%;height:100%;background:' + pc + ';border-radius:99px;"></div>' +
+        '</div>' +
+        '<span style="font-size:11px;color:var(--text3);">' + (j.score||'—') + '/10</span>' +
+      '</div>' +
       (j.top_reason ? '<div class="pick-reason">"' + esc(j.top_reason) + '"</div>' : '') +
       '<div class="pick-actions">' +
-      (j.url ? '<a href="' + esc(j.url) + '" target="_blank" class="btn btn-outline" style="padding:6px 12px;font-size:12px;text-decoration:none;">View job →</a>' : '') +
-      (alreadySaved
-        ? '<span style="font-size:12px;color:var(--green);padding:6px 0;">✓ Already saved</span>'
-        : '<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="savePickedJob(' + idx + ')">Save &amp; analyse →</button>') +
-      '</div></div>';
+        (j.url ? '<a href="' + esc(j.url) + '" target="_blank" class="btn btn-outline" style="padding:5px 11px;font-size:12px;text-decoration:none;">View →</a>' : '') +
+        (alreadySaved
+          ? '<span style="font-size:12px;color:var(--green);padding:5px 0;">✓ Saved</span>'
+          : '<button class="btn btn-primary" style="padding:5px 13px;font-size:12px;" onclick="savePickedJob(' + idx + ')">Save &amp; analyse →</button>') +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
 async function savePickedJob(idx) {
-  const job = (picksData?.jobs||[])[idx];
+  const job = (picksData ? picksData[currentSource] || [] : [])[idx];
   if (!job) return;
   const rawText = job.title + '\n' + job.company + '\n' + job.location + '\n\n' + (job.description||'');
   nav('add');
   document.getElementById('inp-raw-paste').value = rawText;
   onPasteInput();
   window._pendingDiscoveryId = job.id;
-  toast('Job loaded — click Analyse fit to score it 🌸');
+  toast('Job loaded — click Analyse fit 🌸');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
