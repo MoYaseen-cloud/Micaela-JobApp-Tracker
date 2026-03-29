@@ -131,7 +131,7 @@ app.post('/api/claude', async (req, res) => {
 });
 
 
-// ── JOB DISCOVERY ─────────────────────────────────────────────────────────────
+// ── JOB DISCOVERY PIPELINE ───────────────────────────────────────────────────
 const PICKS_PATH = path.join(DATA_DIR, 'daily_picks.json');
 
 function readPicks() {
@@ -145,10 +145,14 @@ function writePicks(data) {
 }
 
 const MICAELA_PROFILE = `
-Honours Forensic Genetics Cum Laude + BSc Biological Sciences. GCP certified, Research Ethics certified, Code 8 licence.
-Roles: Lab Demonstrator, Research Assistant (HIV/HPV/Moringa studies), Business Development Rep (promoted), Sales Rep, Perfume Promoter.
-Skills: DNA extraction, PCR, GLP, QA, CRM, B2B sales, client management, scientific writing, MS Office, Google Workspace.
-Rare science+sales combination. Strong communicator, self-directed, high performer.
+Micaela Harripersadh — Honours Forensic Genetics Cum Laude, BSc Biological Sciences, UKZN.
+GCP certified (ICH-GCP E6 R2), Research Ethics certified, Code 8 driver's licence.
+Work history: Lab Demonstrator, Research Assistant (HIV/HPV/Moringa studies), Business Development Rep (promoted from Junior Sales Rep), Junior Sales Rep / Customer Service, Luxury Perfume Promoter.
+Hard skills: DNA extraction, PCR, GLP, QA, CRM systems, B2B sales, lead generation, pipeline management, client relationship management, scientific writing, documentation, MS Office, Google Workspace, data analysis, scheduling, admin support.
+Soft skills: Exceptional communicator (verbal and written), highly self-directed, thrives under deadlines, attention to detail, comfortable with targets and rejection, persuasive, empathetic.
+RARE COMBINATION: science graduate who can sell and communicate — valuable in clinical sales, pharma, medtech, healthcare, and any role mixing technical knowledge with client-facing work.
+She is entry-level to 2 years experience. She CAN do: any sales role, any admin/coordination role, any lab/research role, clinical research, healthcare admin, customer success, client onboarding, appointment setting, data entry/management, quality assurance, any assistant or coordinator role.
+She is based in Durban, South Africa but will consider remote roles globally and Johannesburg roles.
 `;
 
 // ── DEDUPLICATION ─────────────────────────────────────────────────────────────
@@ -168,41 +172,46 @@ function dedupe(jobs) {
   return [...seen.values()];
 }
 
-// ── FETCH: REMOTEOK (fully remote only) ───────────────────────────────────────
+// ── FETCH: REMOTEOK ───────────────────────────────────────────────────────────
+// RemoteOK returns all jobs — we let the AI scorer decide fit rather than pre-filtering
 async function fetchRemoteOK() {
   const jobs = [];
   try {
     console.log('🌐 Fetching RemoteOK...');
     const resp = await fetch('https://remoteok.com/api', {
-      headers: { 'User-Agent': 'MicaelaJobTracker/1.0' }
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; JobTracker/1.0)',
+        'Accept': 'application/json',
+      }
     });
-    if (!resp.ok) throw new Error('Status ' + resp.status);
-    const data = await resp.json();
-    const keywords = ['clinical','lab','science','health','research','sales','admin','coordinator','medical','pharma','biology','gcp','quality','data','assistant'];
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const raw = await resp.text();
+    // RemoteOK sometimes returns HTML on rate limit — detect that
+    if (raw.trim().startsWith('<')) throw new Error('Got HTML instead of JSON — rate limited');
+    const data = JSON.parse(raw);
+    // Broad inclusion: skip first item (it's a legal notice object), include everything that has a title
+    // No keyword filtering — let the AI scorer decide fit
     for (const job of data.slice(1)) {
       if (!job.position || !job.company) continue;
-      const text = (job.position + ' ' + (job.tags||[]).join(' ')).toLowerCase();
-      if (keywords.some(k => text.includes(k))) {
-        jobs.push({
-          id: 'rok_' + job.id,
-          title: job.position,
-          company: job.company,
-          location: 'Remote',
-          url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
-          description: (job.description||'').slice(0,2000),
-          tags: job.tags||[],
-          salary: job.salary||'',
-          source: 'RemoteOK',
-          postedAt: job.date||new Date().toISOString(),
-        });
-      }
+      jobs.push({
+        id: 'rok_' + (job.id || Math.random()),
+        title: job.position,
+        company: typeof job.company === 'string' ? job.company : (job.company?.name || 'Unknown'),
+        location: 'Remote',
+        url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
+        description: (job.description||'').replace(/<[^>]+>/g,' ').slice(0,2000),
+        tags: Array.isArray(job.tags) ? job.tags : [],
+        salary: job.salary || '',
+        source: 'RemoteOK',
+        postedAt: job.date || new Date().toISOString(),
+      });
     }
     console.log('✅ RemoteOK raw:', jobs.length);
-  } catch(e) { console.error('❌ RemoteOK:', e.message); }
+  } catch(e) { console.error('❌ RemoteOK error:', e.message); }
   return jobs;
 }
 
-// ── FETCH: ADZUNA (Johannesburg + remote SA only) ─────────────────────────────
+// ── FETCH: ADZUNA (South Africa — broad searches) ─────────────────────────────
 async function fetchAdzuna() {
   const jobs = [];
   if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) {
@@ -212,24 +221,39 @@ async function fetchAdzuna() {
   const APP_KEY = process.env.ADZUNA_APP_KEY;
   const seen = new Set();
 
+  // Broad search terms covering all roles she can do — not just science
   const JHB_TERMS = [
-    'clinical research coordinator','laboratory assistant','medical sales',
-    'clinical trial assistant','healthcare administrator','research assistant',
-    'quality assurance science','pharmaceutical sales','data coordinator',
-    'science administrator','lab technician','clinical coordinator',
-  ];
-  const REMOTE_TERMS = [
-    'remote clinical research','remote healthcare admin','remote medical sales',
-    'remote research coordinator','remote laboratory',
+    // Science / Lab / Clinical
+    'laboratory assistant', 'research assistant', 'clinical research coordinator',
+    'clinical trial assistant', 'quality assurance', 'medical sales representative',
+    'pharmaceutical sales', 'lab technician', 'science administrator',
+    // Sales / BD / CRM
+    'sales representative', 'business development', 'account manager',
+    'sales administrator', 'inside sales', 'medical device sales',
+    'territory sales representative',
+    // Admin / Coordinator / Operations
+    'administrator', 'office administrator', 'operations coordinator',
+    'project coordinator', 'client services', 'customer success',
+    // Healthcare admin
+    'healthcare administrator', 'medical administrator', 'healthcare coordinator',
+    'patient coordinator', 'clinical coordinator',
+    // Customer service / support
+    'customer service', 'customer support representative', 'client relationship',
   ];
 
-  // Johannesburg searches
+  const REMOTE_TERMS = [
+    'remote sales south africa', 'remote administrator south africa',
+    'remote customer service south africa', 'remote coordinator south africa',
+    'remote research assistant', 'remote clinical research',
+    'remote healthcare admin', 'remote account manager south africa',
+  ];
+
   for (const term of JHB_TERMS) {
     try {
       const q = encodeURIComponent(term);
       const url = `https://api.adzuna.com/v1/api/jobs/za/search/1?app_id=${APP_ID}&app_key=${APP_KEY}&results_per_page=5&what=${q}&where=Johannesburg&content-type=application/json`;
       const resp = await fetch(url);
-      if (!resp.ok) continue;
+      if (!resp.ok) { console.log('Adzuna JHB skip:', term, resp.status); continue; }
       const data = await resp.json();
       for (const job of (data.results||[])) {
         const uid = 'adz_' + job.id;
@@ -237,19 +261,20 @@ async function fetchAdzuna() {
         seen.add(uid);
         jobs.push({
           id: uid, title: job.title,
-          company: job.company?.display_name||'Unknown',
-          location: job.location?.display_name||'Johannesburg',
-          url: job.redirect_url||'',
+          company: job.company?.display_name || 'Unknown',
+          location: job.location?.display_name || 'Johannesburg',
+          url: job.redirect_url || '',
           description: (job.description||'').slice(0,2000),
-          tags: [], salary: job.salary_min ? `R${Math.round(job.salary_min/1000)}k–R${Math.round((job.salary_max||job.salary_min)/1000)}k/yr` : '',
-          source: 'Adzuna', postedAt: job.created||new Date().toISOString(),
+          tags: [],
+          salary: job.salary_min ? `R${Math.round(job.salary_min/1000)}k–R${Math.round((job.salary_max||job.salary_min)/1000)}k/yr` : '',
+          source: 'Adzuna',
+          postedAt: job.created || new Date().toISOString(),
         });
       }
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise(r => setTimeout(r, 200));
     } catch(e) { console.error('Adzuna JHB error:', term, e.message); }
   }
 
-  // Remote SA searches
   for (const term of REMOTE_TERMS) {
     try {
       const q = encodeURIComponent(term);
@@ -263,15 +288,17 @@ async function fetchAdzuna() {
         seen.add(uid);
         jobs.push({
           id: uid, title: job.title,
-          company: job.company?.display_name||'Unknown',
-          location: 'Remote / ' + (job.location?.display_name||'South Africa'),
-          url: job.redirect_url||'',
+          company: job.company?.display_name || 'Unknown',
+          location: 'Remote / ' + (job.location?.display_name || 'South Africa'),
+          url: job.redirect_url || '',
           description: (job.description||'').slice(0,2000),
-          tags: [], salary: job.salary_min ? `R${Math.round(job.salary_min/1000)}k–R${Math.round((job.salary_max||job.salary_min)/1000)}k/yr` : '',
-          source: 'Adzuna', postedAt: job.created||new Date().toISOString(),
+          tags: [],
+          salary: job.salary_min ? `R${Math.round(job.salary_min/1000)}k–R${Math.round((job.salary_max||job.salary_min)/1000)}k/yr` : '',
+          source: 'Adzuna',
+          postedAt: job.created || new Date().toISOString(),
         });
       }
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise(r => setTimeout(r, 200));
     } catch(e) { console.error('Adzuna remote error:', term, e.message); }
   }
 
@@ -283,18 +310,35 @@ async function fetchAdzuna() {
 async function fetchJSearch() {
   const jobs = [];
   if (!process.env.JSEARCH_API_KEY) {
-    console.log('⚠️  JSearch key missing'); return jobs;
+    console.log('⚠️  JSearch key missing — set JSEARCH_API_KEY in Railway environment variables');
+    return jobs;
   }
   const seen = new Set();
+
+  // Broad queries — science, sales, admin, customer service, coordinator
   const QUERIES = [
-    { q: 'clinical research Johannesburg', remote: false },
-    { q: 'laboratory assistant Johannesburg', remote: false },
-    { q: 'medical sales Johannesburg', remote: false },
+    // JHB — science/lab
+    { q: 'research assistant Johannesburg South Africa', remote: false },
+    { q: 'laboratory technician Johannesburg South Africa', remote: false },
+    { q: 'clinical research coordinator Johannesburg', remote: false },
+    { q: 'quality assurance Johannesburg South Africa', remote: false },
+    // JHB — sales/BD
+    { q: 'sales representative Johannesburg South Africa', remote: false },
+    { q: 'business development representative Johannesburg', remote: false },
+    { q: 'medical sales representative Johannesburg', remote: false },
+    { q: 'account manager Johannesburg South Africa', remote: false },
+    // JHB — admin/coordinator
+    { q: 'administrator Johannesburg South Africa', remote: false },
+    { q: 'coordinator Johannesburg South Africa', remote: false },
+    { q: 'customer service representative Johannesburg', remote: false },
     { q: 'healthcare administrator Johannesburg', remote: false },
-    { q: 'research assistant Johannesburg', remote: false },
-    { q: 'clinical trial coordinator remote', remote: true },
-    { q: 'medical sales remote South Africa', remote: true },
-    { q: 'research coordinator remote', remote: true },
+    // Remote
+    { q: 'remote sales representative South Africa', remote: true },
+    { q: 'remote customer success South Africa', remote: true },
+    { q: 'remote clinical research coordinator', remote: true },
+    { q: 'remote administrator South Africa', remote: true },
+    { q: 'remote research coordinator', remote: true },
+    { q: 'remote account manager South Africa', remote: true },
   ];
 
   for (const query of QUERIES) {
@@ -304,7 +348,7 @@ async function fetchJSearch() {
         page: '1',
         num_pages: '1',
         date_posted: 'month',
-        ...(query.remote ? { remote_jobs_only: 'true' } : { job_city: 'Johannesburg' }),
+        ...(query.remote ? { remote_jobs_only: 'true' } : {}),
       });
       const resp = await fetch('https://jsearch.p.rapidapi.com/search?' + params, {
         headers: {
@@ -312,26 +356,36 @@ async function fetchJSearch() {
           'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
         }
       });
-      if (!resp.ok) { console.log('JSearch skip:', query.q, resp.status); continue; }
+      if (!resp.ok) {
+        console.log('JSearch skip:', query.q, resp.status);
+        // 429 = rate limited, back off
+        if (resp.status === 429) await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
       const data = await resp.json();
       for (const job of (data.data||[])) {
-        const uid = 'js_' + (job.job_id||Math.random());
+        const uid = 'js_' + (job.job_id || Math.random());
         if (seen.has(uid)) continue;
         seen.add(uid);
-        const loc = query.remote ? 'Remote' : (job.job_city ? job.job_city + ', ' + (job.job_country||'') : 'Johannesburg');
+        const loc = query.remote
+          ? 'Remote'
+          : (job.job_city ? job.job_city + (job.job_country ? ', ' + job.job_country : '') : 'Johannesburg');
         jobs.push({
-          id: uid, title: job.job_title||'Untitled',
-          company: job.employer_name||'Unknown',
+          id: uid,
+          title: job.job_title || 'Untitled',
+          company: job.employer_name || 'Unknown',
           location: loc,
-          url: job.job_apply_link||job.job_google_link||'',
+          url: job.job_apply_link || job.job_google_link || '',
           description: (job.job_description||'').slice(0,2000),
           tags: (job.job_required_skills||[]).slice(0,5),
-          salary: job.job_min_salary ? `$${Math.round(job.job_min_salary/1000)}k–$${Math.round((job.job_max_salary||job.job_min_salary)/1000)}k` : '',
+          salary: job.job_min_salary
+            ? `$${Math.round(job.job_min_salary/1000)}k–$${Math.round((job.job_max_salary||job.job_min_salary)/1000)}k`
+            : '',
           source: 'JSearch (' + (job.job_publisher||'Indeed') + ')',
-          postedAt: job.job_posted_at_datetime_utc||new Date().toISOString(),
+          postedAt: job.job_posted_at_datetime_utc || new Date().toISOString(),
         });
       }
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
     } catch(e) { console.error('JSearch error:', query.q, e.message); }
   }
   console.log('✅ JSearch raw:', jobs.length);
@@ -341,19 +395,44 @@ async function fetchJSearch() {
 // ── SCORE A JOB ───────────────────────────────────────────────────────────────
 async function scoreJob(job) {
   if (!process.env.ANTHROPIC_API_KEY) return null;
-  const prompt = 'You are a recruiter. Quickly evaluate if Micaela fits this job.\n\nMICAELA:\n' + MICAELA_PROFILE + '\n\nJOB:\nTitle: ' + job.title + '\nCompany: ' + job.company + '\nLocation: ' + job.location + '\nDescription: ' + (job.description||'').slice(0,1000) + '\n\nReturn ONLY raw JSON (no markdown):\n{"fit":"High"or"Medium"or"Low","probability":0-100,"score":1-10,"verdict":"2 sentences max","top_reason":"strongest fit reason max 10 words","skip":true or false}';
+  const prompt = `You are a recruiter evaluating whether Micaela is a realistic hire.
+
+MICAELA:
+${MICAELA_PROFILE}
+
+JOB:
+Title: ${job.title}
+Company: ${job.company}
+Location: ${job.location}
+Description: ${(job.description||'').slice(0,1000)}
+
+Think about transferable skills, not just direct matches. She has science + sales + admin experience. Entry-level and coordinator roles are realistic. Do NOT skip just because she lacks years of experience.
+
+Return ONLY raw JSON (no markdown, no code blocks):
+{"fit":"High" or "Medium" or "Low","probability":0-100,"score":1-10,"verdict":"1-2 sentences","top_reason":"strongest fit reason max 10 words","skip":false}
+
+Only set skip:true if it is truly impossible (e.g. requires 5+ years, senior management, specific professional registration she cannot have).`;
+
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json','x-api-key':process.env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01' },
-      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:200, messages:[{role:'user',content:prompt}] }),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      }),
     });
     if (!resp.ok) return null;
     const data = await resp.json();
-    const text = data.content.map(c=>c.text||'').join('');
+    const text = data.content.map(c => c.text||'').join('');
     let parsed;
     try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
-    catch(e) { const m=text.match(/\{[\s\S]*\}/); parsed=m?JSON.parse(m[0]):null; }
+    catch(e) { const m = text.match(/\{[\s\S]*?\}/); parsed = m ? JSON.parse(m[0]) : null; }
     return parsed;
   } catch(e) { return null; }
 }
@@ -363,9 +442,11 @@ async function scoreBatch(jobs, limit) {
   const scored = [];
   for (const job of jobs) {
     const score = await scoreJob(job);
-    if (!score || score.skip || (score.probability||0) < 25) continue;
+    // Only hard-skip if explicitly marked or probability is truly zero
+    // Lower threshold to 15 so borderline roles still surface
+    if (!score || score.skip === true || (score.probability||0) < 15) continue;
     scored.push({ ...job, ...score });
-    await new Promise(r => setTimeout(r, 120));
+    await new Promise(r => setTimeout(r, 100));
   }
   scored.sort((a, b) => (b.score||0) - (a.score||0));
   return scored.slice(0, limit);
@@ -388,7 +469,7 @@ async function runDiscoveryPipeline() {
 
     console.log('📋 Raw counts — RemoteOK:', remoteRaw.length, '| Adzuna:', adzunaRaw.length, '| JSearch:', jsearchRaw.length);
 
-    // Deduplicate within each source, then cross-source
+    // Global dedupe across all sources, preserving source attribution
     const allForDedupe = [
       ...remoteRaw.map(j => ({...j, _src:'remoteok'})),
       ...adzunaRaw.map(j => ({...j, _src:'adzuna'})),
@@ -400,14 +481,14 @@ async function runDiscoveryPipeline() {
     const jsearchDeduped = deduped.filter(j => j._src === 'jsearch');
     console.log('After dedupe — RemoteOK:', remoteDeduped.length, '| Adzuna:', adzunaDeduped.length, '| JSearch:', jsearchDeduped.length);
 
-    // Score each batch, get top 25 per source
+    // Score each batch in parallel (faster), top 25 per source
     const [remoteTop, adzunaTop, jsearchTop] = await Promise.all([
       scoreBatch(remoteDeduped, 25),
       scoreBatch(adzunaDeduped, 25),
       scoreBatch(jsearchDeduped, 25),
     ]);
 
-    console.log('✅ Pipeline done. RemoteOK:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
+    console.log('✅ Pipeline done — RemoteOK:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
 
     writePicks({
       remoteok: remoteTop,
@@ -418,7 +499,7 @@ async function runDiscoveryPipeline() {
     });
   } catch(e) {
     console.error('Pipeline error:', e.message);
-    writePicks({ adzuna:[], remoteok:[], jsearch:[], fetchedAt:new Date().toISOString(), status:'error', error:e.message });
+    writePicks({ adzuna:[], remoteok:[], jsearch:[], fetchedAt:new Date().toISOString(), status:'error', error: e.message });
   } finally { fetchInProgress = false; }
 }
 
@@ -429,11 +510,10 @@ setInterval(() => runDiscoveryPipeline(), 6 * 60 * 60 * 1000);
 // ── PICKS ENDPOINTS ───────────────────────────────────────────────────────────
 app.get('/api/picks', (req, res) => res.json(readPicks()));
 app.post('/api/picks/refresh', (req, res) => {
-  if (fetchInProgress) return res.json({ ok:false, message:'Already running' });
+  if (fetchInProgress) return res.json({ ok: false, message: 'Already running' });
   runDiscoveryPipeline();
-  res.json({ ok:true, message:'Pipeline started' });
+  res.json({ ok: true, message: 'Pipeline started' });
 });
-
 
 // ── SPA FALLBACK ──────────────────────────────────────────────────────────────
 // This MUST be last — catches everything that isn't an API route or static file
