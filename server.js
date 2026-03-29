@@ -171,36 +171,47 @@ function dedupe(jobs) {
 // health/science terms. We fetch everything and let the AI scorer decide.
 async function fetchRemoteOK() {
   const jobs = [];
-  try {
-    console.log('🌐 Fetching RemoteOK...');
-    const resp = await fetch('https://remoteok.com/api', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-      }
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const raw = await resp.text();
-    if (raw.trim().startsWith('<')) throw new Error('Rate limited — got HTML');
-    const data = JSON.parse(raw);
-    // data[0] is always a legal notice object, skip it
-    for (const job of (Array.isArray(data) ? data.slice(1) : [])) {
-      if (!job.position || !job.company) continue;
-      jobs.push({
-        id: 'rok_' + (job.id || Math.random()),
-        title: job.position,
-        company: typeof job.company === 'string' ? job.company : (job.company?.name || 'Unknown'),
-        location: 'Remote',
-        url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
-        description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').slice(0, 1500),
-        tags: Array.isArray(job.tags) ? job.tags : [],
-        salary: job.salary || '',
-        source: 'RemoteOK',
-        postedAt: job.date || new Date().toISOString(),
+  // Try multiple approaches since RemoteOK sometimes rate-limits server IPs
+  const URLS = [
+    'https://remoteok.com/api',
+    'https://remoteok.io/api',
+  ];
+  for (const url of URLS) {
+    try {
+      console.log('🌐 Fetching RemoteOK from', url);
+      const resp = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; JobAggregator/1.0)',
+          'Accept': 'application/json, text/plain, */*',
+          'Cache-Control': 'no-cache',
+        },
+        signal: AbortSignal.timeout(15000),
       });
-    }
-    console.log('✅ RemoteOK raw:', jobs.length);
-  } catch(e) { console.error('❌ RemoteOK:', e.message); }
+      console.log('RemoteOK status:', resp.status, 'content-type:', resp.headers.get('content-type'));
+      if (!resp.ok) { console.log('RemoteOK non-ok:', resp.status); continue; }
+      const raw = await resp.text();
+      console.log('RemoteOK raw length:', raw.length, '| starts with:', raw.slice(0,30));
+      if (raw.trim().startsWith('<')) { console.log('RemoteOK returned HTML — likely rate limited'); continue; }
+      const data = JSON.parse(raw);
+      for (const job of (Array.isArray(data) ? data.slice(1) : [])) {
+        if (!job.position || !job.company) continue;
+        jobs.push({
+          id: 'rok_' + (job.id || Math.random()),
+          title: job.position,
+          company: typeof job.company === 'string' ? job.company : (job.company?.name || 'Unknown'),
+          location: 'Remote',
+          url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
+          description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').slice(0, 1500),
+          tags: Array.isArray(job.tags) ? job.tags : [],
+          salary: job.salary || '',
+          source: 'RemoteOK',
+          postedAt: job.date || new Date().toISOString(),
+        });
+      }
+      console.log('✅ RemoteOK raw:', jobs.length, 'jobs');
+      break; // success — stop trying other URLs
+    } catch(e) { console.error('❌ RemoteOK attempt failed:', e.message); }
+  }
   return jobs;
 }
 
@@ -318,10 +329,18 @@ async function fetchJSearch() {
       });
       // Log every status so we can see exactly what's happening
       console.log('JSearch query:', q.slice(0,40), '— status:', resp.status);
-      if (resp.status === 429) { await new Promise(r => setTimeout(r, 3000)); continue; }
-      if (!resp.ok) continue;
+      if (resp.status === 429) {
+        console.log('JSearch rate limited — waiting 5s');
+        await new Promise(r => setTimeout(r, 5000)); continue;
+      }
+      if (resp.status === 403) { console.log('JSearch 403 — check API key and plan limits'); break; }
+      if (!resp.ok) {
+        const errBody = await resp.text().catch(() => '');
+        console.log('JSearch error body:', errBody.slice(0,200));
+        continue;
+      }
       const data = await resp.json();
-      console.log('JSearch results for', q.slice(0,30), ':', (data.data||[]).length);
+      console.log('JSearch results for', q.slice(0,30), ':', (data.data||[]).length, '| status:', data.status);
       for (const job of (data.data||[])) {
         const uid = 'js_' + (job.job_id||Math.random());
         if (seen.has(uid)) continue;
@@ -387,7 +406,7 @@ async function scoreBatch(jobs, limit) {
     const chunk = jobs.slice(i, i + BATCH);
     const results = await Promise.all(chunk.map(async job => {
       const score = await scoreJob(job);
-      if (!score || score.skip === true || (score.probability||0) < 20) return null;
+      if (!score || score.skip === true || (score.probability||0) < 15) return null;
       return { ...job, ...score };
     }));
     results.forEach(r => { if (r) scored.push(r); });
@@ -463,7 +482,28 @@ app.post('/api/picks/refresh', (req, res) => {
   res.json({ ok:true, message:'Pipeline started' });
 });
 // Diagnostic endpoint — hit this to see raw fetch counts without triggering a full run
-app.get('/api/picks/diag', (req, res) => res.json({ ...readPicks(), lastDiag }));
+app.get('/api/picks/diag', (req, res) => {
+  const picks = readPicks();
+  res.json({
+    status: picks.status,
+    fetchedAt: picks.fetchedAt,
+    counts: {
+      adzuna: (picks.adzuna||[]).length,
+      remoteok: (picks.remoteok||[]).length,
+      jsearch: (picks.jsearch||[]).length,
+    },
+    rawCounts: lastDiag,
+    error: picks.error || null,
+    sampleRemoteOK: (picks.remoteok||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
+    sampleJSearch: (picks.jsearch||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
+    sampleAdzuna: (picks.adzuna||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
+    envCheck: {
+      adzuna: !!(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY),
+      jsearch: !!process.env.JSEARCH_API_KEY,
+      anthropic: !!process.env.ANTHROPIC_API_KEY,
+    }
+  });
+});
 
 // ── SPA FALLBACK ──────────────────────────────────────────────────────────────
 // This MUST be last — catches everything that isn't an API route or static file
