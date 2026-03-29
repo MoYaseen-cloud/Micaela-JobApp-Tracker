@@ -130,24 +130,8 @@ app.post('/api/claude', async (req, res) => {
   }
 });
 
-// ── SPA FALLBACK ──────────────────────────────────────────────────────────────
-// This MUST be last — catches everything that isn't an API route or static file
-app.get('*', (req, res) => {
-  const indexPath = path.join(PUBLIC_DIR, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).send('index.html not found. Make sure public/index.html exists in your repository.');
-  }
-});
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n✅ Micaela tracker running at http://localhost:${PORT}`);
-  console.log(`📁 Data stored at: ${DB_PATH}`);
-  console.log(`🌐 Serving frontend from: ${PUBLIC_DIR}\n`);
-});
-
-// ── JOB DISCOVERY PIPELINE ───────────────────────────────────────────────────
+// ── JOB DISCOVERY ─────────────────────────────────────────────────────────────
 const PICKS_PATH = path.join(DATA_DIR, 'daily_picks.json');
 
 function readPicks() {
@@ -448,4 +432,22 @@ app.post('/api/picks/refresh', (req, res) => {
   if (fetchInProgress) return res.json({ ok:false, message:'Already running' });
   runDiscoveryPipeline();
   res.json({ ok:true, message:'Pipeline started' });
+});
+
+
+// ── SPA FALLBACK ──────────────────────────────────────────────────────────────
+// This MUST be last — catches everything that isn't an API route or static file
+app.get('*', (req, res) => {
+  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('index.html not found. Make sure public/index.html exists in your repository.');
+  }
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n✅ Micaela tracker running at http://localhost:${PORT}`);
+  console.log(`📁 Data stored at: ${DB_PATH}`);
+  console.log(`🌐 Serving frontend from: ${PUBLIC_DIR}\n`);
 });
