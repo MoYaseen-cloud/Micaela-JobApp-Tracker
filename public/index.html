@@ -340,7 +340,7 @@
     <div id="sec-discover" class="section">
       <div class="page-header">
         <div class="page-title">Discover jobs 🔍</div>
-        <div class="page-sub">Auto-ranked jobs from 3 sources — refreshed every 6 hours. Deduplicated across platforms.</div>
+        <div class="page-sub">Auto-ranked jobs from Adzuna, Arbeitnow &amp; JSearch — refreshed every 6 hours. Deduplicated.</div>
       </div>
 
       <div id="picks-status-banner" class="status-banner never">
@@ -349,7 +349,7 @@
         <button class="btn btn-outline" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="refreshPicks()">Refresh now</button>
       </div>
       <div id="picks-last-fetch" class="last-fetch" style="display:none;"></div>
-      <div id="picks-debug-panel" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);font-family:monospace;white-space:pre-wrap;"></div>
+      <div id="picks-debug-panel" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);font-family:monospace;white-space:pre-wrap;line-height:1.6;"></div>
       <div style="margin-bottom:1rem;">
         <button class="btn btn-outline" style="padding:4px 12px;font-size:11px;" onclick="showPicksDebug()">🔍 Show diagnostics</button>
       </div>
@@ -357,7 +357,7 @@
       <!-- Source tabs -->
       <div class="src-tabs">
         <button class="src-tab active" id="stab-adzuna" onclick="switchSource('adzuna')">🏢 Adzuna <span id="stab-adzuna-count" style="opacity:0.6;font-size:11px;"></span></button>
-        <button class="src-tab" id="stab-remoteok" onclick="switchSource('remoteok')">🌍 RemoteOK <span id="stab-remoteok-count" style="opacity:0.6;font-size:11px;"></span></button>
+        <button class="src-tab" id="stab-remoteok" onclick="switchSource('remoteok')">🌍 Arbeitnow <span id="stab-remoteok-count" style="opacity:0.6;font-size:11px;"></span></button>
         <button class="src-tab" id="stab-jsearch" onclick="switchSource('jsearch')">🔎 JSearch <span id="stab-jsearch-count" style="opacity:0.6;font-size:11px;"></span></button>
       </div>
 
@@ -1272,39 +1272,6 @@ function filterPicks(f, el) {
   renderPicks();
 }
 
-async function showPicksDebug() {
-  const panel = document.getElementById('picks-debug-panel');
-  if (!panel) return;
-  try {
-    const resp = await fetch('/api/picks/diag');
-    const d = await resp.json();
-    panel.style.display = 'block';
-    panel.textContent = [
-      '=== DIAGNOSTICS ===',
-      'Status: ' + d.status,
-      'Last fetch: ' + (d.fetchedAt || 'never'),
-      '',
-      '=== RAW FETCHED (before scoring) ===',
-      'RemoteOK: ' + (d.rawCounts?.remoteok ?? '?') + ' jobs',
-      'Adzuna:   ' + (d.rawCounts?.adzuna ?? '?') + ' jobs',
-      'JSearch:  ' + (d.rawCounts?.jsearch ?? '?') + ' jobs',
-      '',
-      '=== AFTER SCORING (shown in tabs) ===',
-      'RemoteOK: ' + d.counts.remoteok + ' jobs',
-      'Adzuna:   ' + d.counts.adzuna + ' jobs',
-      'JSearch:  ' + d.counts.jsearch + ' jobs',
-      '',
-      '=== ENV KEYS SET ===',
-      'Adzuna:    ' + (d.envCheck?.adzuna ? '✅' : '❌ MISSING'),
-      'JSearch:   ' + (d.envCheck?.jsearch ? '✅' : '❌ MISSING'),
-      'Anthropic: ' + (d.envCheck?.anthropic ? '✅' : '❌ MISSING'),
-      d.error ? '\n=== ERROR ===\n' + d.error : '',
-    ].filter(Boolean).join('\n');
-  } catch(e) {
-    if (panel) { panel.style.display = 'block'; panel.textContent = 'Could not load diagnostics: ' + e.message; }
-  }
-}
-
 async function refreshPicks() {
   const banner = document.getElementById('picks-status-banner');
   banner.className = 'status-banner loading';
@@ -1370,7 +1337,7 @@ function renderPicks() {
     const fitClass = (j.fit||'medium').toLowerCase() + '-fit';
     const pc = j.probability >= 70 ? 'var(--green)' : j.probability >= 50 ? 'var(--gold)' : 'var(--red)';
     const alreadySaved = apps.some(a => a.discoveryId === j.id);
-    const srcShort = j.source ? j.source.replace('JSearch (','').replace(')','') : currentSource;
+    const srcShort = j.source ? j.source.replace('JSearch (','').replace(')','') : (currentSource === 'remoteok' ? 'Arbeitnow' : currentSource);
     return '<div class="pick-card ' + fitClass + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">' +
         '<div><div class="pick-title">' + esc(j.title) + '</div>' +
