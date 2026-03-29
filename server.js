@@ -166,52 +166,50 @@ function dedupe(jobs) {
   return [...seen.values()];
 }
 
-// ── FETCH: REMOTEOK ───────────────────────────────────────────────────────────
-// NO keyword pre-filter — RemoteOK tags are all tech keywords that never match
-// health/science terms. We fetch everything and let the AI scorer decide.
+// ── FETCH: ARBEITNOW (replaces RemoteOK — proper API, no IP blocking) ──────────
+// Free, no auth, returns remote-friendly international jobs
 async function fetchRemoteOK() {
   const jobs = [];
-  // Try multiple approaches since RemoteOK sometimes rate-limits server IPs
-  const URLS = [
-    'https://remoteok.com/api',
-    'https://remoteok.io/api',
-  ];
-  for (const url of URLS) {
-    try {
-      console.log('🌐 Fetching RemoteOK from', url);
+  try {
+    console.log('🌐 Fetching Arbeitnow...');
+    // Arbeitnow: free job board API, remote-friendly international roles
+    // Multiple pages to get enough volume
+    for (let page = 1; page <= 4; page++) {
+      const url = `https://www.arbeitnow.com/api/job-board-api?page=${page}`;
       const resp = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; JobAggregator/1.0)',
-          'Accept': 'application/json, text/plain, */*',
-          'Cache-Control': 'no-cache',
-        },
-        signal: AbortSignal.timeout(15000),
+        headers: { 'Accept': 'application/json', 'User-Agent': 'MicaelaJobTracker/1.0' },
+        signal: AbortSignal.timeout(10000),
       });
-      console.log('RemoteOK status:', resp.status, 'content-type:', resp.headers.get('content-type'));
-      if (!resp.ok) { console.log('RemoteOK non-ok:', resp.status); continue; }
-      const raw = await resp.text();
-      console.log('RemoteOK raw length:', raw.length, '| starts with:', raw.slice(0,30));
-      if (raw.trim().startsWith('<')) { console.log('RemoteOK returned HTML — likely rate limited'); continue; }
-      const data = JSON.parse(raw);
-      for (const job of (Array.isArray(data) ? data.slice(1) : [])) {
-        if (!job.position || !job.company) continue;
+      console.log('Arbeitnow page', page, 'status:', resp.status);
+      if (!resp.ok) break;
+      const data = await resp.json();
+      const listings = data.data || [];
+      if (!listings.length) break;
+
+      for (const job of listings) {
+        if (!job.title || !job.company_name) continue;
+        // Keep remote jobs and jobs mentioning relevant fields
+        const text = (job.title + ' ' + (job.tags||[]).join(' ') + ' ' + (job.description||'')).toLowerCase();
+        const relevant = ['sales','admin','coordinator','clinical','research','lab','health','science','assistant','customer','support','remote','data','quality','medical','pharma','biology'];
+        if (!relevant.some(k => text.includes(k))) continue;
+
         jobs.push({
-          id: 'rok_' + (job.id || Math.random()),
-          title: job.position,
-          company: typeof job.company === 'string' ? job.company : (job.company?.name || 'Unknown'),
-          location: 'Remote',
-          url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
-          description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').slice(0, 1500),
-          tags: Array.isArray(job.tags) ? job.tags : [],
-          salary: job.salary || '',
-          source: 'RemoteOK',
-          postedAt: job.date || new Date().toISOString(),
+          id: 'arb_' + job.slug,
+          title: job.title,
+          company: job.company_name,
+          location: job.remote ? 'Remote' : (job.location || 'International'),
+          url: job.url || ('https://www.arbeitnow.com/jobs/' + job.slug),
+          description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500),
+          tags: job.tags || [],
+          salary: '',
+          source: 'Arbeitnow',
+          postedAt: job.created_at ? new Date(job.created_at * 1000).toISOString() : new Date().toISOString(),
         });
       }
-      console.log('✅ RemoteOK raw:', jobs.length, 'jobs');
-      break; // success — stop trying other URLs
-    } catch(e) { console.error('❌ RemoteOK attempt failed:', e.message); }
-  }
+      await new Promise(r => setTimeout(r, 300));
+    }
+    console.log('✅ Arbeitnow raw:', jobs.length, 'jobs');
+  } catch(e) { console.error('❌ Arbeitnow:', e.message); }
   return jobs;
 }
 
@@ -329,18 +327,10 @@ async function fetchJSearch() {
       });
       // Log every status so we can see exactly what's happening
       console.log('JSearch query:', q.slice(0,40), '— status:', resp.status);
-      if (resp.status === 429) {
-        console.log('JSearch rate limited — waiting 5s');
-        await new Promise(r => setTimeout(r, 5000)); continue;
-      }
-      if (resp.status === 403) { console.log('JSearch 403 — check API key and plan limits'); break; }
-      if (!resp.ok) {
-        const errBody = await resp.text().catch(() => '');
-        console.log('JSearch error body:', errBody.slice(0,200));
-        continue;
-      }
+      if (resp.status === 429) { await new Promise(r => setTimeout(r, 3000)); continue; }
+      if (!resp.ok) continue;
       const data = await resp.json();
-      console.log('JSearch results for', q.slice(0,30), ':', (data.data||[]).length, '| status:', data.status);
+      console.log('JSearch results for', q.slice(0,30), ':', (data.data||[]).length);
       for (const job of (data.data||[])) {
         const uid = 'js_' + (job.job_id||Math.random());
         if (seen.has(uid)) continue;
@@ -406,7 +396,7 @@ async function scoreBatch(jobs, limit) {
     const chunk = jobs.slice(i, i + BATCH);
     const results = await Promise.all(chunk.map(async job => {
       const score = await scoreJob(job);
-      if (!score || score.skip === true || (score.probability||0) < 15) return null;
+      if (!score || score.skip === true || (score.probability||0) < 20) return null;
       return { ...job, ...score };
     }));
     results.forEach(r => { if (r) scored.push(r); });
@@ -433,7 +423,7 @@ async function runDiscoveryPipeline() {
       fetchRemoteOK(), fetchAdzuna(), fetchJSearch()
     ]);
 
-    console.log('📋 RAW — RemoteOK:', remoteRaw.length, '| Adzuna:', adzunaRaw.length, '| JSearch:', jsearchRaw.length);
+    console.log('📋 RAW — Arbeitnow:', remoteRaw.length, '| Adzuna:', adzunaRaw.length, '| JSearch:', jsearchRaw.length);
     lastDiag = { remoteok: remoteRaw.length, adzuna: adzunaRaw.length, jsearch: jsearchRaw.length };
 
     const allForDedupe = [
@@ -445,7 +435,7 @@ async function runDiscoveryPipeline() {
     const remoteDeduped = deduped.filter(j=>j._src==='remoteok');
     const adzunaDeduped = deduped.filter(j=>j._src==='adzuna');
     const jsearchDeduped = deduped.filter(j=>j._src==='jsearch');
-    console.log('📋 DEDUPED — RemoteOK:', remoteDeduped.length, '| Adzuna:', adzunaDeduped.length, '| JSearch:', jsearchDeduped.length);
+    console.log('📋 DEDUPED — Arbeitnow:', remoteDeduped.length, '| Adzuna:', adzunaDeduped.length, '| JSearch:', jsearchDeduped.length);
 
     // Score all 3 sources in parallel (not sequential) — much faster
     const [remoteTop, adzunaTop, jsearchTop] = await Promise.all([
@@ -454,7 +444,7 @@ async function runDiscoveryPipeline() {
       scoreBatch(jsearchDeduped, 25),
     ]);
 
-    console.log('✅ SCORED — RemoteOK:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
+    console.log('✅ SCORED — Arbeitnow:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
 
     writePicks({
       remoteok: remoteTop,
@@ -482,28 +472,7 @@ app.post('/api/picks/refresh', (req, res) => {
   res.json({ ok:true, message:'Pipeline started' });
 });
 // Diagnostic endpoint — hit this to see raw fetch counts without triggering a full run
-app.get('/api/picks/diag', (req, res) => {
-  const picks = readPicks();
-  res.json({
-    status: picks.status,
-    fetchedAt: picks.fetchedAt,
-    counts: {
-      adzuna: (picks.adzuna||[]).length,
-      remoteok: (picks.remoteok||[]).length,
-      jsearch: (picks.jsearch||[]).length,
-    },
-    rawCounts: lastDiag,
-    error: picks.error || null,
-    sampleRemoteOK: (picks.remoteok||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
-    sampleJSearch: (picks.jsearch||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
-    sampleAdzuna: (picks.adzuna||[]).slice(0,2).map(j=>({title:j.title,company:j.company,score:j.score})),
-    envCheck: {
-      adzuna: !!(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY),
-      jsearch: !!process.env.JSEARCH_API_KEY,
-      anthropic: !!process.env.ANTHROPIC_API_KEY,
-    }
-  });
-});
+app.get('/api/picks/diag', (req, res) => res.json({ ...readPicks(), lastDiag }));
 
 // ── SPA FALLBACK ──────────────────────────────────────────────────────────────
 // This MUST be last — catches everything that isn't an API route or static file
