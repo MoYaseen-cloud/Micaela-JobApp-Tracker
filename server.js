@@ -101,7 +101,7 @@ app.post('/api/claude', async (req, res) => {
   if (!ANTHROPIC_API_KEY) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set in Railway environment variables.' });
   }
-  const { model, max_tokens, messages } = req.body;
+  const { model, max_tokens, messages, system } = req.body;
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Invalid request: messages array required' });
   }
@@ -113,7 +113,7 @@ app.post('/api/claude', async (req, res) => {
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({ model, max_tokens, messages }),
+      body: JSON.stringify({ model, max_tokens, messages, ...(system ? { system } : {}) }),
     });
     if (!response.ok) {
       const errText = await response.text();
@@ -166,50 +166,41 @@ function dedupe(jobs) {
   return [...seen.values()];
 }
 
-// ── FETCH: ARBEITNOW (replaces RemoteOK — proper API, no IP blocking) ──────────
-// Free, no auth, returns remote-friendly international jobs
+// ── FETCH: REMOTEOK ───────────────────────────────────────────────────────────
+// NO keyword pre-filter — RemoteOK tags are all tech keywords that never match
+// health/science terms. We fetch everything and let the AI scorer decide.
 async function fetchRemoteOK() {
   const jobs = [];
   try {
-    console.log('🌐 Fetching Arbeitnow...');
-    // Arbeitnow: free job board API, remote-friendly international roles
-    // Multiple pages to get enough volume
-    for (let page = 1; page <= 4; page++) {
-      const url = `https://www.arbeitnow.com/api/job-board-api?page=${page}`;
-      const resp = await fetch(url, {
-        headers: { 'Accept': 'application/json', 'User-Agent': 'MicaelaJobTracker/1.0' },
-        signal: AbortSignal.timeout(10000),
-      });
-      console.log('Arbeitnow page', page, 'status:', resp.status);
-      if (!resp.ok) break;
-      const data = await resp.json();
-      const listings = data.data || [];
-      if (!listings.length) break;
-
-      for (const job of listings) {
-        if (!job.title || !job.company_name) continue;
-        // Keep remote jobs and jobs mentioning relevant fields
-        const text = (job.title + ' ' + (job.tags||[]).join(' ') + ' ' + (job.description||'')).toLowerCase();
-        const relevant = ['sales','admin','coordinator','clinical','research','lab','health','science','assistant','customer','support','remote','data','quality','medical','pharma','biology'];
-        if (!relevant.some(k => text.includes(k))) continue;
-
-        jobs.push({
-          id: 'arb_' + job.slug,
-          title: job.title,
-          company: job.company_name,
-          location: job.remote ? 'Remote' : (job.location || 'International'),
-          url: job.url || ('https://www.arbeitnow.com/jobs/' + job.slug),
-          description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500),
-          tags: job.tags || [],
-          salary: '',
-          source: 'Arbeitnow',
-          postedAt: job.created_at ? new Date(job.created_at * 1000).toISOString() : new Date().toISOString(),
-        });
+    console.log('🌐 Fetching RemoteOK...');
+    const resp = await fetch('https://remoteok.com/api', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
+        'Accept': 'application/json',
       }
-      await new Promise(r => setTimeout(r, 300));
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const raw = await resp.text();
+    if (raw.trim().startsWith('<')) throw new Error('Rate limited — got HTML');
+    const data = JSON.parse(raw);
+    // data[0] is always a legal notice object, skip it
+    for (const job of (Array.isArray(data) ? data.slice(1) : [])) {
+      if (!job.position || !job.company) continue;
+      jobs.push({
+        id: 'rok_' + (job.id || Math.random()),
+        title: job.position,
+        company: typeof job.company === 'string' ? job.company : (job.company?.name || 'Unknown'),
+        location: 'Remote',
+        url: job.url || ('https://remoteok.com/remote-jobs/' + job.id),
+        description: (job.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').slice(0, 1500),
+        tags: Array.isArray(job.tags) ? job.tags : [],
+        salary: job.salary || '',
+        source: 'RemoteOK',
+        postedAt: job.date || new Date().toISOString(),
+      });
     }
-    console.log('✅ Arbeitnow raw:', jobs.length, 'jobs');
-  } catch(e) { console.error('❌ Arbeitnow:', e.message); }
+    console.log('✅ RemoteOK raw:', jobs.length);
+  } catch(e) { console.error('❌ RemoteOK:', e.message); }
   return jobs;
 }
 
@@ -423,7 +414,7 @@ async function runDiscoveryPipeline() {
       fetchRemoteOK(), fetchAdzuna(), fetchJSearch()
     ]);
 
-    console.log('📋 RAW — Arbeitnow:', remoteRaw.length, '| Adzuna:', adzunaRaw.length, '| JSearch:', jsearchRaw.length);
+    console.log('📋 RAW — RemoteOK:', remoteRaw.length, '| Adzuna:', adzunaRaw.length, '| JSearch:', jsearchRaw.length);
     lastDiag = { remoteok: remoteRaw.length, adzuna: adzunaRaw.length, jsearch: jsearchRaw.length };
 
     const allForDedupe = [
@@ -435,7 +426,7 @@ async function runDiscoveryPipeline() {
     const remoteDeduped = deduped.filter(j=>j._src==='remoteok');
     const adzunaDeduped = deduped.filter(j=>j._src==='adzuna');
     const jsearchDeduped = deduped.filter(j=>j._src==='jsearch');
-    console.log('📋 DEDUPED — Arbeitnow:', remoteDeduped.length, '| Adzuna:', adzunaDeduped.length, '| JSearch:', jsearchDeduped.length);
+    console.log('📋 DEDUPED — RemoteOK:', remoteDeduped.length, '| Adzuna:', adzunaDeduped.length, '| JSearch:', jsearchDeduped.length);
 
     // Score all 3 sources in parallel (not sequential) — much faster
     const [remoteTop, adzunaTop, jsearchTop] = await Promise.all([
@@ -444,7 +435,7 @@ async function runDiscoveryPipeline() {
       scoreBatch(jsearchDeduped, 25),
     ]);
 
-    console.log('✅ SCORED — Arbeitnow:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
+    console.log('✅ SCORED — RemoteOK:', remoteTop.length, '| Adzuna:', adzunaTop.length, '| JSearch:', jsearchTop.length);
 
     writePicks({
       remoteok: remoteTop,
