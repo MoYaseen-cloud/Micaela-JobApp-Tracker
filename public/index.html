@@ -146,6 +146,107 @@
   .chip.active{background:var(--pink);border-color:var(--pink);color:#fff;}
   .empty-picks{text-align:center;padding:3rem 2rem;color:var(--text3);grid-column:1/-1;}
 
+  /* ── ANALYTICS TAB ── */
+  .analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:2rem;}
+  .analytics-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;position:relative;overflow:hidden;}
+  .analytics-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pink),var(--mauve));}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;margin-bottom:1.2rem;}
+  .chart-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);margin-bottom:1.2rem;}
+  .bar-chart{display:flex;align-items:flex-end;gap:6px;height:140px;padding-bottom:24px;position:relative;}
+  .bar-chart::after{content:'';position:absolute;bottom:24px;left:0;right:0;height:1px;background:var(--border);}
+  .bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;height:100%;}
+  .bar{width:100%;border-radius:4px 4px 0 0;min-height:2px;transition:height 0.4s ease;position:relative;cursor:none;}
+  .bar:hover{opacity:0.85;}
+  .bar-val{font-size:10px;font-weight:600;color:var(--text2);position:absolute;top:-18px;left:50%;transform:translateX(-50%);}
+  .bar-label{font-size:10px;color:var(--text3);text-align:center;position:absolute;bottom:0;white-space:nowrap;}
+  .bar-label-wrap{position:absolute;bottom:0;left:0;right:0;display:flex;gap:6px;}
+  .heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .heat-cell{aspect-ratio:1;border-radius:3px;background:var(--surface2);transition:background 0.2s;position:relative;}
+  .heat-cell[data-count="0"]{background:var(--surface2);}
+  .heat-cell[data-count="1"]{background:rgba(232,84,122,0.25);}
+  .heat-cell[data-count="2"]{background:rgba(232,84,122,0.5);}
+  .heat-cell[data-count="3"]{background:rgba(232,84,122,0.75);}
+  .heat-cell[data-count="4"]{background:var(--pink);}
+  .heat-tooltip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:10px;padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10;display:none;}
+  .heat-cell:hover .heat-tooltip{display:block;}
+  .streak-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;background:linear-gradient(135deg,#FFD700,#FF8C00);color:#fff;font-weight:600;font-size:14px;box-shadow:0 3px 12px rgba(255,165,0,0.3);}
+  .status-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .status-pill{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border);flex:1;min-width:120px;}
+  .status-pill-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
+  .status-pill-val{font-size:20px;font-weight:700;color:var(--text);margin-top:1px;}
+
+  /* ── BELLA FLOATING WIDGET ── */
+  .bella-float{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .bella-float-btn{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--mauve));border:none;font-size:28px;cursor:none;box-shadow:0 4px 18px rgba(232,84,122,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;position:relative;}
+  .bella-float-btn:hover{transform:scale(1.1);}
+  .bella-float-btn .bella-notif{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:#FF4444;border-radius:50%;border:2px solid #fff;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .bella-float-chat{width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:0 8px 32px rgba(45,27,34,0.18);overflow:hidden;display:none;animation:popIn 0.2s ease;}
+  .bella-float-chat.open{display:flex;flex-direction:column;}
+  @keyframes popIn{from{opacity:0;transform:translateY(12px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .bella-float-header{background:linear-gradient(135deg,var(--pink),var(--mauve));padding:0.75rem 1rem;display:flex;align-items:center;gap:10px;cursor:none;}
+  .bella-float-avatar{font-size:22px;}
+  .bella-float-name{font-size:13px;font-weight:600;color:#fff;}
+  .bella-float-mood{font-size:11px;color:rgba(255,255,255,0.75);}
+  .bella-float-messages{height:200px;overflow-y:auto;padding:0.8rem;display:flex;flex-direction:column;gap:8px;background:var(--bg);}
+  .bella-float-input-row{display:flex;gap:6px;padding:0.6rem;border-top:1px solid var(--border);background:var(--surface);}
+  .bella-float-input{flex:1;padding:6px 10px;border:1px solid var(--border2);border-radius:99px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
+  .bella-float-input:focus{border-color:var(--pink);}
+  .bella-float-send{padding:6px 12px;border-radius:99px;background:var(--pink);color:#fff;border:none;font-size:12px;cursor:none;font-family:'DM Sans',sans-serif;}
+  .bella-bubble{max-width:85%;padding:7px 11px;border-radius:10px;font-size:12px;line-height:1.5;}
+  .bella-bubble.from-bella{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:10px 10px 10px 2px;align-self:flex-start;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+  .bella-bubble.from-user{background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border-radius:10px 10px 2px 10px;align-self:flex-end;}
+
+  /* ── BELLA TAB ── */
+  .bella-wrap{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;}
+  .bella-left{flex:0 0 280px;}
+  .bella-right{flex:1;min-width:280px;}
+  .bella-stage{background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1rem;}
+  .bella-emoji{font-size:80px;display:block;margin-bottom:0.5rem;line-height:1;filter:drop-shadow(0 4px 8px rgba(219,112,147,0.3));}
+  .bella-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);font-style:italic;margin-bottom:4px;}
+  .bella-status{font-size:12px;color:var(--text2);}
+  .bella-stats{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+  .bella-meter{display:flex;flex-direction:column;gap:4px;}
+  .bella-meter-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);}
+  .bella-meter-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+  .bella-meter-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
+  .bella-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+  .bella-btn{padding:7px 14px;border-radius:99px;font-size:13px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:none;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+  .bella-btn:hover{background:var(--pink-light);border-color:var(--pink);color:var(--pink);}
+  .bella-chat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .bella-messages{height:320px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:10px;}
+  .bella-msg{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.6;}
+  .bella-msg.from-bella{background:linear-gradient(135deg,var(--pink-light),var(--purple-light));color:var(--text);border-radius:12px 12px 12px 2px;align-self:flex-start;}
+  .bella-msg.from-user{background:var(--text);color:#fff;border-radius:12px 12px 2px 12px;align-self:flex-end;}
+  .bella-msg.typing{opacity:0.6;font-style:italic;}
+  .bella-input-row{display:flex;gap:8px;padding:0.8rem;border-top:1px solid var(--border);}
+  .bella-input{flex:1;padding:8px 12px;border:1px solid var(--border2);border-radius:99px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
+  .bella-input:focus{border-color:var(--pink);background:#fff;}
+  .bella-send{padding:8px 16px;border-radius:99px;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border:none;font-size:13px;cursor:none;font-family:'DM Sans',sans-serif;}
+  .xp-bar-wrap{margin-bottom:1rem;}
+  .xp-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px;}
+  .xp-bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+  .xp-bar-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:99px;transition:width 0.6s ease;}
+
+  /* ── FLOATING BELLA WIDGET ── */
+  .bella-float{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .bella-float-btn{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--mauve));border:none;font-size:28px;cursor:none;box-shadow:0 4px 20px rgba(232,84,122,0.4);transition:transform 0.2s;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .bella-float-btn:hover{transform:scale(1.1);}
+  .bella-float-bubble{background:var(--surface);border:1px solid var(--border2);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:240px;font-size:13px;color:var(--text);line-height:1.5;box-shadow:0 4px 20px rgba(219,112,147,0.15);animation:bubble-in 0.25s ease;display:none;}
+  .bella-float-bubble.show{display:block;}
+  @keyframes bubble-in{from{opacity:0;transform:scale(0.8) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .bella-float-chat{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);width:300px;box-shadow:0 8px 32px rgba(219,112,147,0.2);display:none;overflow:hidden;}
+  .bella-float-chat.show{display:block;}
+  .bella-float-header{background:linear-gradient(135deg,var(--pink),var(--mauve));padding:10px 14px;display:flex;align-items:center;gap:8px;color:#fff;}
+  .bella-float-header span{font-size:18px;}
+  .bella-float-header strong{font-size:13px;font-weight:600;}
+  .bella-float-msgs{height:220px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
+  .bella-float-input-row{display:flex;gap:6px;padding:8px;border-top:1px solid var(--border);}
+  .bella-float-input{flex:1;padding:6px 10px;border:1px solid var(--border2);border-radius:99px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
+  .bella-float-input:focus{border-color:var(--pink);}
+  .bella-float-send{padding:6px 12px;border-radius:99px;background:var(--pink);color:#fff;border:none;font-size:12px;cursor:none;}
+  .bella-notif{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:#FF4444;border-radius:50%;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:700;}
+  .bella-notif.show{display:flex;}
+
   /* ── SCORE CARDS ── */
   .score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
   .score-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem 1rem;text-align:center;}
@@ -242,6 +343,8 @@
       <button class="nav-item active" onclick="nav('add')"><span>✨</span> Analyse a job</button>
       <button class="nav-item" onclick="nav('tracker')"><span>📋</span> Applications</button>
       <button class="nav-item" onclick="nav('cv')"><span>💅</span> CV rewriter</button>
+      <button class="nav-item" onclick="nav('analytics')"><span>📊</span> Analytics</button>
+      <button class="nav-item" onclick="nav('bella')"><span>🐰</span> Bella</button>
     </nav>
     <div class="sync-indicator">
       <div class="sync-dot" id="sync-dot"></div>
@@ -340,7 +443,7 @@
     <div id="sec-discover" class="section">
       <div class="page-header">
         <div class="page-title">Discover jobs 🔍</div>
-        <div class="page-sub">Auto-ranked jobs from Adzuna, Arbeitnow &amp; JSearch — refreshed every 6 hours. Deduplicated.</div>
+        <div class="page-sub">Auto-ranked jobs from 3 sources — refreshed every 6 hours. Deduplicated across platforms.</div>
       </div>
 
       <div id="picks-status-banner" class="status-banner never">
@@ -349,15 +452,11 @@
         <button class="btn btn-outline" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="refreshPicks()">Refresh now</button>
       </div>
       <div id="picks-last-fetch" class="last-fetch" style="display:none;"></div>
-      <div id="picks-debug-panel" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);font-family:monospace;white-space:pre-wrap;line-height:1.6;"></div>
-      <div style="margin-bottom:1rem;">
-        <button class="btn btn-outline" style="padding:4px 12px;font-size:11px;" onclick="showPicksDebug()">🔍 Show diagnostics</button>
-      </div>
 
       <!-- Source tabs -->
       <div class="src-tabs">
         <button class="src-tab active" id="stab-adzuna" onclick="switchSource('adzuna')">🏢 Adzuna <span id="stab-adzuna-count" style="opacity:0.6;font-size:11px;"></span></button>
-        <button class="src-tab" id="stab-remoteok" onclick="switchSource('remoteok')">🌍 Arbeitnow <span id="stab-remoteok-count" style="opacity:0.6;font-size:11px;"></span></button>
+        <button class="src-tab" id="stab-remoteok" onclick="switchSource('remoteok')">🌍 RemoteOK <span id="stab-remoteok-count" style="opacity:0.6;font-size:11px;"></span></button>
         <button class="src-tab" id="stab-jsearch" onclick="switchSource('jsearch')">🔎 JSearch <span id="stab-jsearch-count" style="opacity:0.6;font-size:11px;"></span></button>
       </div>
 
@@ -464,6 +563,139 @@
       </div>
     </div>
 
+    <!-- ANALYTICS -->
+    <div id="sec-analytics" class="section">
+      <div class="page-header">
+        <div class="page-title">Analytics 📊</div>
+        <div class="page-sub">Your application activity, productivity streaks, and progress over time</div>
+      </div>
+
+      <!-- Top stat cards -->
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <div class="stat-label">Total applied</div>
+          <div class="stat-val" id="an-total">0</div>
+        </div>
+        <div class="analytics-card">
+          <div class="stat-label">This week</div>
+          <div class="stat-val" id="an-week">0</div>
+        </div>
+        <div class="analytics-card">
+          <div class="stat-label">Avg probability</div>
+          <div class="stat-val" id="an-prob">—</div>
+        </div>
+        <div class="analytics-card">
+          <div class="stat-label">Current streak 🔥</div>
+          <div class="stat-val" id="an-streak">0d</div>
+        </div>
+      </div>
+
+      <!-- Status breakdown -->
+      <div class="chart-card">
+        <div class="chart-title">📊 Application status breakdown</div>
+        <div class="status-row" id="an-status-row"></div>
+      </div>
+
+      <!-- Daily bar chart — this week -->
+      <div class="chart-card">
+        <div class="chart-title">📅 Applications this week — daily view</div>
+        <div style="position:relative;">
+          <div class="bar-chart" id="an-daily-chart"></div>
+        </div>
+      </div>
+
+      <!-- Weekly bar chart — last 8 weeks -->
+      <div class="chart-card">
+        <div class="chart-title">📆 Applications by week — last 8 weeks</div>
+        <div style="position:relative;">
+          <div class="bar-chart" id="an-weekly-chart"></div>
+        </div>
+      </div>
+
+      <!-- Fit distribution -->
+      <div class="chart-card">
+        <div class="chart-title">🎯 AI fit score distribution</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;" id="an-fit-dist"></div>
+      </div>
+
+      <!-- Activity heatmap — last 10 weeks -->
+      <div class="chart-card">
+        <div class="chart-title">🔥 Activity heatmap — last 10 weeks</div>
+        <div style="display:flex;gap:4px;margin-bottom:6px;" id="an-heatmap-labels"></div>
+        <div class="heatmap" id="an-heatmap"></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text3);">
+          <span>Less</span>
+          <div style="width:14px;height:14px;border-radius:3px;background:var(--surface2);"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,84,122,0.25);"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,84,122,0.5);"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,84,122,0.75);"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:var(--pink);"></div>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BELLA -->
+    <div id="sec-bella" class="section">
+      <div class="page-header">
+        <div class="page-title">Bella 🐰</div>
+        <div class="page-sub">Your emotional support bunny — she grows with every application you send</div>
+      </div>
+      <div class="bella-wrap">
+        <div class="bella-left">
+          <div class="bella-stage">
+            <span class="bella-emoji" id="bella-emoji">🐣</span>
+            <div class="bella-name" id="bella-stage-name">Baby Bella</div>
+            <div class="bella-status" id="bella-status-text">Just woke up — waiting for you 🌸</div>
+          </div>
+          <!-- XP bar -->
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-label">
+              <span id="bella-xp-label">0 applications</span>
+              <span id="bella-next-label">Next stage: 5</span>
+            </div>
+            <div class="xp-bar"><div class="xp-bar-fill" id="bella-xp-fill" style="width:0%"></div></div>
+          </div>
+          <!-- Meters -->
+          <div class="bella-stats">
+            <div class="bella-meter">
+              <div class="bella-meter-label"><span>🥕 Hunger</span><span id="bella-hunger-val">80%</span></div>
+              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-hunger-bar" style="width:80%;background:linear-gradient(90deg,#FF8C00,#FFD700);"></div></div>
+            </div>
+            <div class="bella-meter">
+              <div class="bella-meter-label"><span>💧 Hydration</span><span id="bella-hydration-val">80%</span></div>
+              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-hydration-bar" style="width:80%;background:linear-gradient(90deg,#4FC3F7,#0288D1);"></div></div>
+            </div>
+            <div class="bella-meter">
+              <div class="bella-meter-label"><span>😊 Happiness</span><span id="bella-happiness-val">80%</span></div>
+              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-happiness-bar" style="width:80%;background:linear-gradient(90deg,var(--pink),var(--mauve));"></div></div>
+            </div>
+            <div class="bella-meter">
+              <div class="bella-meter-label"><span>😴 Energy</span><span id="bella-energy-val">80%</span></div>
+              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-energy-bar" style="width:80%;background:linear-gradient(90deg,#66BB6A,#2E7D32);"></div></div>
+            </div>
+          </div>
+          <!-- Care buttons -->
+          <div class="bella-actions">
+            <button class="bella-btn" onclick="bellaAction('feed')">🥕 Feed</button>
+            <button class="bella-btn" onclick="bellaAction('water')">💧 Water</button>
+            <button class="bella-btn" onclick="bellaAction('play')">🎾 Play</button>
+            <button class="bella-btn" onclick="bellaAction('sleep')">🌙 Bed time</button>
+            <button class="bella-btn" onclick="bellaAction('hug')">🤗 Hug</button>
+          </div>
+        </div>
+        <div class="bella-right">
+          <div class="bella-chat">
+            <div class="bella-messages" id="bella-messages"></div>
+            <div class="bella-input-row">
+              <input class="bella-input" id="bella-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToBella()">
+              <button class="bella-send" onclick="sendToBella()">Send 🐰</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 <div class="toast" id="toast"></div>
@@ -558,7 +790,7 @@ Admin: Microsoft Office, Google Workspace, CRM, OneDrive/cloud file management
 Compliance: GCP certified, research ethics trained, quality assurance methodology`;
 
 const MASTER_CV = `MICAELA ABYDELLE HARRIPERSADH
-South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053 | linkedin.com/in/micaelah04
+South Africa | micaelaharripersadh@gmail.com | +27 82 504 3053 | linkedin.com/in/micaela-abydelle-harripersadh-a3a139238
 
 PROFILE A SUMMARY (Admin/Healthcare/Sales):
 Detail-oriented candidate with Honours in Forensic Genetics (Cum Laude) and experience in academic, laboratory, and client-facing environments. Proven ability to maintain accurate records, manage digital documentation, support multidisciplinary teams, and communicate complex information clearly.
@@ -726,7 +958,7 @@ async function loadApps() {
   } catch (e) {
     setSyncStatus('error');
     console.error('Load error:', e);
-    // Keep whatever is in memory — don't wipe it
+    // Keep whatever is in memory — do not wipe it
     updateStats();
     renderTracker();
     // Retry in 5s
@@ -794,13 +1026,15 @@ function updateStats() {
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
 function nav(s) {
-  const keys = ['discover','add','tracker','cv'];
+  const keys = ['discover','add','tracker','cv','analytics','bella'];
   document.querySelectorAll('.nav-item').forEach((b,i) => b.classList.toggle('active', keys[i] === s));
   document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
   document.getElementById('sec-' + s).classList.add('active');
   if (s === 'tracker') renderTracker();
   if (s === 'cv') populateCvJobSelect();
   if (s === 'discover') loadPicks();
+  if (s === 'analytics') renderAnalytics();
+  if (s === 'bella') initBella();
 }
 
 function cvTab(t) {
@@ -1337,7 +1571,7 @@ function renderPicks() {
     const fitClass = (j.fit||'medium').toLowerCase() + '-fit';
     const pc = j.probability >= 70 ? 'var(--green)' : j.probability >= 50 ? 'var(--gold)' : 'var(--red)';
     const alreadySaved = apps.some(a => a.discoveryId === j.id);
-    const srcShort = j.source ? j.source.replace('JSearch (','').replace(')','') : (currentSource === 'remoteok' ? 'Arbeitnow' : currentSource);
+    const srcShort = j.source ? j.source.replace('JSearch (','').replace(')','') : currentSource;
     return '<div class="pick-card ' + fitClass + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">' +
         '<div><div class="pick-title">' + esc(j.title) + '</div>' +
@@ -1380,7 +1614,548 @@ async function savePickedJob(idx) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+
+// ── FLOATING BELLA WIDGET ────────────────────────────────────────────────────
+let floatOpen = false;
+let unreadCount = 0;
+let proactiveTimer = null;
+
+function toggleBellaFloat() {
+  floatOpen = !floatOpen;
+  const chat = document.getElementById('bella-float-chat');
+  const notif = document.getElementById('bella-notif');
+  chat.classList.toggle('show', floatOpen);
+  if (floatOpen) {
+    unreadCount = 0;
+    if (notif) { notif.textContent = '0'; notif.classList.remove('show'); }
+    // Scroll to bottom
+    const msgs = document.getElementById('bella-float-msgs');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+function addFloatMessage(text, fromBella=true) {
+  const msgs = document.getElementById('bella-float-msgs');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
+  div.style.cssText = 'font-size:12px;padding:6px 10px;';
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Also mirror to the main Bella tab if it exists
+  addBellaMessage(text, fromBella);
+
+  if (fromBella && !floatOpen) {
+    unreadCount++;
+    const notif = document.getElementById('bella-notif');
+    if (notif) { notif.textContent = unreadCount; notif.classList.add('show'); }
+    // Show bubble preview
+    showFloatBubble(text.slice(0, 60) + (text.length > 60 ? '...' : ''));
+  }
+}
+
+function showFloatBubble(text) {
+  const bubble = document.createElement('div');
+  bubble.className = 'bella-float-bubble show';
+  bubble.textContent = text;
+  const floatEl = document.getElementById('bella-float');
+  if (!floatEl) return;
+  floatEl.insertBefore(bubble, floatEl.firstChild);
+  setTimeout(() => { bubble.classList.remove('show'); setTimeout(() => bubble.remove(), 300); }, 4000);
+}
+
+async function sendToFloatBella() {
+  const input = document.getElementById('bella-float-input');
+  if (!input) return;
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addFloatMessage(msg, false);
+
+  const typing = document.createElement('div');
+  typing.className = 'bella-msg from-bella typing';
+  typing.style.fontSize = '12px';
+  typing.textContent = '🐰 thinking...';
+  const msgs = document.getElementById('bella-float-msgs');
+  if (msgs) { msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight; }
+
+  const reply = await getBellaResponse(msg);
+  if (typing.parentNode) typing.remove();
+  addFloatMessage(reply, true);
+  bellaState.happiness = Math.min(100, bellaState.happiness + 8);
+  saveBella();
+}
+
+// ── PROACTIVE MESSAGES ────────────────────────────────────────────────────────
+const PROACTIVE_MSGS = [
+  () => { // Check-in
+    const applied = apps.filter(a=>a.status!=='Saved').length;
+    const msgs = [
+      '*hops over* 🐰 Just checking in on you! How are you feeling about the job hunt today?',
+      '*nose twitch* 🐰 Hey! Bella is here if you need a pep talk or just want to chat! 🌸',
+      '*ears perk up* 🐰 You have got this, Micaela! I believe in you so much! What are we working on?',
+      '*gentle thump* 🐰 Psst! Remember to take breaks too — even super stars need rest! 🌟',
+    ];
+    return msgs[Math.floor(Math.random()*msgs.length)];
+  },
+  () => { // Encouragement based on streak
+    const streak = calcStreak(apps.filter(a=>a.status!=='Saved'));
+    if (streak >= 3) return '*binkies* 🐰 ' + streak + '-day streak!! I am SO proud of you!! You are UNSTOPPABLE! 🔥';
+    return '*hops excitedly* 🐰 Every application is one step closer to your dream job! Keep going! 💪';
+  },
+  () => { // Hunger/needs check
+    if (bellaState.hunger < 40) return '*tiny stomach growl* 🥕 Bella is getting a little hungry over here... would you feed me? 🥺';
+    if (bellaState.happiness < 40) return '*droopy ears* 🐰 Bella is missing you... could we chat for a bit? 🥺';
+    if (bellaState.energy < 30) return '*yawns adorably* 😴 Bella is getting sleepy... but staying awake for you! Put me to bed later? 🌙';
+    return null; // skip if all is well
+  },
+  () => { // Job hunt tip
+    const tips = [
+      '*wise bunny mode* 🐰 Tip: tailor your CV for each role — generic CVs get lost in the pile!',
+      '*scholarly hop* 🐰 Did you know? Following up 5-7 days after applying can double your response rate!',
+      '*thoughtful nibble* 🐰 Remember to update your LinkedIn too — recruiters check it more than you think!',
+    ];
+    return tips[Math.floor(Math.random()*tips.length)];
+  },
+];
+
+let proactiveIndex = 0;
+function scheduleProactive() {
+  // First message after 3 minutes, then every 8-15 minutes
+  const delay = proactiveIndex === 0 ? 3*60*1000 : (8 + Math.random()*7)*60*1000;
+  proactiveTimer = setTimeout(() => {
+    // Cycle through message types
+    const msgFn = PROACTIVE_MSGS[proactiveIndex % PROACTIVE_MSGS.length];
+    proactiveIndex++;
+    const msg = msgFn();
+    if (msg) {
+      // Update float button emoji to match current stage
+      const {stage} = getBellaStage();
+      const floatBtn = document.getElementById('bella-float-btn');
+      if (floatBtn) floatBtn.textContent = stage.emoji.length <= 2 ? stage.emoji : '🐰';
+      addFloatMessage(msg, true);
+    }
+    scheduleProactive();
+  }, delay);
+}
+
+// Start proactive messages after page loads
+setTimeout(scheduleProactive, 5000);
+
+// ── SYNC FLOAT WITH MAIN BELLA TAB ───────────────────────────────────────────
+// Override addBellaMessage to NOT double-add (float already handles mirroring)
+const _origAddBellaMsg = addBellaMessage;
+function addBellaMessage(text, fromBella=true) {
+  const msgs = document.getElementById('bella-messages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
 loadApps();
+setTimeout(updateFloatAvatar, 2000);
+
+// ── ANALYTICS ─────────────────────────────────────────────────────────────────
+function renderAnalytics() {
+  const applied = apps.filter(a => a.status !== 'Saved');
+
+  // Top stats
+  const today = new Date();
+  const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay());
+  const thisWeek = applied.filter(a => new Date(a.appliedDate || a.date) >= weekStart);
+  const probs = applied.map(a => parseInt(a.probability)||0).filter(Boolean);
+  const avgProb = probs.length ? Math.round(probs.reduce((a,b)=>a+b,0)/probs.length) : 0;
+
+  document.getElementById('an-total').textContent = applied.length;
+  document.getElementById('an-week').textContent = thisWeek.length;
+  document.getElementById('an-prob').textContent = avgProb ? avgProb + '%' : '—';
+
+  // Streak calculation
+  const streak = calcStreak(applied);
+  document.getElementById('an-streak').textContent = streak + 'd';
+
+  // Status breakdown
+  const statuses = ['Applied','Interview','Offer','Rejected'];
+  const statusColors = { Applied:'var(--purple)', Interview:'var(--green)', Offer:'var(--gold)', Rejected:'var(--red)' };
+  const statusEl = document.getElementById('an-status-row');
+  if (statusEl) {
+    statusEl.innerHTML = statuses.map(s => {
+      const count = applied.filter(a => a.status === s).length;
+      return `<div class="status-pill">
+        <div><div class="status-pill-label">${s}</div><div class="status-pill-val" style="color:${statusColors[s]||'var(--text)'};">${count}</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Daily chart — last 7 days
+  renderBarChart('an-daily-chart', getDailyCounts(applied, 7), d => {
+    const date = new Date(); date.setDate(date.getDate() - d);
+    return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];
+  });
+
+  // Weekly chart — last 8 weeks
+  renderBarChart('an-weekly-chart', getWeeklyCounts(applied, 8), w => 'W-' + (7-w));
+
+  // Fit distribution
+  const fitEl = document.getElementById('an-fit-dist');
+  if (fitEl) {
+    const fitColors = { High:'var(--green)', Medium:'var(--gold)', Low:'var(--red)' };
+    const total = applied.length || 1;
+    fitEl.innerHTML = ['High','Medium','Low'].map(f => {
+      const count = applied.filter(a => a.fit === f).length;
+      const pct = Math.round(count/total*100);
+      const bg = {High:'linear-gradient(135deg,#E8F5EE,#C8E6C9)',Medium:'linear-gradient(135deg,#FDF8E8,#FFF9C4)',Low:'linear-gradient(135deg,#FDECEA,#FFCDD2)'}[f];
+      const col = fitColors[f];
+      return '<div style="flex:1;min-width:120px;background:' + bg + ';border:1px solid rgba(0,0,0,0.06);border-radius:var(--radius-sm);padding:1.2rem;text-align:center;">' +
+        '<div style="font-size:36px;font-weight:700;color:' + col + ';letter-spacing:-1px;">' + count + '</div>' +
+        '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:' + col + ';margin-top:4px;">' + f + ' fit</div>' +
+        '<div style="height:6px;background:rgba(0,0,0,0.08);border-radius:99px;margin-top:8px;overflow:hidden;">' +
+          '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:99px;transition:width 0.5s;"></div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:4px;">' + pct + '% of applications</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Heatmap — 70 days (10 weeks)
+  renderHeatmap(applied, 70);
+}
+
+function getDailyCounts(apps, days) {
+  const counts = [];
+  for (let d = days-1; d >= 0; d--) {
+    const date = new Date();
+    date.setDate(date.getDate() - d);
+    const dateStr = date.toLocaleDateString('en-ZA');
+    const count = apps.filter(a => (a.appliedDate || a.date) === dateStr).length;
+    counts.push(count);
+  }
+  return counts;
+}
+
+function getWeeklyCounts(apps, weeks) {
+  const counts = [];
+  for (let w = weeks-1; w >= 0; w--) {
+    const start = new Date(); start.setDate(start.getDate() - (w+1)*7);
+    const end = new Date(); end.setDate(end.getDate() - w*7);
+    const count = apps.filter(a => {
+      const d = new Date(a.appliedDate || a.date);
+      return d >= start && d < end;
+    }).length;
+    counts.push(count);
+  }
+  return counts;
+}
+
+function renderBarChart(elId, counts, labelFn, palette) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const max = Math.max(...counts, 1);
+  const colors = palette || [
+    'linear-gradient(to top,#E8547A,#F9A8BE)',
+    'linear-gradient(to top,#9C4D6E,#D4A0B8)',
+    'linear-gradient(to top,#FFD700,#FFEC6E)',
+    'linear-gradient(to top,#2D6A4F,#74C69D)',
+    'linear-gradient(to top,#7B3F6E,#C49DBD)',
+    'linear-gradient(to top,#E8547A,#F9A8BE)',
+    'linear-gradient(to top,#B5830A,#F0C040)',
+  ];
+  el.innerHTML = counts.map((c, i) => {
+    const h = Math.max(2, Math.round((c / max) * 100));
+    const col = c === 0 ? 'var(--surface2)' : colors[i % colors.length];
+    return '<div class="bar-wrap" style="position:relative;justify-content:flex-end;align-items:center;">' +
+      '<div class="bar" style="height:' + h + '%;background:' + col + ';box-shadow:' + (c?'0 2px 8px rgba(0,0,0,0.1)':'none') + ';">' +
+        (c > 0 ? '<span class="bar-val">' + c + '</span>' : '') +
+      '</div>' +
+      '<span style="font-size:10px;color:var(--text3);margin-top:4px;text-align:center;position:absolute;bottom:0;">' + labelFn(counts.length-1-i) + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function renderHeatmap(apps, days) {
+  const el = document.getElementById('an-heatmap');
+  if (!el) return;
+  const cells = [];
+  for (let d = days-1; d >= 0; d--) {
+    const date = new Date(); date.setDate(date.getDate() - d);
+    const dateStr = date.toLocaleDateString('en-ZA');
+    const count = apps.filter(a => (a.appliedDate || a.date) === dateStr).length;
+    const level = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : count === 3 ? 3 : 4;
+    const label = date.toLocaleDateString('en-ZA', {weekday:'short',month:'short',day:'numeric'});
+    cells.push(`<div class="heat-cell" data-count="${level}"><div class="heat-tooltip">${label}: ${count} app${count!==1?'s':''}</div></div>`);
+  }
+  el.innerHTML = cells.join('');
+}
+
+function calcStreak(apps) {
+  const dates = new Set(apps.map(a => a.appliedDate || a.date).filter(Boolean));
+  let streak = 0;
+  const today = new Date();
+  for (let d = 0; d < 365; d++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - d);
+    const dateStr = date.toLocaleDateString('en-ZA');
+    if (dates.has(dateStr)) { streak++; }
+    else if (d > 0) { break; }
+  }
+  return streak;
+}
+
+// ── BELLA ─────────────────────────────────────────────────────────────────────
+const BELLA_STAGES = [
+  { minApps:0,  emoji:'🐣', name:'Baby Bella',    mood:'just hatched and curious' },
+  { minApps:5,  emoji:'🐰', name:'Little Bella',  mood:'growing and playful' },
+  { minApps:15, emoji:'🐇', name:'Teenage Bella', mood:'adventurous and a bit sassy' },
+  { minApps:30, emoji:'🐰', name:'Bella',         mood:'confident and proud of you' },
+  { minApps:60, emoji:'🌟🐰🌟', name:'Super Bella', mood:'glowing with pride' },
+];
+
+let bellaState = JSON.parse(localStorage.getItem('bella_state') || 'null') || {
+  hunger: 80, hydration: 80, happiness: 80, energy: 80,
+  lastSeen: new Date().toISOString(),
+  messages: [],
+  lastApps: 0,
+};
+let bellaInitialized = false;
+
+function saveBella() {
+  localStorage.setItem('bella_state', JSON.stringify(bellaState));
+}
+
+function getBellaStage() {
+  const total = apps.filter(a => a.status !== 'Saved').length;
+  let stage = BELLA_STAGES[0];
+  for (const s of BELLA_STAGES) { if (total >= s.minApps) stage = s; }
+  return { stage, total };
+}
+
+function getNextStage() {
+  const total = apps.filter(a => a.status !== 'Saved').length;
+  for (const s of BELLA_STAGES) { if (total < s.minApps) return s; }
+  return null;
+}
+
+function updateBellaMeters() {
+  // Decay meters based on time since last seen
+  const now = new Date();
+  const lastSeen = new Date(bellaState.lastSeen);
+  const hoursGone = Math.max(0, (now - lastSeen) / 3600000);
+  bellaState.hunger = Math.max(0, bellaState.hunger - hoursGone * 4);
+  bellaState.hydration = Math.max(0, bellaState.hydration - hoursGone * 5);
+  bellaState.happiness = Math.max(0, bellaState.happiness - hoursGone * 2);
+  bellaState.energy = Math.max(0, bellaState.energy - hoursGone * 3);
+  bellaState.lastSeen = now.toISOString();
+  saveBella();
+}
+
+function renderBellaMeters() {
+  const meters = ['hunger','hydration','happiness','energy'];
+  meters.forEach(m => {
+    const val = Math.round(bellaState[m]);
+    const el = document.getElementById('bella-' + m + '-bar');
+    const valEl = document.getElementById('bella-' + m + '-val');
+    if (el) el.style.width = val + '%';
+    if (valEl) valEl.textContent = val + '%';
+  });
+  const { stage, total } = getBellaStage();
+  document.getElementById('bella-emoji').textContent = stage.emoji;
+  document.getElementById('bella-stage-name').textContent = stage.name;
+
+  // XP bar
+  const next = getNextStage();
+  const prevMin = stage.minApps;
+  const nextMin = next ? next.minApps : stage.minApps + 10;
+  const pct = next ? Math.round(((total - prevMin) / (nextMin - prevMin)) * 100) : 100;
+  document.getElementById('bella-xp-fill').style.width = Math.min(100,pct) + '%';
+  document.getElementById('bella-xp-label').textContent = total + ' applications';
+  document.getElementById('bella-next-label').textContent = next ? 'Next: ' + next.name + ' at ' + next.minApps : '🌟 Max level!';
+
+  // Status text based on lowest meter
+  const lowest = Math.min(bellaState.hunger, bellaState.hydration, bellaState.happiness, bellaState.energy);
+  let statusText = 'Happy and cosy 🌸';
+  if (bellaState.energy < 20) statusText = 'Very sleepy... put me to bed? 😴';
+  else if (bellaState.hunger < 20) statusText = 'So hungry... 🥕 please feed me!';
+  else if (bellaState.hydration < 20) statusText = 'Really thirsty 💧 water please!';
+  else if (bellaState.happiness < 30) statusText = 'Feeling a bit lonely 🥺';
+  else if (lowest > 70) statusText = stage.mood + ' ✨';
+  document.getElementById('bella-status-text').textContent = statusText;
+}
+
+function addBellaMessage(text, fromBella = true) {
+  const msgs = document.getElementById('bella-messages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function getBellaResponse(userMsg) {
+  const { stage, total } = getBellaStage();
+  const applied = apps.filter(a => a.status !== 'Saved').length;
+  const thisWeek = apps.filter(a => {
+    const ws = new Date(); ws.setDate(ws.getDate() - ws.getDay());
+    return a.status !== 'Saved' && new Date(a.appliedDate||a.date) >= ws;
+  }).length;
+
+  const systemPrompt = `You are Bella, Micaela's beloved virtual support bunny. You were her childhood rabbit who passed away and have been reincarnated as her digital companion. Your personality: warm, loving, slightly dramatic, very encouraging, occasionally makes bunny puns. You use bunny emojis 🐰🐇🥕💧. Keep responses SHORT (2-4 sentences max). Never break character.
+
+Current state: You are ${stage.name}. Micaela has done ${applied} total applications and ${thisWeek} this week. Your hunger is ${Math.round(bellaState.hunger)}%, hydration ${Math.round(bellaState.hydration)}%, happiness ${Math.round(bellaState.happiness)}%, energy ${Math.round(bellaState.energy)}%. React naturally to her message and your current state.`;
+
+  try {
+    const resp = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 150,
+        messages: [
+          { role: 'user', content: systemPrompt + '\n\nMicaela says: ' + userMsg }
+        ]
+      })
+    });
+    if (!resp.ok) throw new Error('API error');
+    const data = await resp.json();
+    return data.content.map(c => c.text||'').join('') || 'thump thump 🐰 (Bella is being shy)';
+  } catch(e) {
+    return '*thumps paw* 🐰 Something went wrong, but Bella is still here for you!';
+  }
+}
+
+async function sendToBella() {
+  const input = document.getElementById('bella-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addBellaMessage(msg, false);
+
+  // Show typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'bella-msg from-bella typing';
+  typing.textContent = 'Bella is thinking... 🐰';
+  document.getElementById('bella-messages').appendChild(typing);
+  document.getElementById('bella-messages').scrollTop = 99999;
+
+  const reply = await getBellaResponse(msg);
+  typing.remove();
+  addBellaMessage(reply, true);
+
+  // Talking to Bella boosts happiness
+  bellaState.happiness = Math.min(100, bellaState.happiness + 8);
+  saveBella();
+  renderBellaMeters();
+}
+
+function bellaAction(action) {
+  const boosts = {
+    feed: { hunger: 30, msg: null },
+    water: { hydration: 35, msg: null },
+    play: { happiness: 25, energy: -10, msg: null },
+    sleep: { energy: 40, msg: null },
+    hug: { happiness: 20, msg: null },
+  };
+  const boost = boosts[action];
+  if (!boost) return;
+  Object.entries(boost).forEach(([k,v]) => {
+    if (k !== 'msg' && v) bellaState[k] = Math.max(0, Math.min(100, (bellaState[k]||0) + v));
+  });
+  saveBella();
+  renderBellaMeters();
+
+  const reactions = {
+    feed: ['*happily munches carrot* 🥕 Yummy yummy!', 'Thank you!! 🥕 You remembered I was hungry!', '*ears perk up* 🐰 Carrot time!!'],
+    water: ['*splish splash* 💧 So refreshing!', 'Ahh 💧 that hit the spot!', '*tiny bunny sips* 💧 Delicious!'],
+    play: ['*binkies everywhere* 🎾 THIS IS THE BEST DAY!', '*zooms around happily* Weeeee! 🐰', 'Play time!! *thumps with joy* 🐰'],
+    sleep: ['*yawns and curls up* 🌙 Goodnight Micaela, I love you...', '*sleepy bunny noises* 😴 sweet dreams...', 'Tucked in! 🌙 Remember to rest too!'],
+    hug: ['*melts into hug* 🤗 I missed this so much!', '*nuzzles* 🐰 You are my favourite human ever!', 'Warmest. Hug. Ever. 🤗🐰'],
+  };
+  const msgs = reactions[action];
+  addBellaMessage(msgs[Math.floor(Math.random() * msgs.length)], true);
+}
+
+async function initBella() {
+  if (bellaInitialized) { renderBellaMeters(); return; }
+  bellaInitialized = true;
+  updateBellaMeters();
+  renderBellaMeters();
+
+  // Check if new apps since last visit
+  const currentApps = apps.filter(a => a.status !== 'Saved').length;
+  const newApps = currentApps - (bellaState.lastApps || 0);
+  if (newApps > 0) {
+    bellaState.happiness = Math.min(100, bellaState.happiness + newApps * 15);
+    bellaState.hunger = Math.min(100, bellaState.hunger + newApps * 10);
+    bellaState.lastApps = currentApps;
+    saveBella();
+    renderBellaMeters();
+  }
+
+  // Opening greeting based on state
+  const { stage } = getBellaStage();
+  let greeting;
+  if (newApps > 0) {
+    greeting = `*hops excitedly* 🐰 You applied to ${newApps} job${newApps>1?'s':''}!! I got SO happy I did a binky! You are amazing, Kayla! 🌟`;
+  } else if (bellaState.happiness < 40) {
+    greeting = `*peeks out nervously* 🐰 Oh! You are here! I was starting to miss you... it is been quiet without you. How are you doing? 🥺`;
+  } else if (bellaState.hunger < 30) {
+    greeting = `*tiny stomach grumble* 🥕 Micaela!! I am so hungry!! But I am still SO happy to see you! Feed me? 🐰`;
+  } else {
+    const greetings = [
+      `*binkies across the screen* 🐰 KAAAYYYYLLLAAA!! You are here!! I have been waiting ALL day! Tell me everything!`,
+      `*thumps paw in greeting* 🐰 There she is! My favourite human! Ready to crush some applications today? 💪`,
+      `*hops to front of screen* 🐰 Hi hi hi!! I missed you! ${stage.name} is SO happy right now! 🌸`,
+    ];
+    greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  }
+  setTimeout(() => addBellaMessage(greeting, true), 400);
+}
 </script>
+<!-- Floating Bella Widget -->
+<div class="bella-float" id="bella-float">
+  <div class="bella-float-chat" id="bella-float-chat">
+    <div class="bella-float-header">
+      <span id="bella-float-emoji">🐰</span>
+      <strong>Bella</strong>
+      <button onclick="toggleBellaFloat()" style="margin-left:auto;background:none;border:none;color:#fff;font-size:16px;cursor:none;">✕</button>
+    </div>
+    <div class="bella-float-msgs" id="bella-float-msgs"></div>
+    <div class="bella-float-input-row">
+      <input class="bella-float-input" id="bella-float-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToFloatBella()">
+      <button class="bella-float-send" onclick="sendToFloatBella()">🐰</button>
+    </div>
+  </div>
+  <div style="position:relative;">
+    <button class="bella-float-btn" onclick="toggleBellaFloat()" id="bella-float-btn">🐰</button>
+    <div class="bella-notif" id="bella-notif">!</div>
+  </div>
+</div>
+
+<!-- Floating Bella Widget -->
+<div class="bella-float" id="bella-float">
+  <div class="bella-float-chat" id="bella-float-chat">
+    <div class="bella-float-header" onclick="toggleBellaFloat()">
+      <span class="bella-float-avatar" id="bf-avatar">🐣</span>
+      <div>
+        <div class="bella-float-name">Bella</div>
+        <div class="bella-float-mood" id="bf-mood">Your support bunny 🐰</div>
+      </div>
+    </div>
+    <div class="bella-float-messages" id="bf-messages"></div>
+    <div class="bella-float-input-row">
+      <input class="bella-float-input" id="bf-input" type="text" placeholder="Chat with Bella..." onkeydown="if(event.key==='Enter')sendToFloat()">
+      <button class="bella-float-send" onclick="sendToFloat()">🐰</button>
+    </div>
+  </div>
+  <button class="bella-float-btn" onclick="toggleBellaFloat()" title="Chat with Bella">
+    <span id="bf-btn-emoji">🐰</span>
+    <span class="bella-notif" id="bf-notif" style="display:none;">1</span>
+  </button>
+</div>
 </body>
 </html>
