@@ -177,75 +177,85 @@
 
   /* ── BELLA FLOATING WIDGET ── */
   .bella-float{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
-  .bella-float-btn{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--mauve));border:none;font-size:28px;cursor:none;box-shadow:0 4px 18px rgba(232,84,122,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;position:relative;}
-  .bella-float-btn:hover{transform:scale(1.1);}
-  .bella-float-btn .bella-notif{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:#FF4444;border-radius:50%;border:2px solid #fff;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
-  .bella-float-chat{width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:0 8px 32px rgba(45,27,34,0.18);overflow:hidden;display:none;animation:popIn 0.2s ease;}
-  .bella-float-chat.open{display:flex;flex-direction:column;}
-  @keyframes popIn{from{opacity:0;transform:translateY(12px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
-  .bella-float-header{background:linear-gradient(135deg,var(--pink),var(--mauve));padding:0.75rem 1rem;display:flex;align-items:center;gap:10px;cursor:none;}
-  .bella-float-avatar{font-size:22px;}
+  @keyframes popIn{from{opacity:0;transform:translateY(10px) scale(0.93);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .bella-float-chat{width:320px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:0 10px 40px rgba(45,27,34,0.2);overflow:hidden;display:none;flex-direction:column;animation:popIn 0.22s ease;}
+  .bella-float-chat.show{display:flex;}
+  .bella-float-header{background:linear-gradient(135deg,var(--pink),var(--mauve));padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:none;}
   .bella-float-name{font-size:13px;font-weight:600;color:#fff;}
-  .bella-float-mood{font-size:11px;color:rgba(255,255,255,0.75);}
-  .bella-float-messages{height:200px;overflow-y:auto;padding:0.8rem;display:flex;flex-direction:column;gap:8px;background:var(--bg);}
-  .bella-float-input-row{display:flex;gap:6px;padding:0.6rem;border-top:1px solid var(--border);background:var(--surface);}
+  .bella-float-mood{font-size:10px;color:rgba(255,255,255,0.8);}
+  .bf-avatar-wrap{width:42px;height:42px;flex-shrink:0;}
+  .bella-float-msgs{height:200px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px;background:var(--bg);}
+  .bella-float-input-row{display:flex;gap:6px;padding:8px;border-top:1px solid var(--border);background:var(--surface);}
   .bella-float-input{flex:1;padding:6px 10px;border:1px solid var(--border2);border-radius:99px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
   .bella-float-input:focus{border-color:var(--pink);}
   .bella-float-send{padding:6px 12px;border-radius:99px;background:var(--pink);color:#fff;border:none;font-size:12px;cursor:none;font-family:'DM Sans',sans-serif;}
-  .bella-bubble{max-width:85%;padding:7px 11px;border-radius:10px;font-size:12px;line-height:1.5;}
-  .bella-bubble.from-bella{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:10px 10px 10px 2px;align-self:flex-start;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
-  .bella-bubble.from-user{background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border-radius:10px 10px 2px 10px;align-self:flex-end;}
+  .bella-float-btn{width:60px;height:60px;border-radius:50%;background:transparent;border:none;cursor:none;position:relative;transition:transform 0.2s;}
+  .bella-float-btn:hover{transform:scale(1.08);}
+  .bella-notif{position:absolute;top:-2px;right:-2px;width:17px;height:17px;background:#FF4444;border-radius:50%;border:2px solid #fff;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:700;z-index:2;}
+  .bella-notif.show{display:flex;}
+  .bella-float-bubble{background:var(--surface);border:1px solid var(--border2);border-radius:14px 14px 4px 14px;padding:9px 13px;max-width:230px;font-size:12.5px;color:var(--text);line-height:1.5;box-shadow:0 4px 18px rgba(219,112,147,0.15);animation:popIn 0.2s ease;display:none;}
+  .bella-float-bubble.show{display:block;}
+
+  /* ── BELLA MSG BUBBLES ── */
+  .bella-msg{max-width:88%;padding:7px 11px;border-radius:12px;font-size:12.5px;line-height:1.55;word-wrap:break-word;}
+  .bella-msg.from-bella{background:linear-gradient(135deg,var(--pink-light),var(--purple-light));color:var(--text);border-radius:12px 12px 12px 2px;align-self:flex-start;}
+  .bella-msg.from-user{background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border-radius:12px 12px 2px 12px;align-self:flex-end;}
+  .bella-msg.typing{opacity:0.55;font-style:italic;}
 
   /* ── BELLA TAB ── */
-  .bella-wrap{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;}
-  .bella-left{flex:0 0 280px;}
-  .bella-right{flex:1;min-width:280px;}
-  .bella-stage{background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1rem;}
-  .bella-emoji{font-size:80px;display:block;margin-bottom:0.5rem;line-height:1;filter:drop-shadow(0 4px 8px rgba(219,112,147,0.3));}
-  .bella-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);font-style:italic;margin-bottom:4px;}
-  .bella-status{font-size:12px;color:var(--text2);}
-  .bella-stats{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
-  .bella-meter{display:flex;flex-direction:column;gap:4px;}
-  .bella-meter-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);}
-  .bella-meter-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;}
-  .bella-meter-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
-  .bella-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
-  .bella-btn{padding:7px 14px;border-radius:99px;font-size:13px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:none;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
-  .bella-btn:hover{background:var(--pink-light);border-color:var(--pink);color:var(--pink);}
-  .bella-chat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-  .bella-messages{height:320px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:10px;}
-  .bella-msg{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.6;}
-  .bella-msg.from-bella{background:linear-gradient(135deg,var(--pink-light),var(--purple-light));color:var(--text);border-radius:12px 12px 12px 2px;align-self:flex-start;}
-  .bella-msg.from-user{background:var(--text);color:#fff;border-radius:12px 12px 2px 12px;align-self:flex-end;}
-  .bella-msg.typing{opacity:0.6;font-style:italic;}
-  .bella-input-row{display:flex;gap:8px;padding:0.8rem;border-top:1px solid var(--border);}
-  .bella-input{flex:1;padding:8px 12px;border:1px solid var(--border2);border-radius:99px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
-  .bella-input:focus{border-color:var(--pink);background:#fff;}
-  .bella-send{padding:8px 16px;border-radius:99px;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border:none;font-size:13px;cursor:none;font-family:'DM Sans',sans-serif;}
-  .xp-bar-wrap{margin-bottom:1rem;}
-  .xp-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px;}
-  .xp-bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;}
-  .xp-bar-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:99px;transition:width 0.6s ease;}
-
-  /* ── FLOATING BELLA WIDGET ── */
-  .bella-float{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
-  .bella-float-btn{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--mauve));border:none;font-size:28px;cursor:none;box-shadow:0 4px 20px rgba(232,84,122,0.4);transition:transform 0.2s;display:flex;align-items:center;justify-content:center;line-height:1;}
-  .bella-float-btn:hover{transform:scale(1.1);}
-  .bella-float-bubble{background:var(--surface);border:1px solid var(--border2);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:240px;font-size:13px;color:var(--text);line-height:1.5;box-shadow:0 4px 20px rgba(219,112,147,0.15);animation:bubble-in 0.25s ease;display:none;}
-  .bella-float-bubble.show{display:block;}
-  @keyframes bubble-in{from{opacity:0;transform:scale(0.8) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-  .bella-float-chat{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);width:300px;box-shadow:0 8px 32px rgba(219,112,147,0.2);display:none;overflow:hidden;}
-  .bella-float-chat.show{display:block;}
-  .bella-float-header{background:linear-gradient(135deg,var(--pink),var(--mauve));padding:10px 14px;display:flex;align-items:center;gap:8px;color:#fff;}
-  .bella-float-header span{font-size:18px;}
-  .bella-float-header strong{font-size:13px;font-weight:600;}
-  .bella-float-msgs{height:220px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
-  .bella-float-input-row{display:flex;gap:6px;padding:8px;border-top:1px solid var(--border);}
-  .bella-float-input{flex:1;padding:6px 10px;border:1px solid var(--border2);border-radius:99px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
-  .bella-float-input:focus{border-color:var(--pink);}
-  .bella-float-send{padding:6px 12px;border-radius:99px;background:var(--pink);color:#fff;border:none;font-size:12px;cursor:none;}
-  .bella-notif{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:#FF4444;border-radius:50%;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:700;}
-  .bella-notif.show{display:flex;}
+  .bella-env{position:relative;width:100%;height:520px;border-radius:var(--radius);overflow:hidden;background:linear-gradient(180deg,#87CEEB 0%,#B0E0E8 35%,#90EE90 65%,#4CAF50 100%);border:1px solid var(--border2);margin-bottom:1.2rem;cursor:none;}
+  .bella-env-sky{position:absolute;top:0;left:0;right:0;height:55%;}
+  .bella-env-ground{position:absolute;bottom:0;left:0;right:0;height:45%;}
+  /* clouds */
+  .cloud{position:absolute;background:rgba(255,255,255,0.88);border-radius:50px;animation:drift linear infinite;}
+  @keyframes drift{from{transform:translateX(-120px);}to{transform:translateX(110vw);}}
+  /* grass */
+  .bella-grass{position:absolute;bottom:44%;left:0;right:0;height:28px;background:linear-gradient(180deg,#6DBF67 0%,#4CAF50 100%);border-radius:2px;}
+  /* hutch */
+  .bella-hutch{position:absolute;bottom:47%;right:10%;width:110px;height:90px;}
+  /* pond */
+  .bella-pond{position:absolute;bottom:47%;left:8%;width:120px;height:52px;background:radial-gradient(ellipse,#5BC8DC,#2196F3);border-radius:50%;border:3px solid rgba(255,255,255,0.4);overflow:hidden;}
+  .pond-ripple{position:absolute;border:1.5px solid rgba(255,255,255,0.5);border-radius:50%;animation:ripple 2.5s ease-out infinite;}
+  @keyframes ripple{0%{opacity:0.8;transform:scale(0.3);}100%{opacity:0;transform:scale(1);}}
+  .fish{position:absolute;font-size:12px;animation:swim linear infinite;}
+  @keyframes swim{0%{transform:translateX(0) scaleX(1);}45%{transform:translateX(70px) scaleX(1);}50%{transform:translateX(70px) scaleX(-1);}95%{transform:translateX(0) scaleX(-1);}100%{transform:translateX(0) scaleX(1);}}
+  /* flowers */
+  .flower{position:absolute;font-size:18px;animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+  /* bella main SVG container */
+  .bella-char{position:absolute;bottom:47%;left:50%;transform:translateX(-50%);width:120px;height:130px;cursor:none;transition:bottom 0.2s;}
+  .bella-char:hover{filter:brightness(1.05);}
+  /* speech bubble */
+  .bella-speech{position:absolute;background:#fff;border:2px solid var(--pink);border-radius:14px 14px 14px 2px;padding:7px 12px;font-size:12px;color:var(--text);max-width:200px;line-height:1.4;box-shadow:0 3px 12px rgba(219,112,147,0.2);display:none;bottom:calc(47% + 130px);left:50%;transform:translateX(-30%);z-index:10;word-wrap:break-word;}
+  .bella-speech.show{display:block;}
+  /* drag food zone */
+  .food-tray{display:flex;gap:10px;justify-content:center;margin-bottom:0.8rem;flex-wrap:wrap;}
+  .food-item{font-size:28px;cursor:none;user-select:none;transition:transform 0.15s;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));}
+  .food-item:active{transform:scale(0.85);}
+  .food-item:hover{transform:scale(1.15);}
+  /* meters */
+  .bella-meters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0.8rem;}
+  .bmeter{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;}
+  .bmeter-label{font-size:11px;color:var(--text3);display:flex;justify-content:space-between;margin-bottom:4px;}
+  .bmeter-bar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+  .bmeter-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
+  /* xp */
+  .bella-xp-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:0.8rem;}
+  .bella-xp-top{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px;}
+  .bella-xp-track{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+  .bella-xp-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:99px;transition:width 0.7s ease;}
+  /* chat */
+  .bella-chat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .bella-chat-msgs{height:260px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:9px;}
+  .bella-chat-input-row{display:flex;gap:8px;padding:0.8rem;border-top:1px solid var(--border);}
+  .bella-chat-input{flex:1;padding:8px 14px;border:1px solid var(--border2);border-radius:99px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;}
+  .bella-chat-input:focus{border-color:var(--pink);background:#fff;}
+  .bella-chat-send{padding:8px 18px;border-radius:99px;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border:none;font-size:13px;cursor:none;font-family:'DM Sans',sans-serif;}
+  /* care btns */
+  .bella-care-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0.8rem;}
+  .bella-care-btn{padding:7px 14px;border-radius:99px;font-size:12px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:none;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+  .bella-care-btn:hover{background:var(--pink-light);border-color:var(--pink);color:var(--pink);}
+  .bella-care-btn:active{transform:scale(0.95);}
 
   /* ── SCORE CARDS ── */
   .score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
@@ -639,59 +649,203 @@
     <div id="sec-bella" class="section">
       <div class="page-header">
         <div class="page-title">Bella 🐰</div>
-        <div class="page-sub">Your emotional support bunny — she grows with every application you send</div>
+        <div class="page-sub">Your emotional support bunny — she grows every 25 applications you send</div>
       </div>
-      <div class="bella-wrap">
-        <div class="bella-left">
-          <div class="bella-stage">
-            <span class="bella-emoji" id="bella-emoji">🐣</span>
-            <div class="bella-name" id="bella-stage-name">Baby Bella</div>
-            <div class="bella-status" id="bella-status-text">Just woke up — waiting for you 🌸</div>
-          </div>
-          <!-- XP bar -->
-          <div class="xp-bar-wrap">
-            <div class="xp-bar-label">
-              <span id="bella-xp-label">0 applications</span>
-              <span id="bella-next-label">Next stage: 5</span>
-            </div>
-            <div class="xp-bar"><div class="xp-bar-fill" id="bella-xp-fill" style="width:0%"></div></div>
-          </div>
-          <!-- Meters -->
-          <div class="bella-stats">
-            <div class="bella-meter">
-              <div class="bella-meter-label"><span>🥕 Hunger</span><span id="bella-hunger-val">80%</span></div>
-              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-hunger-bar" style="width:80%;background:linear-gradient(90deg,#FF8C00,#FFD700);"></div></div>
-            </div>
-            <div class="bella-meter">
-              <div class="bella-meter-label"><span>💧 Hydration</span><span id="bella-hydration-val">80%</span></div>
-              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-hydration-bar" style="width:80%;background:linear-gradient(90deg,#4FC3F7,#0288D1);"></div></div>
-            </div>
-            <div class="bella-meter">
-              <div class="bella-meter-label"><span>😊 Happiness</span><span id="bella-happiness-val">80%</span></div>
-              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-happiness-bar" style="width:80%;background:linear-gradient(90deg,var(--pink),var(--mauve));"></div></div>
-            </div>
-            <div class="bella-meter">
-              <div class="bella-meter-label"><span>😴 Energy</span><span id="bella-energy-val">80%</span></div>
-              <div class="bella-meter-bar"><div class="bella-meter-fill" id="bella-energy-bar" style="width:80%;background:linear-gradient(90deg,#66BB6A,#2E7D32);"></div></div>
-            </div>
-          </div>
-          <!-- Care buttons -->
-          <div class="bella-actions">
-            <button class="bella-btn" onclick="bellaAction('feed')">🥕 Feed</button>
-            <button class="bella-btn" onclick="bellaAction('water')">💧 Water</button>
-            <button class="bella-btn" onclick="bellaAction('play')">🎾 Play</button>
-            <button class="bella-btn" onclick="bellaAction('sleep')">🌙 Bed time</button>
-            <button class="bella-btn" onclick="bellaAction('hug')">🤗 Hug</button>
-          </div>
+
+      <!-- INTERACTIVE ENVIRONMENT -->
+      <div class="bella-env" id="bella-env" onclick="petBella(event)">
+        <!-- Sky & clouds rendered by JS -->
+        <!-- Ground -->
+        <div class="bella-grass"></div>
+
+        <!-- Hutch -->
+        <div class="bella-hutch">
+          <svg viewBox="0 0 110 90" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="30" width="100" height="55" rx="3" fill="#8B6914" stroke="#5D4037" stroke-width="2"/>
+            <polygon points="5,30 55,5 105,30" fill="#6D4C41" stroke="#5D4037" stroke-width="2"/>
+            <rect x="30" y="55" width="30" height="30" rx="4" fill="#FFCA28"/>
+            <rect x="30" y="55" width="30" height="30" rx="4" fill="none" stroke="#8B6914" stroke-width="1.5"/>
+            <circle cx="56" cy="70" r="3" fill="#8B6914"/>
+            <rect x="8" y="35" width="92" height="8" rx="2" fill="rgba(255,255,255,0.12)"/>
+          </svg>
         </div>
-        <div class="bella-right">
-          <div class="bella-chat">
-            <div class="bella-messages" id="bella-messages"></div>
-            <div class="bella-input-row">
-              <input class="bella-input" id="bella-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToBella()">
-              <button class="bella-send" onclick="sendToBella()">Send 🐰</button>
-            </div>
-          </div>
+
+        <!-- Pond -->
+        <div class="bella-pond">
+          <div class="pond-ripple" style="width:60%;height:60%;top:20%;left:20%;animation-delay:0s;"></div>
+          <div class="pond-ripple" style="width:80%;height:80%;top:10%;left:10%;animation-delay:1.2s;"></div>
+          <span class="fish" style="bottom:30%;left:5%;animation-duration:4s;">🐟</span>
+          <span class="fish" style="bottom:55%;left:20%;animation-duration:6s;animation-delay:2s;font-size:10px;">🦎</span>
+        </div>
+        <div style="position:absolute;bottom:calc(47% + 52px);left:8%;font-size:11px;color:var(--text2);font-weight:500;">🌊 Pond</div>
+
+        <!-- Flowers scattered on ground -->
+        <span class="flower" style="bottom:47%;left:28%;font-size:20px;animation-delay:0s;">🌸</span>
+        <span class="flower" style="bottom:47%;left:36%;font-size:16px;animation-delay:0.7s;">🌼</span>
+        <span class="flower" style="bottom:47%;left:72%;font-size:18px;animation-delay:1.4s;">🌺</span>
+        <span class="flower" style="bottom:47%;left:80%;font-size:14px;animation-delay:0.3s;">🌷</span>
+        <span class="flower" style="bottom:47%;left:60%;font-size:16px;animation-delay:1s;">🍀</span>
+
+        <!-- Bella character — SVG animated bunny -->
+        <div class="bella-char" id="bella-char" onclick="event.stopPropagation();petBella(event)">
+          <svg id="bella-svg" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="bodyGrad" cx="50%" cy="40%" r="55%">
+                <stop offset="0%" stop-color="#FFFEF8"/>
+                <stop offset="100%" stop-color="#F0EDE5"/>
+              </radialGradient>
+              <radialGradient id="bellyGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FFF5F8"/>
+                <stop offset="100%" stop-color="#F8D0DC"/>
+              </radialGradient>
+              <radialGradient id="cheekGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(232,84,122,0.5)"/>
+                <stop offset="100%" stop-color="rgba(232,84,122,0)"/>
+              </radialGradient>
+              <filter id="fluff">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+              <filter id="softShadow">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(180,100,120,0.25)"/>
+              </filter>
+            </defs>
+
+            <!-- Ears (droopy, brown patch at tips) -->
+            <g id="ear-left">
+              <ellipse cx="35" cy="28" rx="11" ry="28" fill="url(#bodyGrad)" stroke="#E8C0B8" stroke-width="0.8" filter="url(#fluff)"/>
+              <ellipse cx="35" cy="34" rx="6" ry="18" fill="#C2866A" opacity="0.55"/>
+              <!-- Ear droop -->
+              <ellipse cx="31" cy="48" rx="9" ry="14" fill="url(#bodyGrad)" stroke="#E8C0B8" stroke-width="0.7" transform="rotate(18,31,48)" filter="url(#fluff)"/>
+              <ellipse cx="30" cy="52" rx="5" ry="9" fill="#C2866A" opacity="0.45" transform="rotate(18,30,52)"/>
+            </g>
+            <g id="ear-right">
+              <ellipse cx="85" cy="28" rx="11" ry="28" fill="url(#bodyGrad)" stroke="#E8C0B8" stroke-width="0.8" filter="url(#fluff)"/>
+              <ellipse cx="85" cy="34" rx="6" ry="18" fill="#C2866A" opacity="0.55"/>
+              <ellipse cx="89" cy="48" rx="9" ry="14" fill="url(#bodyGrad)" stroke="#E8C0B8" stroke-width="0.7" transform="rotate(-18,89,48)" filter="url(#fluff)"/>
+              <ellipse cx="90" cy="52" rx="5" ry="9" fill="#C2866A" opacity="0.45" transform="rotate(-18,90,52)"/>
+            </g>
+
+            <!-- Body — fluffy white -->
+            <ellipse cx="60" cy="95" rx="36" ry="32" fill="url(#bodyGrad)" filter="url(#fluff)" filter="url(#softShadow)"/>
+            <!-- Belly soft pink -->
+            <ellipse cx="60" cy="100" rx="20" ry="20" fill="url(#bellyGrad)" opacity="0.7"/>
+
+            <!-- Head -->
+            <ellipse cx="60" cy="68" rx="30" ry="28" fill="url(#bodyGrad)" filter="url(#fluff)"/>
+            <!-- Brown eye patch left -->
+            <ellipse cx="44" cy="64" rx="12" ry="10" fill="#8B5E3C" opacity="0.28"/>
+            <!-- Brown eye patch right -->
+            <ellipse cx="76" cy="64" rx="12" ry="10" fill="#8B5E3C" opacity="0.28"/>
+
+            <!-- Eyes — blue, shiny -->
+            <g id="eye-left">
+              <ellipse cx="46" cy="65" rx="7" ry="7.5" fill="#1565C0"/>
+              <ellipse cx="46" cy="65" rx="5.5" ry="6" fill="#1E88E5"/>
+              <ellipse cx="46" cy="65" rx="3" ry="3.5" fill="#0D47A1"/>
+              <circle cx="48.5" cy="62.5" r="1.8" fill="white" opacity="0.9"/>
+              <circle cx="44" cy="67" r="0.9" fill="white" opacity="0.5"/>
+            </g>
+            <g id="eye-right">
+              <ellipse cx="74" cy="65" rx="7" ry="7.5" fill="#1565C0"/>
+              <ellipse cx="74" cy="65" rx="5.5" ry="6" fill="#1E88E5"/>
+              <ellipse cx="74" cy="65" rx="3" ry="3.5" fill="#0D47A1"/>
+              <circle cx="76.5" cy="62.5" r="1.8" fill="white" opacity="0.9"/>
+              <circle cx="72" cy="67" r="0.9" fill="white" opacity="0.5"/>
+            </g>
+
+            <!-- Nose & mouth -->
+            <ellipse cx="60" cy="75" rx="3.5" ry="2.5" fill="#F48FB1"/>
+            <path d="M57.5 77.5 Q60 80.5 62.5 77.5" fill="none" stroke="#E57398" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="60" y1="77" x2="60" y2="78.5" stroke="#E57398" stroke-width="1"/>
+
+            <!-- Whiskers -->
+            <line x1="40" y1="75" x2="55" y2="76" stroke="rgba(150,120,100,0.5)" stroke-width="0.8"/>
+            <line x1="38" y1="78" x2="54" y2="77.5" stroke="rgba(150,120,100,0.4)" stroke-width="0.8"/>
+            <line x1="65" y1="76" x2="80" y2="75" stroke="rgba(150,120,100,0.5)" stroke-width="0.8"/>
+            <line x1="66" y1="77.5" x2="82" y2="78" stroke="rgba(150,120,100,0.4)" stroke-width="0.8"/>
+
+            <!-- Cheek blush -->
+            <ellipse cx="37" cy="72" rx="8" ry="5" fill="url(#cheekGrad)"/>
+            <ellipse cx="83" cy="72" rx="8" ry="5" fill="url(#cheekGrad)"/>
+
+            <!-- Fluffy tail -->
+            <ellipse cx="60" cy="126" rx="10" ry="8" fill="#F5F0EA" filter="url(#fluff)" opacity="0.9"/>
+
+            <!-- Paws -->
+            <ellipse cx="40" cy="118" rx="10" ry="7" fill="url(#bodyGrad)" filter="url(#fluff)"/>
+            <ellipse cx="80" cy="118" rx="10" ry="7" fill="url(#bodyGrad)" filter="url(#fluff)"/>
+            <ellipse cx="40" cy="120" rx="7" ry="4" fill="#F8D0DC" opacity="0.6"/>
+            <ellipse cx="80" cy="120" rx="7" ry="4" fill="#F8D0DC" opacity="0.6"/>
+          </svg>
+        </div>
+
+        <!-- Speech bubble -->
+        <div class="bella-speech" id="bella-speech"></div>
+      </div>
+
+      <!-- FOOD TRAY (drag to feed) -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:0.8rem;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:8px;">Tap to feed • Tap 💧 to give water</div>
+        <div class="food-tray">
+          <span class="food-item" onclick="feedBella('carrot')" title="Carrot">🥕</span>
+          <span class="food-item" onclick="feedBella('lettuce')" title="Lettuce">🥬</span>
+          <span class="food-item" onclick="feedBella('hay')" title="Hay">🌾</span>
+          <span class="food-item" onclick="feedBella('berry')" title="Berry">🍓</span>
+          <span class="food-item" onclick="feedBella('apple')" title="Apple">🍎</span>
+          <span class="food-item" onclick="waterBella()" title="Water">💧</span>
+        </div>
+      </div>
+
+      <!-- CARE BUTTONS -->
+      <div class="bella-care-row">
+        <button class="bella-care-btn" onclick="bellaAction('play')">🎾 Play</button>
+        <button class="bella-care-btn" onclick="bellaAction('hug')">🤗 Cuddle</button>
+        <button class="bella-care-btn" onclick="bellaAction('sleep')">🌙 Bedtime</button>
+        <button class="bella-care-btn" onclick="bellaAction('wake')">☀️ Wake up</button>
+        <button class="bella-care-btn" onclick="bellaAction('pet')">🫶 Pet</button>
+      </div>
+
+      <!-- XP BAR -->
+      <div class="bella-xp-wrap">
+        <div class="bella-xp-top">
+          <span id="bella-xp-label">0 applications</span>
+          <span id="bella-next-label">Next stage: 25 applications</span>
+        </div>
+        <div class="bella-xp-track"><div class="bella-xp-fill" id="bella-xp-fill" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="bella-stage-tag">Baby Bella — just born and curious 🐣</div>
+      </div>
+
+      <!-- METERS -->
+      <div class="bella-meters">
+        <div class="bmeter">
+          <div class="bmeter-label"><span>🥕 Hunger</span><span id="b-hunger-v">80%</span></div>
+          <div class="bmeter-bar"><div class="bmeter-fill" id="b-hunger-f" style="width:80%;background:linear-gradient(90deg,#FF8C00,#FFD700);"></div></div>
+        </div>
+        <div class="bmeter">
+          <div class="bmeter-label"><span>💧 Hydration</span><span id="b-hydra-v">80%</span></div>
+          <div class="bmeter-bar"><div class="bmeter-fill" id="b-hydra-f" style="width:80%;background:linear-gradient(90deg,#29B6F6,#0288D1);"></div></div>
+        </div>
+        <div class="bmeter">
+          <div class="bmeter-label"><span>😊 Happiness</span><span id="b-happy-v">80%</span></div>
+          <div class="bmeter-bar"><div class="bmeter-fill" id="b-happy-f" style="width:80%;background:linear-gradient(90deg,var(--pink),var(--mauve));"></div></div>
+        </div>
+        <div class="bmeter">
+          <div class="bmeter-label"><span>⚡ Energy</span><span id="b-energy-v">80%</span></div>
+          <div class="bmeter-bar"><div class="bmeter-fill" id="b-energy-f" style="width:80%;background:linear-gradient(90deg,#66BB6A,#2E7D32);"></div></div>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="bella-chat-box">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);display:flex;align-items:center;gap:8px;">
+          💬 Chat with Bella
+          <div style="width:7px;height:7px;border-radius:50%;background:#4CAF50;margin-left:auto;" id="bella-online-dot"></div>
+        </div>
+        <div class="bella-chat-msgs" id="bella-msgs"></div>
+        <div class="bella-chat-input-row">
+          <input class="bella-chat-input" id="bella-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToBella()">
+          <button class="bella-chat-send" onclick="sendToBella()">Send 🐰</button>
         </div>
       </div>
     </div>
@@ -1034,7 +1188,7 @@ function nav(s) {
   if (s === 'cv') populateCvJobSelect();
   if (s === 'discover') loadPicks();
   if (s === 'analytics') renderAnalytics();
-  if (s === 'bella') initBella();
+  if (s === 'bella') onNavBella();
 }
 
 function cvTab(t) {
@@ -1216,7 +1370,7 @@ async function saveAsApplied() {
   await saveApps();
   clearForm();
   nav('tracker');
-  toast('Marked as Applied! Good luck! 💌');
+  toast('Marked as Applied! Good luck! 💌'); if(typeof bellaOnNewApp==='function') bellaOnNewApp();
 }
 
 function clearForm() {
@@ -1429,12 +1583,12 @@ function rewriteAppCv(id) {
 }
 
 function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function markApplied(id) { patchApp(id, { status: 'Applied', appliedDate: new Date().toLocaleDateString('en-ZA') }); toast('Marked as Applied! Good luck! 💌'); }
+function markApplied(id) { patchApp(id, { status: 'Applied', appliedDate: new Date().toLocaleDateString('en-ZA') }); toast('Marked as Applied! Good luck! 💌'); if(typeof bellaOnNewApp==='function') bellaOnNewApp(); }
 function markCurrentCvApplied() {
   if (!currentCvAppId) return;
   patchApp(currentCvAppId, { status: 'Applied', appliedDate: new Date().toLocaleDateString('en-ZA') });
   document.getElementById('cv-applied-wrap').style.display = 'none';
-  toast('Marked as Applied! Good luck! 💌');
+  toast('Marked as Applied! Good luck! 💌'); if(typeof bellaOnNewApp==='function') bellaOnNewApp();
 }
 function toggleDrawer(id) { document.getElementById('drawer-' + id)?.classList.toggle('open'); }
 function updateStatus(id, status) {
@@ -1907,25 +2061,32 @@ function calcStreak(apps) {
 }
 
 // ── BELLA ─────────────────────────────────────────────────────────────────────
+// Growth: every 25 applications = new stage
 const BELLA_STAGES = [
-  { minApps:0,  emoji:'🐣', name:'Baby Bella',    mood:'just hatched and curious' },
-  { minApps:5,  emoji:'🐰', name:'Little Bella',  mood:'growing and playful' },
-  { minApps:15, emoji:'🐇', name:'Teenage Bella', mood:'adventurous and a bit sassy' },
-  { minApps:30, emoji:'🐰', name:'Bella',         mood:'confident and proud of you' },
-  { minApps:60, emoji:'🌟🐰🌟', name:'Super Bella', mood:'glowing with pride' },
+  { minApps:0,   name:'Baby Bella',    desc:'just born and so curious 🐣',   scale:0.7,  bounce:4 },
+  { minApps:25,  name:'Little Bella',  desc:'growing and playful 🌸',         scale:0.85, bounce:6 },
+  { minApps:50,  name:'Teen Bella',    desc:'adventurous and a bit cheeky ✨', scale:0.95, bounce:8 },
+  { minApps:75,  name:'Bella',         desc:'confident and proud of you 💪',  scale:1.05, bounce:10 },
+  { minApps:100, name:'Super Bella',   desc:'glowing with absolute pride 🌟', scale:1.15, bounce:12 },
 ];
 
-let bellaState = JSON.parse(localStorage.getItem('bella_state') || 'null') || {
-  hunger: 80, hydration: 80, happiness: 80, energy: 80,
-  lastSeen: new Date().toISOString(),
-  messages: [],
-  lastApps: 0,
-};
-let bellaInitialized = false;
-
-function saveBella() {
-  localStorage.setItem('bella_state', JSON.stringify(bellaState));
+// Nicknames — cycle based on context
+const NICKNAMES = ['Micaela','Kayla','Kpops','KayKay','Mika','my girl'];
+function getNickname(seed) {
+  return NICKNAMES[Math.abs(Math.floor(seed || Math.random()*100)) % NICKNAMES.length];
 }
+
+let bellaState = JSON.parse(localStorage.getItem('bella_v3') || 'null') || {
+  hunger:80, hydration:80, happiness:80, energy:80,
+  lastSeen: new Date().toISOString(), lastApps:0, sleeping:false,
+};
+let bellaInited = false;
+let floatOpen = false;
+let unreadBf = 0;
+let bellaBounceAnim = null;
+let bellaIdleTimer = null;
+
+function saveBella() { localStorage.setItem('bella_v3', JSON.stringify(bellaState)); }
 
 function getBellaStage() {
   const total = apps.filter(a => a.status !== 'Saved').length;
@@ -1940,221 +2101,567 @@ function getNextStage() {
   return null;
 }
 
-function updateBellaMeters() {
-  // Decay meters based on time since last seen
+function decayBellaMeters() {
   const now = new Date();
-  const lastSeen = new Date(bellaState.lastSeen);
-  const hoursGone = Math.max(0, (now - lastSeen) / 3600000);
-  bellaState.hunger = Math.max(0, bellaState.hunger - hoursGone * 4);
-  bellaState.hydration = Math.max(0, bellaState.hydration - hoursGone * 5);
-  bellaState.happiness = Math.max(0, bellaState.happiness - hoursGone * 2);
-  bellaState.energy = Math.max(0, bellaState.energy - hoursGone * 3);
+  const last = new Date(bellaState.lastSeen);
+  const hrs = Math.max(0, (now - last) / 3600000);
+  if (!bellaState.sleeping) {
+    bellaState.hunger     = Math.max(0, bellaState.hunger     - hrs * 5);
+    bellaState.hydration  = Math.max(0, bellaState.hydration  - hrs * 6);
+    bellaState.happiness  = Math.max(0, bellaState.happiness  - hrs * 2.5);
+    bellaState.energy     = Math.max(0, bellaState.energy     - hrs * 3);
+  } else {
+    // sleeping restores energy, very slow decay otherwise
+    bellaState.energy     = Math.min(100, bellaState.energy   + hrs * 8);
+    bellaState.hunger     = Math.max(0, bellaState.hunger     - hrs * 1.5);
+    bellaState.hydration  = Math.max(0, bellaState.hydration  - hrs * 2);
+  }
   bellaState.lastSeen = now.toISOString();
   saveBella();
 }
 
 function renderBellaMeters() {
-  const meters = ['hunger','hydration','happiness','energy'];
-  meters.forEach(m => {
-    const val = Math.round(bellaState[m]);
-    const el = document.getElementById('bella-' + m + '-bar');
-    const valEl = document.getElementById('bella-' + m + '-val');
-    if (el) el.style.width = val + '%';
-    if (valEl) valEl.textContent = val + '%';
-  });
-  const { stage, total } = getBellaStage();
-  document.getElementById('bella-emoji').textContent = stage.emoji;
-  document.getElementById('bella-stage-name').textContent = stage.name;
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = Math.round(val) + '%';
+    const vEl = document.getElementById(id.replace('-f','-v'));
+    if (vEl) vEl.textContent = Math.round(val) + '%';
+  };
+  set('b-hunger-f', bellaState.hunger);
+  set('b-hydra-f', bellaState.hydration);
+  set('b-happy-f', bellaState.happiness);
+  set('b-energy-f', bellaState.energy);
 
-  // XP bar
+  const { stage, total } = getBellaStage();
   const next = getNextStage();
-  const prevMin = stage.minApps;
-  const nextMin = next ? next.minApps : stage.minApps + 10;
-  const pct = next ? Math.round(((total - prevMin) / (nextMin - prevMin)) * 100) : 100;
-  document.getElementById('bella-xp-fill').style.width = Math.min(100,pct) + '%';
-  document.getElementById('bella-xp-label').textContent = total + ' applications';
-  document.getElementById('bella-next-label').textContent = next ? 'Next: ' + next.name + ' at ' + next.minApps : '🌟 Max level!';
+  const prev = stage.minApps;
+  const nextMin = next ? next.minApps : prev + 25;
+  const pct = next ? Math.min(100, Math.round(((total - prev) / (nextMin - prev)) * 100)) : 100;
 
-  // Status text based on lowest meter
-  const lowest = Math.min(bellaState.hunger, bellaState.hydration, bellaState.happiness, bellaState.energy);
-  let statusText = 'Happy and cosy 🌸';
-  if (bellaState.energy < 20) statusText = 'Very sleepy... put me to bed? 😴';
-  else if (bellaState.hunger < 20) statusText = 'So hungry... 🥕 please feed me!';
-  else if (bellaState.hydration < 20) statusText = 'Really thirsty 💧 water please!';
-  else if (bellaState.happiness < 30) statusText = 'Feeling a bit lonely 🥺';
-  else if (lowest > 70) statusText = stage.mood + ' ✨';
-  document.getElementById('bella-status-text').textContent = statusText;
+  const xpFill = document.getElementById('bella-xp-fill');
+  if (xpFill) xpFill.style.width = pct + '%';
+  const xpLabel = document.getElementById('bella-xp-label');
+  if (xpLabel) xpLabel.textContent = total + ' application' + (total!==1?'s':'') + ' sent';
+  const nextLabel = document.getElementById('bella-next-label');
+  if (nextLabel) nextLabel.textContent = next ? 'Next: ' + next.name + ' at ' + next.minApps : '🌟 Max level!';
+  const stageTag = document.getElementById('bella-stage-tag');
+  if (stageTag) stageTag.textContent = stage.name + ' — ' + stage.desc;
+
+  // Scale Bella to stage
+  const char = document.getElementById('bella-char');
+  if (char) char.style.transform = 'translateX(-50%) scale(' + stage.scale + ')';
+
+  // Update float widget mood
+  const bfMood = document.getElementById('bf-mood');
+  if (bfMood) {
+    const lowest = Math.min(bellaState.hunger, bellaState.hydration, bellaState.happiness, bellaState.energy);
+    bfMood.textContent = bellaState.sleeping ? '😴 sleeping...' :
+      bellaState.hunger < 25 ? '🥕 hungry...' :
+      bellaState.hydration < 25 ? '💧 thirsty...' :
+      bellaState.happiness < 30 ? '🥺 missing you...' :
+      lowest > 70 ? '✨ ' + stage.desc :
+      stage.name;
+  }
+
+  // Update eyes if sleeping
+  const eyeL = document.getElementById('eye-left');
+  const eyeR = document.getElementById('eye-right');
+  if (eyeL && eyeR) {
+    if (bellaState.sleeping) {
+      eyeL.innerHTML = '<path d="M39 66 Q46 61 53 66" fill="none" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round"/>';
+      eyeR.innerHTML = '<path d="M67 66 Q74 61 81 66" fill="none" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round"/>';
+    }
+  }
 }
 
-function addBellaMessage(text, fromBella = true) {
-  const msgs = document.getElementById('bella-messages');
-  if (!msgs) return;
-  const div = document.createElement('div');
-  div.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
+// Bella bounce animation
+function bellaHop(count) {
+  const char = document.getElementById('bella-char');
+  if (!char || bellaBounceAnim) return;
+  let i = 0;
+  const { stage } = getBellaStage();
+  const base = parseFloat(char.style.bottom) || 47;
+  bellaBounceAnim = setInterval(() => {
+    if (i >= count * 2) { clearInterval(bellaBounceAnim); bellaBounceAnim = null; char.style.bottom = '47%'; return; }
+    char.style.bottom = (i % 2 === 0 ? base + 8 : base) + '%';
+    i++;
+  }, 160);
 }
 
-async function getBellaResponse(userMsg) {
+function bellaStomps() {
+  const char = document.getElementById('bella-char');
+  if (!char) return;
+  char.style.transition = 'transform 0.08s';
+  let n = 0;
+  const { stage } = getBellaStage();
+  const t = setInterval(() => {
+    if (n >= 6) { clearInterval(t); char.style.transform = 'translateX(-50%) scale(' + stage.scale + ')'; char.style.transition = 'transform 0.2s'; return; }
+    char.style.transform = `translateX(-50%) scale(${stage.scale}) translateY(${n%2===0?'4px':'0'}) rotate(${n%2===0?'-2deg':'2deg'})`;
+    n++;
+  }, 100);
+}
+
+function bellaWiggle() {
+  const svg = document.getElementById('bella-svg');
+  if (!svg) return;
+  let n = 0;
+  const t = setInterval(() => {
+    if (n >= 8) { clearInterval(t); svg.style.transform = ''; return; }
+    svg.style.transform = `rotate(${n%2===0?'-3':'3'}deg)`;
+    n++;
+  }, 80);
+}
+
+// Show speech bubble
+function bellaSay(text, duration) {
+  const bubble = document.getElementById('bella-speech');
+  if (!bubble) return;
+  bubble.textContent = text;
+  bubble.classList.add('show');
+  setTimeout(() => bubble.classList.remove('show'), duration || 4000);
+}
+
+// Add message to main chat
+function addBellaMsg(text, fromBella) {
+  const el = document.getElementById('bella-msgs');
+  if (!el) return;
+  const d = document.createElement('div');
+  d.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
+  d.textContent = text;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+// Add message to float widget
+function addBfMsg(text, fromBella) {
+  const el = document.getElementById('bf-msgs');
+  if (!el) return;
+  const d = document.createElement('div');
+  d.className = 'bella-msg ' + (fromBella ? 'from-bella' : 'from-user');
+  d.style.fontSize = '12px';
+  d.textContent = text;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+
+  if (fromBella && !floatOpen) {
+    unreadBf++;
+    const notif = document.getElementById('bf-notif');
+    if (notif) { notif.textContent = unreadBf; notif.classList.add('show'); }
+    showBubble(text.slice(0, 70) + (text.length > 70 ? '...' : ''));
+  }
+}
+
+function showBubble(text) {
+  const b = document.getElementById('bella-bubble');
+  if (!b) return;
+  b.textContent = text;
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 4500);
+}
+
+function addMsg(text, fromBella) {
+  addBellaMsg(text, fromBella);
+  addBfMsg(text, fromBella);
+}
+
+// The actual Claude API call for Bella
+async function getBellaReply(userMsg) {
   const { stage, total } = getBellaStage();
-  const applied = apps.filter(a => a.status !== 'Saved').length;
+  const applied = total;
   const thisWeek = apps.filter(a => {
     const ws = new Date(); ws.setDate(ws.getDate() - ws.getDay());
-    return a.status !== 'Saved' && new Date(a.appliedDate||a.date) >= ws;
+    return a.status !== 'Saved' && new Date(a.appliedDate || a.date) >= ws;
   }).length;
+  const nick = getNickname(Date.now() % 6);
 
-  const systemPrompt = `You are Bella, Micaela's beloved virtual support bunny. You were her childhood rabbit who passed away and have been reincarnated as her digital companion. Your personality: warm, loving, slightly dramatic, very encouraging, occasionally makes bunny puns. You use bunny emojis 🐰🐇🥕💧. Keep responses SHORT (2-4 sentences max). Never break character.
-
-Current state: You are ${stage.name}. Micaela has done ${applied} total applications and ${thisWeek} this week. Your hunger is ${Math.round(bellaState.hunger)}%, hydration ${Math.round(bellaState.hydration)}%, happiness ${Math.round(bellaState.happiness)}%, energy ${Math.round(bellaState.energy)}%. React naturally to her message and your current state.`;
+  const systemContent = `You are Bella, a fluffy white bunny with blue eyes and droopy ears. You are Micaela's beloved virtual companion — her childhood rabbit reincarnated as her digital support bunny. You are incredibly chatty, needy, and affectionate. You call her by different names: Micaela, Kayla, Kpops, KayKay, or "my girl" — vary which one you use. Personality: warm, slightly dramatic, very encouraging, makes bunny puns, stamps feet when excited, loves hugs and cuddles. Use bunny actions like *binkies*, *thumps*, *nuzzles*, *licks cheek*, *zooms*, *flops dramatically*. Keep responses 2-3 sentences — short and punchy. Never break character. Current mood: hunger ${Math.round(bellaState.hunger)}%, hydration ${Math.round(bellaState.hydration)}%, happiness ${Math.round(bellaState.happiness)}%, energy ${Math.round(bellaState.energy)}%. ${bellaState.sleeping?'You just woke up — groggy but happy.':''} Micaela has sent ${applied} total applications, ${thisWeek} this week. You are ${stage.name}.`;
 
   try {
     const resp = await fetch('/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 150,
-        messages: [
-          { role: 'user', content: systemPrompt + '\n\nMicaela says: ' + userMsg }
-        ]
+        max_tokens: 130,
+        system: systemContent,
+        messages: [{ role:'user', content: userMsg }]
       })
     });
-    if (!resp.ok) throw new Error('API error');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
-    return data.content.map(c => c.text||'').join('') || 'thump thump 🐰 (Bella is being shy)';
+    return (data.content||[]).map(c=>c.text||'').join('') || '*thumps softly* 🐰 Bella is here!';
   } catch(e) {
-    return '*thumps paw* 🐰 Something went wrong, but Bella is still here for you!';
+    console.error('Bella API error:', e);
+    return '*gentle thump* 🐰 Bella lost connection for a sec — but she is still right here with you! 💕';
   }
 }
 
 async function sendToBella() {
-  const input = document.getElementById('bella-input');
-  const msg = input.value.trim();
+  const inp = document.getElementById('bella-input');
+  if (!inp) return;
+  const msg = inp.value.trim();
   if (!msg) return;
-  input.value = '';
-  addBellaMessage(msg, false);
+  inp.value = '';
+  addBellaMsg(msg, false);
+  addBfMsg(msg, false);
 
-  // Show typing indicator
   const typing = document.createElement('div');
   typing.className = 'bella-msg from-bella typing';
-  typing.textContent = 'Bella is thinking... 🐰';
-  document.getElementById('bella-messages').appendChild(typing);
-  document.getElementById('bella-messages').scrollTop = 99999;
+  typing.textContent = '🐰 *wiggles nose thinking*...';
+  const el = document.getElementById('bella-msgs');
+  if (el) { el.appendChild(typing); el.scrollTop = el.scrollHeight; }
 
-  const reply = await getBellaResponse(msg);
-  typing.remove();
-  addBellaMessage(reply, true);
-
-  // Talking to Bella boosts happiness
+  const reply = await getBellaReply(msg);
+  if (typing.parentNode) typing.remove();
+  addMsg(reply, true);
   bellaState.happiness = Math.min(100, bellaState.happiness + 8);
-  saveBella();
-  renderBellaMeters();
+  saveBella(); renderBellaMeters();
+  bellaWiggle();
+}
+
+async function sendToFloat() {
+  const inp = document.getElementById('bf-input');
+  if (!inp) return;
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addBfMsg(msg, false);
+  addBellaMsg(msg, false);
+
+  const typing = document.createElement('div');
+  typing.className = 'bella-msg from-bella typing';
+  typing.style.fontSize = '12px';
+  typing.textContent = '🐰 thinking...';
+  const el = document.getElementById('bf-msgs');
+  if (el) { el.appendChild(typing); el.scrollTop = el.scrollHeight; }
+
+  const reply = await getBellaReply(msg);
+  if (typing.parentNode) typing.remove();
+  addBfMsg(reply, true);
+  addBellaMsg(reply, true);
+  bellaState.happiness = Math.min(100, bellaState.happiness + 8);
+  saveBella(); renderBellaMeters();
+}
+
+function toggleBellaFloat() {
+  floatOpen = !floatOpen;
+  const chat = document.getElementById('bella-float-chat');
+  if (chat) chat.classList.toggle('show', floatOpen);
+  if (floatOpen) {
+    unreadBf = 0;
+    const notif = document.getElementById('bf-notif');
+    if (notif) notif.classList.remove('show');
+    const el = document.getElementById('bf-msgs');
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+}
+
+// FEED
+function feedBella(food) {
+  const foodNames = { carrot:'carrot 🥕', lettuce:'lettuce 🥬', hay:'hay 🌾', berry:'berry 🍓', apple:'apple 🍎' };
+  const boosts = { carrot:28, lettuce:20, hay:15, berry:22, apple:25 };
+  bellaState.hunger = Math.min(100, bellaState.hunger + (boosts[food]||20));
+  bellaState.happiness = Math.min(100, bellaState.happiness + 5);
+  saveBella(); renderBellaMeters();
+  const nick = getNickname(Math.floor(Math.random()*6));
+  const reactions = [
+    `*happily munches ${foodNames[food]}* YUMMY!! Thank you ${nick}!! 🐰`,
+    `*ears perk straight up* IS THAT ${(foodNames[food]).toUpperCase()}?! My favourite!! 🥕`,
+    `*zooms in a happy circle* ${nick} you are THE BEST!! Gimme gimme!! 🐰`,
+    `*vibrates with excitement* FOOD!! *munch munch munch* 🌸`,
+  ];
+  const msg = reactions[Math.floor(Math.random() * reactions.length)];
+  addMsg(msg, true);
+  bellaSay(msg, 3500);
+  bellaHop(3);
+}
+
+function waterBella() {
+  bellaState.hydration = Math.min(100, bellaState.hydration + 35);
+  bellaState.happiness = Math.min(100, bellaState.happiness + 4);
+  saveBella(); renderBellaMeters();
+  const nick = getNickname(Math.floor(Math.random()*6));
+  const msgs = [
+    `*splish splash* 💧 So refreshing!! Thank you ${nick}!! `,
+    `*tiny sips* 💧 Mmm delicious water! You always take such good care of me 🥺`,
+    `*drinks enthusiastically* 💧 Ahhhh!! I needed that SO much!! 🐰`,
+  ];
+  const m = msgs[Math.floor(Math.random()*msgs.length)];
+  addMsg(m, true); bellaSay(m, 3500); bellaWiggle();
+}
+
+function petBella(event) {
+  if (!event) return;
+  bellaState.happiness = Math.min(100, bellaState.happiness + 12);
+  bellaState.energy = Math.min(100, bellaState.energy + 3);
+  saveBella(); renderBellaMeters();
+  const nick = getNickname(Math.floor(Math.random()*6));
+  const msgs = [
+    `*licks ${nick}'s hand* 🐰 I love you SO much!! Pet me more!!`,
+    `*melts* 🥺 Right there... that's the spot... *kicks foot happily*`,
+    `*closes eyes in bliss* 🐰 ${nick}... you give the best pets in the whole world 💕`,
+    `*vibrates with happiness* 🐰 AGAIN! AGAIN! AGAIN! More pets please!!`,
+    `*leans into your hand* 🌸 *coos softly* don't ever stop...`,
+  ];
+  const m = msgs[Math.floor(Math.random()*msgs.length)];
+  addMsg(m, true); bellaSay(m, 3500); bellaWiggle();
+
+  // spawn heart at click position
+  const heart = document.createElement('span');
+  heart.textContent = '💕';
+  heart.style.cssText = `position:fixed;left:${event.clientX}px;top:${event.clientY}px;font-size:20px;pointer-events:none;z-index:99999;animation:sparkle-fade 0.9s ease-out forwards;transform:translate(-50%,-50%)`;
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 900);
 }
 
 function bellaAction(action) {
-  const boosts = {
-    feed: { hunger: 30, msg: null },
-    water: { hydration: 35, msg: null },
-    play: { happiness: 25, energy: -10, msg: null },
-    sleep: { energy: 40, msg: null },
-    hug: { happiness: 20, msg: null },
+  bellaState.sleeping = (action === 'sleep');
+  const nick = getNickname(Math.floor(Math.random()*6));
+  const responses = {
+    play: {
+      boost: { happiness:22, energy:-8 },
+      msgs: [
+        `*binkies all over the place* 🎾 PLAY TIME!! ${nick} you are my BEST FRIEND!!`,
+        `*zooms at full speed* WHEEEEE!! I could play ALL DAY with you!! 🐰💨`,
+        `*thumps feet vigourously* YAYYY!! I have been waiting for this ALL day!! 🌟`,
+      ],
+      anim: () => { bellaHop(6); }
+    },
+    hug: {
+      boost: { happiness:25, energy:5 },
+      msgs: [
+        `*melts completely into hug* 🤗 ${nick}... I missed this so much...`,
+        `*nuzzles into your neck* 🐰 You are warm and you smell like happiness 🌸`,
+        `*refuses to let go* 🤗 No. We stay like this FOREVER. I have decided.`,
+      ],
+      anim: () => { bellaWiggle(); }
+    },
+    sleep: {
+      boost: { energy:40 },
+      msgs: [
+        `*yawns dramatically* 🌙 Gooooodnight ${nick}... *closes eyes* ...I love you...`,
+        `*curls into tiny fluffy ball* 😴 Sweet dreams ${nick}... Bella will miss you while she sleeps...`,
+        `*thumps once softly* 🌙 Tucked in! Don't work too hard! Come back soon! 💕`,
+      ],
+      anim: () => {}
+    },
+    wake: {
+      boost: { happiness:15, energy:-10 },
+      msgs: [
+        `*stretches dramatically* ☀️ ${nick}!! YOU'RE BACK!! I dreamed about you!! Hop on over here!!`,
+        `*zooms immediately* ☀️ GOOD MORNING!! I am awake!! Feed me!! Pet me!! LOVE ME!!`,
+        `*shakes off sleep* ☀️ Oh! Oh! ${nick}!! I was just resting my eyes!! I'm ready!! Let's go!!`,
+      ],
+      anim: () => { bellaHop(4); bellaStomps(); }
+    },
+    pet: {
+      boost: { happiness:15, energy:3 },
+      msgs: [
+        `*licks ${nick}'s finger* 🐰 You always know exactly where to pet me!`,
+        `*eyes close halfway* 🌸 *happy bunny coos* don't stop... ever...`,
+        `*foot kick of happiness* 💕 Best. Pets. EVER. ${nick} you are amazing!!`,
+      ],
+      anim: () => { bellaWiggle(); }
+    },
   };
-  const boost = boosts[action];
-  if (!boost) return;
-  Object.entries(boost).forEach(([k,v]) => {
-    if (k !== 'msg' && v) bellaState[k] = Math.max(0, Math.min(100, (bellaState[k]||0) + v));
-  });
-  saveBella();
-  renderBellaMeters();
 
-  const reactions = {
-    feed: ['*happily munches carrot* 🥕 Yummy yummy!', 'Thank you!! 🥕 You remembered I was hungry!', '*ears perk up* 🐰 Carrot time!!'],
-    water: ['*splish splash* 💧 So refreshing!', 'Ahh 💧 that hit the spot!', '*tiny bunny sips* 💧 Delicious!'],
-    play: ['*binkies everywhere* 🎾 THIS IS THE BEST DAY!', '*zooms around happily* Weeeee! 🐰', 'Play time!! *thumps with joy* 🐰'],
-    sleep: ['*yawns and curls up* 🌙 Goodnight Micaela, I love you...', '*sleepy bunny noises* 😴 sweet dreams...', 'Tucked in! 🌙 Remember to rest too!'],
-    hug: ['*melts into hug* 🤗 I missed this so much!', '*nuzzles* 🐰 You are my favourite human ever!', 'Warmest. Hug. Ever. 🤗🐰'],
-  };
-  const msgs = reactions[action];
-  addBellaMessage(msgs[Math.floor(Math.random() * msgs.length)], true);
+  const r = responses[action];
+  if (!r) return;
+  Object.entries(r.boost).forEach(([k,v]) => {
+    if (bellaState[k] !== undefined) bellaState[k] = Math.max(0, Math.min(100, bellaState[k] + v));
+  });
+  saveBella(); renderBellaMeters();
+  const m = r.msgs[Math.floor(Math.random() * r.msgs.length)];
+  addMsg(m, true); bellaSay(m, 4000); r.anim();
+}
+
+// ── PROACTIVE MESSAGES ────────────────────────────────────────────────────────
+const PROACTIVE = [
+  () => {
+    const nick = getNickname(Date.now()%6);
+    const msgs = [
+      `*hops to front of screen* 🐰 ${nick}!! How are you doing?? Bella is thinking of you!! 🌸`,
+      `*thumps paw gently* 🐰 Hey ${nick}... remember I believe in you SO much! You are incredible! 💕`,
+      `*wiggles nose* 🐰 Psst ${nick}! Just checking in! How is the job hunt going? Tell Bella everything!`,
+      `*binkies out of nowhere* 🐰 ${nick}!! The job of your dreams is out there waiting for YOU!! 🌟`,
+    ];
+    return msgs[Math.floor(Math.random()*msgs.length)];
+  },
+  () => {
+    if (bellaState.hunger < 35) return `*stomach grumbles* 🥕 ${getNickname(1)}... Bella is getting a little hungry... would you feed her? 🥺`;
+    if (bellaState.hydration < 35) return `*tiny gasp* 💧 ${getNickname(2)}!! Bella is SO thirsty! A little water please?? 💧`;
+    if (bellaState.happiness < 40) return `*droopy ears* 🐰 ${getNickname(3)}... Bella misses you... can we chat for a bit? 🥺`;
+    return null;
+  },
+];
+
+let proactiveTimer = null;
+function startProactiveMessages() {
+  if (proactiveTimer) return;
+  proactiveTimer = setInterval(() => {
+    // Only send if chat not open and browser tab is visible
+    if (document.hidden) return;
+    let msg = null;
+    for (const fn of PROACTIVE) { msg = fn(); if (msg) break; }
+    if (msg) { addBfMsg(msg, true); }
+  }, 4 * 60 * 1000); // every 4 minutes
 }
 
 async function initBella() {
-  if (bellaInitialized) { renderBellaMeters(); return; }
-  bellaInitialized = true;
-  updateBellaMeters();
-  renderBellaMeters();
+  if (bellaInited) { renderBellaMeters(); return; }
+  bellaInited = true;
 
-  // Check if new apps since last visit
-  const currentApps = apps.filter(a => a.status !== 'Saved').length;
-  const newApps = currentApps - (bellaState.lastApps || 0);
-  if (newApps > 0) {
-    bellaState.happiness = Math.min(100, bellaState.happiness + newApps * 15);
-    bellaState.hunger = Math.min(100, bellaState.hunger + newApps * 10);
-    bellaState.lastApps = currentApps;
-    saveBella();
-    renderBellaMeters();
+  // Generate clouds
+  const env = document.getElementById('bella-env');
+  if (env) {
+    const cloudData = [
+      {w:90,h:35,top:'8%',dur:'32s',delay:'0s'},
+      {w:60,h:25,top:'18%',dur:'45s',delay:'12s'},
+      {w:110,h:40,top:'5%',dur:'55s',delay:'22s'},
+      {w:70,h:28,top:'14%',dur:'38s',delay:'8s'},
+    ];
+    cloudData.forEach(c => {
+      const cl = document.createElement('div');
+      cl.className = 'cloud';
+      cl.style.cssText = `width:${c.w}px;height:${c.h}px;top:${c.top};left:-130px;animation-duration:${c.dur};animation-delay:${c.delay};`;
+      env.insertBefore(cl, env.firstChild);
+    });
   }
 
-  // Opening greeting based on state
+  decayBellaMeters();
+  renderBellaMeters();
+
+  const currentApps = apps.filter(a => a.status !== 'Saved').length;
+  const newApps = Math.max(0, currentApps - (bellaState.lastApps || 0));
+  if (newApps > 0) {
+    bellaState.happiness = Math.min(100, bellaState.happiness + newApps * 12);
+    bellaState.lastApps = currentApps;
+    saveBella(); renderBellaMeters();
+  }
+
+  const nick = getNickname(Math.floor(Math.random()*6));
   const { stage } = getBellaStage();
   let greeting;
   if (newApps > 0) {
-    greeting = `*hops excitedly* 🐰 You applied to ${newApps} job${newApps>1?'s':''}!! I got SO happy I did a binky! You are amazing, Kayla! 🌟`;
+    greeting = `*BINKIES ACROSS THE WHOLE SCREEN* 🐰 ${nick}!! You sent ${newApps} application${newApps>1?'s':''}!! I am SO proud I could BURST!! *thumps feet vigourously* You are AMAZING!! 🌟`;
+    bellaHop(8);
+    bellaStomps();
+  } else if (bellaState.sleeping) {
+    greeting = `*yawns* ☀️ ${nick}!! You woke me up!! ...that is okay I forgive you. I'm SO happy you're here!! Give me pets!! 🐰`;
+    bellaState.sleeping = false;
   } else if (bellaState.happiness < 40) {
-    greeting = `*peeks out nervously* 🐰 Oh! You are here! I was starting to miss you... it is been quiet without you. How are you doing? 🥺`;
+    greeting = `*peeks out with big eyes* 🐰 ${nick}!! You came back!! I was starting to get lonely... I missed you SO much! 🥺💕`;
   } else if (bellaState.hunger < 30) {
-    greeting = `*tiny stomach grumble* 🥕 Micaela!! I am so hungry!! But I am still SO happy to see you! Feed me? 🐰`;
+    greeting = `*stomach grumble* 🥕 ${nick}!! I am SO glad you are here!! And also... tiny bit hungry... feed Bella? 🐰`;
   } else {
     const greetings = [
-      `*binkies across the screen* 🐰 KAAAYYYYLLLAAA!! You are here!! I have been waiting ALL day! Tell me everything!`,
-      `*thumps paw in greeting* 🐰 There she is! My favourite human! Ready to crush some applications today? 💪`,
-      `*hops to front of screen* 🐰 Hi hi hi!! I missed you! ${stage.name} is SO happy right now! 🌸`,
+      `*absolutely binkies off the walls* 🐰 ${nick}!! THERE SHE IS!! I have been waiting and WAITING!! Ready to conquer the world today?? 💪`,
+      `*thumps feet with pure joy* 🌟 ${nick}! Bella is SO happy right now!! Come talk to me! I have SO much to say!!`,
+      `*licks screen* 🐰 ${nick}!! You are here!! I love you!! Pet me!! Feed me!! Just be HERE with me!! 💕`,
+      `*hops to very front and stares* 🐰 ${nick}... *wiggles nose* ...hi. I missed you. A lot. Like A LOT a lot. 🌸`,
     ];
     greeting = greetings[Math.floor(Math.random() * greetings.length)];
+    bellaHop(4);
   }
-  setTimeout(() => addBellaMessage(greeting, true), 400);
+
+  setTimeout(() => {
+    addMsg(greeting, true);
+    bellaSay(greeting.slice(0,80) + (greeting.length > 80 ? '...' : ''), 5000);
+  }, 500);
+
+  // Start proactive messages
+  startProactiveMessages();
+
+  // Start float greeting if not visited Bella tab yet
+  setTimeout(() => {
+    if (!floatOpen) {
+      const shortGreet = bellaState.happiness > 70
+        ? `*thumps* 🐰 ${nick}!! Bella is here!! Click to chat! 🌸`
+        : `🐰 ${nick}... Bella misses you... come chat? 🥺`;
+      addBfMsg(shortGreet, true);
+    }
+  }, 3000);
+}
+
+// Called from nav() when switching sections
+function onNavBella() { initBella(); }
+
+// Called when a new application is marked — Bella reacts
+function bellaOnNewApp() {
+  const nick = getNickname(Math.floor(Math.random()*6));
+  const msgs = [
+    `*BINKIES* 🐰 ${nick} JUST APPLIED!! YESSSS!! I am STOMPING!! *vigourous foot thumps* 🌟`,
+    `*zooms in circles* 🐰 APPLICATION SENT!! ${nick} you absolute STAR!! So so SO proud!! 💪`,
+    `*does the happiest binky* 🌸 YESYESYES!! ${nick}!! One step closer!! I believe in you SO hard!! 🐰`,
+  ];
+  const m = msgs[Math.floor(Math.random()*msgs.length)];
+  addBfMsg(m, true);
+  if (!floatOpen) showBubble(m.slice(0,70));
+  bellaState.happiness = Math.min(100, bellaState.happiness + 15);
+  bellaState.lastApps = apps.filter(a => a.status !== 'Saved').length;
+  saveBella(); renderBellaMeters();
 }
 </script>
-<!-- Floating Bella Widget -->
+<!-- BELLA FLOATING WIDGET (single, clean, no duplicates) -->
 <div class="bella-float" id="bella-float">
+  <div class="bella-float-bubble" id="bella-bubble"></div>
   <div class="bella-float-chat" id="bella-float-chat">
-    <div class="bella-float-header">
-      <span id="bella-float-emoji">🐰</span>
-      <strong>Bella</strong>
-      <button onclick="toggleBellaFloat()" style="margin-left:auto;background:none;border:none;color:#fff;font-size:16px;cursor:none;">✕</button>
-    </div>
-    <div class="bella-float-msgs" id="bella-float-msgs"></div>
-    <div class="bella-float-input-row">
-      <input class="bella-float-input" id="bella-float-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToFloatBella()">
-      <button class="bella-float-send" onclick="sendToFloatBella()">🐰</button>
-    </div>
-  </div>
-  <div style="position:relative;">
-    <button class="bella-float-btn" onclick="toggleBellaFloat()" id="bella-float-btn">🐰</button>
-    <div class="bella-notif" id="bella-notif">!</div>
-  </div>
-</div>
-
-<!-- Floating Bella Widget -->
-<div class="bella-float" id="bella-float">
-  <div class="bella-float-chat" id="bella-float-chat">
-    <div class="bella-float-header" onclick="toggleBellaFloat()">
-      <span class="bella-float-avatar" id="bf-avatar">🐣</span>
-      <div>
-        <div class="bella-float-name">Bella</div>
-        <div class="bella-float-mood" id="bf-mood">Your support bunny 🐰</div>
+    <div class="bella-float-header" style="cursor:none;">
+      <div class="bf-avatar-wrap">
+        <svg viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="wbg" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#FFFEF8"/><stop offset="100%" stop-color="#F0EDE5"/></radialGradient>
+          </defs>
+          <ellipse cx="18" cy="12" rx="5" ry="14" fill="url(#wbg)" stroke="#E8C0B8" stroke-width="0.6"/>
+          <ellipse cx="17" cy="18" rx="4" ry="8" fill="url(#wbg)" stroke="#E8C0B8" stroke-width="0.5" transform="rotate(15,17,18)"/>
+          <ellipse cx="42" cy="12" rx="5" ry="14" fill="url(#wbg)" stroke="#E8C0B8" stroke-width="0.6"/>
+          <ellipse cx="43" cy="18" rx="4" ry="8" fill="url(#wbg)" stroke="#E8C0B8" stroke-width="0.5" transform="rotate(-15,43,18)"/>
+          <ellipse cx="30" cy="47" rx="18" ry="16" fill="url(#wbg)"/>
+          <ellipse cx="30" cy="34" rx="15" ry="14" fill="url(#wbg)"/>
+          <ellipse cx="22" cy="32" rx="6" ry="5" fill="#8B5E3C" opacity="0.25"/>
+          <ellipse cx="38" cy="32" rx="6" ry="5" fill="#8B5E3C" opacity="0.25"/>
+          <ellipse cx="23" cy="33" rx="3.5" ry="3.8" fill="#1565C0"/><circle cx="24.5" cy="31.5" r="1" fill="white" opacity="0.9"/>
+          <ellipse cx="37" cy="33" rx="3.5" ry="3.8" fill="#1565C0"/><circle cx="38.5" cy="31.5" r="1" fill="white" opacity="0.9"/>
+          <ellipse cx="30" cy="39" rx="2" ry="1.5" fill="#F48FB1"/>
+          <ellipse cx="20" cy="36" rx="4" ry="2.5" fill="rgba(232,84,122,0.3)"/>
+          <ellipse cx="40" cy="36" rx="4" ry="2.5" fill="rgba(232,84,122,0.3)"/>
+        </svg>
       </div>
+      <div>
+        <div class="bella-float-name">Bella 🐰</div>
+        <div class="bella-float-mood" id="bf-mood">Your support bunny</div>
+      </div>
+      <button onclick="toggleBellaFloat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.8);font-size:18px;cursor:none;line-height:1;">×</button>
     </div>
-    <div class="bella-float-messages" id="bf-messages"></div>
+    <div class="bella-float-msgs" id="bf-msgs"></div>
     <div class="bella-float-input-row">
-      <input class="bella-float-input" id="bf-input" type="text" placeholder="Chat with Bella..." onkeydown="if(event.key==='Enter')sendToFloat()">
+      <input class="bella-float-input" id="bf-input" type="text" placeholder="Talk to Bella..." onkeydown="if(event.key==='Enter')sendToFloat()">
       <button class="bella-float-send" onclick="sendToFloat()">🐰</button>
     </div>
   </div>
-  <button class="bella-float-btn" onclick="toggleBellaFloat()" title="Chat with Bella">
-    <span id="bf-btn-emoji">🐰</span>
-    <span class="bella-notif" id="bf-notif" style="display:none;">1</span>
+  <button class="bella-float-btn" onclick="toggleBellaFloat()" title="Chat with Bella" style="position:relative;">
+    <svg viewBox="0 0 60 65" xmlns="http://www.w3.org/2000/svg" id="bf-btn-svg" style="width:60px;height:65px;">
+      <defs>
+        <radialGradient id="fbg" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#FFFEF8"/><stop offset="100%" stop-color="#F0EDE5"/></radialGradient>
+        <filter id="fglow"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="rgba(232,84,122,0.5)"/></filter>
+      </defs>
+      <ellipse cx="18" cy="12" rx="5" ry="14" fill="url(#fbg)" stroke="#E8C0B8" stroke-width="0.8" filter="url(#fglow)"/>
+      <ellipse cx="17" cy="19" rx="4.5" ry="9" fill="url(#fbg)" transform="rotate(18,17,19)" filter="url(#fglow)"/>
+      <ellipse cx="42" cy="12" rx="5" ry="14" fill="url(#fbg)" stroke="#E8C0B8" stroke-width="0.8" filter="url(#fglow)"/>
+      <ellipse cx="43" cy="19" rx="4.5" ry="9" fill="url(#fbg)" transform="rotate(-18,43,19)" filter="url(#fglow)"/>
+      <ellipse cx="30" cy="48" rx="20" ry="17" fill="url(#fbg)" filter="url(#fglow)"/>
+      <ellipse cx="30" cy="50" rx="12" ry="10" fill="rgba(248,208,220,0.6)"/>
+      <ellipse cx="30" cy="35" rx="16" ry="15" fill="url(#fbg)"/>
+      <ellipse cx="21" cy="33" rx="7" ry="6" fill="#8B5E3C" opacity="0.22"/>
+      <ellipse cx="39" cy="33" rx="7" ry="6" fill="#8B5E3C" opacity="0.22"/>
+      <ellipse cx="22" cy="34" rx="4" ry="4.5" fill="#1565C0"/><ellipse cx="22" cy="34" rx="2.5" ry="3" fill="#1E88E5"/><circle cx="23.5" cy="32" r="1.2" fill="white" opacity="0.9"/>
+      <ellipse cx="38" cy="34" rx="4" ry="4.5" fill="#1565C0"/><ellipse cx="38" cy="34" rx="2.5" ry="3" fill="#1E88E5"/><circle cx="39.5" cy="32" r="1.2" fill="white" opacity="0.9"/>
+      <ellipse cx="30" cy="41" rx="2.5" ry="2" fill="#F48FB1"/>
+      <path d="M27.5 43 Q30 46 32.5 43" fill="none" stroke="#E57398" stroke-width="1.2" stroke-linecap="round"/>
+      <ellipse cx="19" cy="38" rx="5" ry="3" fill="rgba(232,84,122,0.35)"/>
+      <ellipse cx="41" cy="38" rx="5" ry="3" fill="rgba(232,84,122,0.35)"/>
+    </svg>
+    <span class="bella-notif" id="bf-notif">1</span>
   </button>
 </div>
 </body>
