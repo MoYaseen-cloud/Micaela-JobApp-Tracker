@@ -715,6 +715,7 @@
         <div class="chart-title">🔥 Activity heatmap — last 10 weeks</div>
         <div style="display:flex;gap:4px;margin-bottom:6px;" id="an-heatmap-labels"></div>
         <div class="heatmap" id="an-heatmap"></div>
+        <div id="an-heatmap-legend" style="font-size:11px;color:var(--text3);margin-top:6px;font-style:italic;"></div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text3);">
           <span>Less</span>
           <div style="width:14px;height:14px;border-radius:3px;background:var(--surface2);"></div>
@@ -1317,7 +1318,8 @@ function nav(s) {
   if (s === 'cv') populateCvJobSelect();
   if (s === 'discover') loadPicks();
   if (s === 'analytics') renderAnalytics();
-  if (s === 'bella') onNavBella();
+  if (s === 'bella') { onNavBella(); startBellaTabTimer(); }
+  else stopBellaTabTimer();
 }
 
 function cvTab(t) {
@@ -1899,6 +1901,11 @@ async function savePickedJob(idx) {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 loadApps();
+// Load Bella state from localStorage immediately as fallback (server state loaded when tab opens)
+try {
+  const cached = JSON.parse(localStorage.getItem('bella_v5') || 'null');
+  if (cached) bellaState = { ...bellaState, ...cached };
+} catch(e) {}
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 function renderAnalytics() {
@@ -2020,16 +2027,32 @@ function renderBarChart(elId, counts, labelFn, palette) {
 function renderHeatmap(apps, days) {
   const el = document.getElementById('an-heatmap');
   if (!el) return;
-  const cells = [];
+  // Build day counts first so we can scale dynamically
+  const dayCounts = [];
   for (let d = days-1; d >= 0; d--) {
     const date = new Date(); date.setDate(date.getDate() - d);
     const dateStr = date.toLocaleDateString('en-ZA');
     const count = apps.filter(a => (a.appliedDate || a.date) === dateStr).length;
-    const level = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : count === 3 ? 3 : 4;
-    const label = date.toLocaleDateString('en-ZA', {weekday:'short',month:'short',day:'numeric'});
-    cells.push(`<div class="heat-cell" data-count="${level}"><div class="heat-tooltip">${label}: ${count} app${count!==1?'s':''}</div></div>`);
+    dayCounts.push({ date, dateStr, count });
   }
+  // Dynamic scale: max level = 4, thresholds based on actual max
+  const maxCount = Math.max(...dayCounts.map(d => d.count), 1);
+  // Use percentile-based thresholds so the colours are meaningful
+  // Level 1 = any activity, 2 = 25% of max, 3 = 50% of max, 4 = 75%+ of max
+  const t1 = 1;
+  const t2 = Math.max(2, Math.ceil(maxCount * 0.25));
+  const t3 = Math.max(4, Math.ceil(maxCount * 0.5));
+  const t4 = Math.max(7, Math.ceil(maxCount * 0.75));
+  const cells = dayCounts.map(({ date, dateStr, count }) => {
+    const level = count === 0 ? 0 : count < t2 ? 1 : count < t3 ? 2 : count < t4 ? 3 : 4;
+    const label = date.toLocaleDateString('en-ZA', {weekday:'short',month:'short',day:'numeric'});
+    return `<div class="heat-cell" data-count="${level}"><div class="heat-tooltip">${label}: ${count} app${count!==1?'s':''}</div></div>`;
+  });
+  // Add scale legend below
   el.innerHTML = cells.join('');
+  // Update legend labels dynamically
+  const legendEl = document.getElementById('an-heatmap-legend');
+  if (legendEl) legendEl.textContent = `Scale: 1–${t2-1} light | ${t2}–${t3-1} medium | ${t3}–${t4-1} dark | ${t4}+ deep pink`;
 }
 
 function calcStreak(apps) {
@@ -2059,11 +2082,34 @@ const BELLA_STAGES = [
 const NICKS = ['Kayla','KayKay','Micaela','my girl','bestie','love','Kpops'];
 function nick() { return NICKS[Math.floor(Math.random()*NICKS.length)]; }
 
-let bellaState = (() => {
-  try { return JSON.parse(localStorage.getItem('bella_v5')||'null')||null; } catch(e){ return null; }
-})() || { hunger:80, hydration:80, happiness:80, energy:80, lastSeen:new Date().toISOString(), lastApps:0, sleeping:false };
+let bellaState = { hunger:80, hydration:80, happiness:80, energy:80, lastSeen:new Date().toISOString(), lastApps:0, sleeping:false };
+let bellaSyncTimer = null;
 
-function saveBella() { try { localStorage.setItem('bella_v5', JSON.stringify(bellaState)); } catch(e){} }
+async function loadBellaState() {
+  try {
+    const resp = await fetch('/api/bella/state');
+    if (resp.ok) {
+      const data = await resp.json();
+      bellaState = { ...bellaState, ...data };
+    }
+  } catch(e) { console.error('Bella state load error:', e); }
+}
+
+async function saveBella() {
+  // Save to localStorage as instant fallback
+  try { localStorage.setItem('bella_v5', JSON.stringify(bellaState)); } catch(e) {}
+  // Debounce server save — don't hammer on every meter update
+  clearTimeout(bellaSyncTimer);
+  bellaSyncTimer = setTimeout(async () => {
+    try {
+      await fetch('/api/bella/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bellaState)
+      });
+    } catch(e) { console.error('Bella state save error:', e); }
+  }, 1000);
+}
 
 function getBellaStage() {
   const total = apps.filter(a=>a.status!=='Saved').length;
@@ -2098,10 +2144,14 @@ let bellaIdleTimer = null;
 
 function onNavBella() { initBellaScene(); }
 
-function initBellaScene() {
+async function initBellaScene() {
   if (bellaSceneInited) { refreshBellaUI(); return; }
   bellaSceneInited = true;
+  // Load synced state from server before decaying
+  await loadBellaState();
   decayBellaMeters();
+  // Load chat history after a short delay
+  setTimeout(loadBellaChat, 400);
 
   // Generate stars for night mode
   const starsEl = document.getElementById('b-stars');
@@ -2472,6 +2522,34 @@ function addMsg(text, fromBella=true) {
     fc.appendChild(d); fc.scrollTop = fc.scrollHeight;
     if (fromBella && !floatOpen) showFloatBubble(text);
   }
+  // Persist to server
+  fetch('/api/bella/chat', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ text, fromBella, timestamp: new Date().toISOString() })
+  }).catch(()=>{});
+}
+
+async function loadBellaChat() {
+  try {
+    const resp = await fetch('/api/bella/chat');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const messages = data.messages || [];
+    if (!messages.length) return;
+    const mc = document.getElementById('b-msgs');
+    if (!mc || mc.children.length > 0) return; // only load if chat is empty
+    messages.forEach(m => {
+      const d = document.createElement('div');
+      d.className = 'b-msg ' + (m.fromBella ? 'bella' : 'user');
+      d.textContent = m.text;
+      const ts = document.createElement('div');
+      ts.style.cssText = 'font-size:9px;opacity:0.4;margin-top:2px;';
+      ts.textContent = new Date(m.timestamp).toLocaleString('en-ZA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      d.appendChild(ts);
+      mc.appendChild(d);
+    });
+    mc.scrollTop = mc.scrollHeight;
+  } catch(e) {}
 }
 
 async function getBellaAI(userMsg) {
@@ -2538,6 +2616,46 @@ const PROACTIVE = [
 ];
 let proactiveIdx = 0;
 let proactiveTimer = null;
+
+// Track how long user has been on Bella tab
+let bellaTabTimer = null;
+let bellaTabOpenTime = null;
+
+function startBellaTabTimer() {
+  bellaTabOpenTime = Date.now();
+  clearTimeout(bellaTabTimer);
+  // After 4 minutes, gently nudge her to go do applications
+  bellaTabTimer = setTimeout(() => {
+    const applied = apps.filter(a=>a.status!=='Saved').length;
+    const todayApps = apps.filter(a => {
+      const ds = new Date().toLocaleDateString('en-ZA');
+      return a.status!=='Saved' && (a.appliedDate||a.date) === ds;
+    }).length;
+    let nudge;
+    if (todayApps === 0) {
+      nudge = '*stomps paw firmly* \u{1F430} Okay '+nick()+'... I LOVE spending time with you but you have not applied to ANY jobs today!! Go go go!! I believe in you!! Come back after!! \u{1F31F}';
+    } else if (todayApps < 3) {
+      nudge = '*gentle nudge* \u{1F430} '+nick()+'... you have done '+todayApps+' application'+(todayApps!==1?'s':'')+' today, which is amazing!! But I think you can do more! Go get another one and come back to me! \u{1F49C}';
+    } else {
+      nudge = '*proud bunny* \u{1F430} '+nick()+'! '+todayApps+' applications today!! You are incredible!! But maybe squeeze in one more before resting with me? Just one more? \u{1F97A}';
+    }
+    addBellaMsg(nudge, true);
+    showBellaSpeech(nudge, 6000);
+    showFloatNotif(nudge);
+    animateBella('stomping', 800);
+    // Reschedule — remind again after another 5 mins if still on tab
+    bellaTabTimer = setTimeout(() => {
+      const m2 = '*does little motivational stomps* \u{1F430} '+nick()+'!! Applications!! You can do it!! Go!! I will be here waiting!! \u{1F499}';
+      addBellaMsg(m2, true); showBellaSpeech(m2, 5000);
+    }, 5*60*1000);
+  }, 4*60*1000);
+}
+
+function stopBellaTabTimer() {
+  clearTimeout(bellaTabTimer);
+  bellaTabTimer = null;
+  bellaTabOpenTime = null;
+}
 
 function scheduleProactive() {
   const delay = proactiveIdx === 0 ? 5*60*1000 : (6+Math.random()*10)*60*1000;
