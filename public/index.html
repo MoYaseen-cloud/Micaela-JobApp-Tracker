@@ -242,8 +242,7 @@
   @keyframes charSleep{0%,100%{transform:scaleY(1) scaleX(1);}50%{transform:scaleY(0.93) scaleX(1.03);}}
   @keyframes charBinky{0%{transform:translateY(0) rotate(0);}20%{transform:translateY(-40px) rotate(-15deg) scaleX(0.85);}50%{transform:translateY(-18px) rotate(8deg);}75%{transform:translateY(-30px) rotate(-10deg);}100%{transform:translateY(0) rotate(0);}}
   /* Speech bubble */
-  .bella-speech{position:absolute;bottom:calc(100% + 10px);left:50%;transform: translateX(-30%) scaleX(1) !important;background:#fff;border:2px solid var(--pink);border-radius:16px 16px 16px 4px;padding:7px 13px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--text);white-space:normal;max-width:200px;text-align:center;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.28s;box-shadow:0 4px 14px rgba(232,84,122,0.22);z-index:100;}
-  .bella-speech{transform: scaleX(1) !important;display: inline-block;}
+  .bella-speech{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-30%) scaleX(1);background:#fff;border:2px solid var(--pink);border-radius:16px 16px 16px 4px;padding:7px 13px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--text);white-space:normal;max-width:200px;text-align:center;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.28s;box-shadow:0 4px 14px rgba(232,84,122,0.22);z-index:100;}
   .bella-speech.show{opacity:1;}
   .bella-speech::after{content:'';position:absolute;bottom:-10px;left:16px;border:5px solid transparent;border-top-color:var(--pink);}
   /* ZZZ bubbles */
@@ -2057,7 +2056,7 @@ const BELLA_STAGES = [
   { min:75,  name:'Bella',        desc:'Confident, wise, and SO proud of you 💪' },
   { min:100, name:'Super Bella',  desc:'Glowing with love and bunny magic 🌟💜' },
 ];
-const NICKS = ['Kayla','KayKay','Micaela','babe','my girl','bestie','love','Kpops'];
+const NICKS = ['Kayla','KayKay','Micaela','my girl','bestie','love','Kpops'];
 function nick() { return NICKS[Math.floor(Math.random()*NICKS.length)]; }
 
 let bellaState = (() => {
@@ -2172,7 +2171,9 @@ function startBellaMovement() {
     if (char) {
       char.style.left = movePositions[posIdx];
       // Flip SVG based on direction
-      char.style.transform = dir < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+      char.style.transform = dir < 0 ? "scaleX(-1)" : "scaleX(1)";
+      const sp = document.getElementById("bella-speech");
+      if (sp) sp.style.transform = dir < 0 ? "translateX(-30%) scaleX(-1)" : "translateX(-30%) scaleX(1)";
     }
     charAnim('hop', 450);
     // Random idle behaviour after moving
