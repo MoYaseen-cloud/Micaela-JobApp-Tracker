@@ -134,6 +134,32 @@ app.post('/api/claude', async (req, res) => {
 // ── JOB DISCOVERY PIPELINE ───────────────────────────────────────────────────
 const PICKS_PATH = path.join(DATA_DIR, 'daily_picks.json');
 
+const BELLA_STATE_PATH = path.join(DATA_DIR, 'bella_state.json');
+const BELLA_CHAT_PATH = path.join(DATA_DIR, 'bella_chat.json');
+
+function readBellaState() {
+  try {
+    if (fs.existsSync(BELLA_STATE_PATH)) return JSON.parse(fs.readFileSync(BELLA_STATE_PATH, 'utf8'));
+  } catch(e) { console.error('Bella state read error:', e.message); }
+  return { hunger:80, hydration:80, happiness:80, energy:80, sleeping:false, lastSeen:new Date().toISOString(), lastApps:0 };
+}
+function writeBellaState(data) {
+  try { fs.writeFileSync(BELLA_STATE_PATH, JSON.stringify(data, null, 2), 'utf8'); }
+  catch(e) { console.error('Bella state write error:', e.message); }
+}
+
+function readBellaChat() {
+  try {
+    if (fs.existsSync(BELLA_CHAT_PATH)) return JSON.parse(fs.readFileSync(BELLA_CHAT_PATH, 'utf8'));
+  } catch(e) {}
+  return { messages: [] };
+}
+function writeBellaChat(data) {
+  try { fs.writeFileSync(BELLA_CHAT_PATH, JSON.stringify(data, null, 2), 'utf8'); }
+  catch(e) {}
+}
+
+
 function readPicks() {
   try { if (fs.existsSync(PICKS_PATH)) return JSON.parse(fs.readFileSync(PICKS_PATH, 'utf8')); }
   catch(e) {}
@@ -464,6 +490,35 @@ app.post('/api/picks/refresh', (req, res) => {
 });
 // Diagnostic endpoint — hit this to see raw fetch counts without triggering a full run
 app.get('/api/picks/diag', (req, res) => res.json({ ...readPicks(), lastDiag }));
+
+
+// ── BELLA STATE SYNC ─────────────────────────────────────────────────────────
+app.get('/api/bella/state', (req, res) => res.json(readBellaState()));
+
+app.post('/api/bella/state', (req, res) => {
+  const current = readBellaState();
+  const updated = { ...current, ...req.body, lastSeen: new Date().toISOString() };
+  writeBellaState(updated);
+  res.json({ ok: true });
+});
+
+app.get('/api/bella/chat', (req, res) => {
+  const chat = readBellaChat();
+  // Return last 60 messages to keep it manageable
+  res.json({ messages: (chat.messages || []).slice(-60) });
+});
+
+app.post('/api/bella/chat', (req, res) => {
+  const chat = readBellaChat();
+  const { text, fromBella, timestamp } = req.body;
+  if (!text) return res.status(400).json({ error: 'text required' });
+  chat.messages = chat.messages || [];
+  chat.messages.push({ text, fromBella: !!fromBella, timestamp: timestamp || new Date().toISOString() });
+  // Keep last 200 messages on disk
+  if (chat.messages.length > 200) chat.messages = chat.messages.slice(-200);
+  writeBellaChat(chat);
+  res.json({ ok: true });
+});
 
 // ── SPA FALLBACK ──────────────────────────────────────────────────────────────
 // This MUST be last — catches everything that isn't an API route or static file
