@@ -947,6 +947,7 @@
             <button class="game-tab active" onclick="switchGameTab('chat',this)">💬 Chat</button>
             <button class="game-tab" onclick="switchGameTab('ttt',this)">❌⭕ Tic-tac-toe</button>
             <button class="game-tab" onclick="switchGameTab('scratch',this)">🎴 Lucky draw</button>
+            <button class="game-tab" onclick="switchGameTab('roulette',this)">🎯 Job Roulette</button>
           </div>
 
           <!-- Chat panel -->
@@ -975,6 +976,18 @@
               <div class="scratch-result" id="scratch-result"></div>
               <button class="ttt-restart" onclick="resetScratch()">Draw again 🎴</button>
             </div>
+          <div class="game-panel" id="gp-roulette">
+            <div style="padding:1rem;display:flex;flex-direction:column;align-items:center;gap:12px;flex:1;">
+              <div style="font-size:12px;color:var(--text2);text-align:center;line-height:1.5;">Bella picks a job type for you to apply to today! 🎯</div>
+              <div id="roulette-wheel" style="font-size:44px;width:88px;height:88px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pink-light),var(--purple-light));border-radius:50%;border:3px solid var(--border2);transition:transform 0.08s;">🐰</div>
+              <button onclick="spinRoulette()" id="roulette-spin-btn" style="padding:7px 18px;font-size:13px;font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border-radius:99px;border:none;cursor:none;font-weight:500;">Spin! 🎯</button>
+              <div id="roulette-result" style="display:none;text-align:center;padding:0.9rem;background:var(--pink-light);border:1px solid var(--border2);border-radius:var(--radius-sm);width:100%;">
+                <div id="roulette-job-type" style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;"></div>
+                <div id="roulette-bella-msg" style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;"></div>
+                <button onclick="nav('add');toast('Find a '+currentRouletteJob+' job and paste it! Go go go!')" style="padding:5px 14px;border-radius:99px;background:linear-gradient(135deg,var(--pink),var(--mauve));color:#fff;border:none;font-size:12px;cursor:none;font-family:'DM Sans',sans-serif;">Find this job now!</button>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -1900,6 +1913,54 @@ async function savePickedJob(idx) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
+
+// ── JOB ROULETTE ─────────────────────────────────────────────
+const ROULETTE_JOBS = [
+  { type:'Clinical Research Coordinator', emoji:'🔬', tip:'Your GCP cert makes you a TOP candidate!' },
+  { type:'Medical Sales Representative', emoji:'💊', tip:'Science degree + sales background = PERFECT fit!' },
+  { type:'Laboratory Assistant', emoji:'🧪', tip:'PCR, DNA extraction, GLP — this is YOUR wheelhouse!' },
+  { type:'Healthcare Administrator', emoji:'🏥', tip:'Your documentation + admin skills shine here!' },
+  { type:'Appointment Setter', emoji:'📞', tip:'Your sales experience makes this a strong application!' },
+  { type:'Research Assistant', emoji:'📋', tip:'You literally did this at UKZN — apply confidently!' },
+  { type:'Quality Assurance Officer', emoji:'✅', tip:'QA Certificate + GLP experience = made for this!' },
+  { type:'Customer Success Manager', emoji:'🌟', tip:'Sales + communication = strong candidate!' },
+  { type:'Clinical Trial Assistant', emoji:'📝', tip:'GCP cert + research ethics = exactly what they want!' },
+  { type:'Science Communicator', emoji:'🗣️', tip:'Lab demonstrator proves you explain complex things clearly!' },
+];
+let currentRouletteJob = '';
+let rouletteSpinning = false;
+
+function spinRoulette() {
+  if (rouletteSpinning) return;
+  rouletteSpinning = true;
+  bumpInteract();
+  const wheel = document.getElementById('roulette-wheel');
+  const btn = document.getElementById('roulette-spin-btn');
+  const result = document.getElementById('roulette-result');
+  if (btn) btn.disabled = true;
+  if (result) result.style.display = 'none';
+  const emojis = ['🔬','💊','🧪','🏥','📞','📋','✅','🌟','📝','🗣️','🐰','✨'];
+  let count = 0;
+  const maxSpin = 16 + Math.floor(Math.random()*12);
+  const iv = setInterval(() => {
+    if (wheel) { wheel.textContent = emojis[count % emojis.length]; wheel.style.transform = 'rotate('+(count*35)+'deg) scale('+(count%2===0?1.12:0.9)+')'; }
+    count++;
+    if (count >= maxSpin) {
+      clearInterval(iv);
+      const pick = ROULETTE_JOBS[Math.floor(Math.random()*ROULETTE_JOBS.length)];
+      currentRouletteJob = pick.type;
+      if (wheel) { wheel.textContent = pick.emoji; wheel.style.transform = ''; }
+      if (result) result.style.display = 'block';
+      document.getElementById('roulette-job-type').textContent = pick.emoji + ' ' + pick.type;
+      document.getElementById('roulette-bella-msg').textContent = pick.tip + ' — Bella says: apply to one RIGHT NOW ' + nick() + '!!';
+      if (btn) { btn.disabled = false; btn.textContent = 'Spin again! 🎯'; }
+      rouletteSpinning = false;
+      const m = '*spins wheel dramatically* 🎯 The wheel has spoken ' + nick() + '!! Today you MUST apply to a ' + pick.type + ' role!! I believe in you!! 🐰';
+      addMsg(m, true); showBellaSpeech(m, 5000); charAnim('binky', 700);
+    }
+  }, 75);
+}
+
 loadApps();
 // Load Bella state from localStorage immediately as fallback (server state loaded when tab opens)
 try {
@@ -2111,6 +2172,87 @@ async function saveBella() {
   }, 1000);
 }
 
+
+// Redraw Bella's SVG appearance based on growth stage
+function drawBellaSVG(idx) {
+  const svg = document.getElementById('bella-svg');
+  if (!svg) return;
+  // Stage configs: scale, earHeight, eyeRadius, hasBlush, hasCrown, glowColor
+  const S = [
+    {sc:0.75, eH:17, eR:6.8, blush:true,  crown:false, glow:null,      color:'#FFFCF5'}, // Baby
+    {sc:0.85, eH:20, eR:6.2, blush:true,  crown:false, glow:null,      color:'#FFFAF2'}, // Little
+    {sc:0.95, eH:23, eR:5.8, blush:false, crown:false, glow:null,      color:'#FFFDF8'}, // Teen
+    {sc:1.0,  eH:24, eR:5.8, blush:false, crown:false, glow:null,      color:'#FFFFFF'}, // Bella
+    {sc:1.0,  eH:24, eR:6.2, blush:false, crown:true,  glow:'#FFD700', color:'#FFFFF8'}, // Super
+  ];
+  const c = S[Math.min(idx, S.length-1)];
+  const sc = c.sc;
+  // Scale around center 40,50
+  const x = (v) => (40 + (v-40)*sc).toFixed(1);
+  const y = (v) => (50 + (v-50)*sc).toFixed(1);
+  const r = (v) => (v*sc).toFixed(1);
+  const eH = c.eH;
+
+  const glow = c.glow ? '<filter id="sg"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>' : '';
+  const ga = c.glow ? ' filter="url(#sg)"' : '';
+  const blush = c.blush
+    ? `<ellipse cx="${x(22)}" cy="${y(51)}" rx="${r(7)}" ry="${r(4.5)}" fill="rgba(232,84,122,0.35)"/>
+       <ellipse cx="${x(58)}" cy="${y(51)}" rx="${r(7)}" ry="${r(4.5)}" fill="rgba(232,84,122,0.35)"/>`
+    : `<ellipse cx="${x(22)}" cy="${y(51)}" rx="${r(6)}" ry="${r(3.5)}" fill="rgba(232,84,122,0.18)"/>
+       <ellipse cx="${x(58)}" cy="${y(51)}" rx="${r(6)}" ry="${r(3.5)}" fill="rgba(232,84,122,0.18)"/>`;
+  const crown = c.crown
+    ? `<polygon points="${x(40)},${y(19)} ${x(33)},${y(28)} ${x(36)},${y(23)} ${x(40)},${y(28)} ${x(44)},${y(23)} ${x(47)},${y(28)}" fill="#FFD700" stroke="#FFA000" stroke-width="0.8"/>
+       <circle cx="${x(40)}" cy="${y(19)}" r="${r(2.2)}" fill="#FF69B4"/>
+       <circle cx="${x(33)}" cy="${y(27.5)}" r="${r(1.6)}" fill="#FF69B4"/>
+       <circle cx="${x(47)}" cy="${y(27.5)}" r="${r(1.6)}" fill="#FF69B4"/>`
+    : '';
+
+  svg.innerHTML = `<defs>
+    <radialGradient id="bBG" cx="50%" cy="35%" r="58%"><stop offset="0%" stop-color="${c.color}"/><stop offset="100%" stop-color="#EDE8DC"/></radialGradient>
+    <radialGradient id="bBelly"><stop offset="0%" stop-color="#FFF0F5"/><stop offset="100%" stop-color="#F9C8D8"/></radialGradient>
+    <filter id="bFluff"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3"/><feDisplacementMap in="SourceGraphic" scale="${r(2)}" xChannelSelector="R" yChannelSelector="G"/></filter>
+    ${glow}</defs>
+  ${c.glow ? '<circle cx="40" cy="47" r="32" fill="rgba(255,215,0,0.06)"/>' : ''}
+  ${crown}
+  <path d="M${x(22)} ${y(46-eH)} Q${x(16)} ${y(42-eH)} ${x(14)} ${y(50-eH/2)} Q${x(12)} ${y(54)} ${x(18)} ${y(54)} Q${x(24)} ${y(52)} ${x(26)} ${y(47)} Q${x(28)} ${y(50-eH/2)} ${x(22)} ${y(46-eH)}Z" fill="url(#bBG)" stroke="#E0C4B8" stroke-width="1"/>
+  <path d="M${x(21)} ${y(44-eH)} Q${x(16)} ${y(41-eH)} ${x(15)} ${y(51-eH/2)} Q${x(14)} ${y(54)} ${x(19)} ${y(53)} Q${x(23)} ${y(50)} ${x(23)} ${y(46)} Q${x(24)} ${y(49-eH/2)} ${x(21)} ${y(44-eH)}Z" fill="#E8A8B8" opacity="0.7"/>
+  <path d="M${x(58)} ${y(46-eH)} Q${x(64)} ${y(42-eH)} ${x(66)} ${y(50-eH/2)} Q${x(68)} ${y(54)} ${x(62)} ${y(54)} Q${x(56)} ${y(52)} ${x(54)} ${y(47)} Q${x(52)} ${y(50-eH/2)} ${x(58)} ${y(46-eH)}Z" fill="url(#bBG)" stroke="#E0C4B8" stroke-width="1"/>
+  <path d="M${x(59)} ${y(44-eH)} Q${x(64)} ${y(41-eH)} ${x(65)} ${y(51-eH/2)} Q${x(66)} ${y(54)} ${x(61)} ${y(53)} Q${x(57)} ${y(50)} ${x(57)} ${y(46)} Q${x(56)} ${y(49-eH/2)} ${x(59)} ${y(44-eH)}Z" fill="#E8A8B8" opacity="0.7"/>
+  <ellipse cx="${x(40)}" cy="${y(73)}" rx="${r(26)}" ry="${r(22)}" fill="url(#bBG)" filter="url(#bFluff)"${ga}/>
+  <ellipse cx="${x(40)}" cy="${y(77)}" rx="${r(15)}" ry="${r(14)}" fill="url(#bBelly)" opacity="0.75"/>
+  <ellipse cx="${x(40)}" cy="${y(46)}" rx="${r(22)}" ry="${r(21)}" fill="url(#bBG)" filter="url(#bFluff)"${ga}/>
+  <ellipse cx="${x(29)}" cy="${y(43)}" rx="${r(9)}" ry="${r(8)}" fill="#A0724A" opacity="0.32"/>
+  <ellipse cx="${x(51)}" cy="${y(43)}" rx="${r(9)}" ry="${r(8)}" fill="#A0724A" opacity="0.32"/>
+  <g id="eye-l">
+    <circle cx="${x(29)}" cy="${y(43)}" r="${r(c.eR)}" fill="#1565C0"/>
+    <circle cx="${x(29)}" cy="${y(43)}" r="${r(c.eR*0.69)}" fill="#1E88E5"/>
+    <circle cx="${x(29)}" cy="${y(43)}" r="${r(c.eR*0.43)}" fill="#0D3B8E"/>
+    <circle cx="${x(31)}" cy="${y(40.5)}" r="${r(1.6)}" fill="white" opacity="0.92"/>
+    <circle cx="${x(27.5)}" cy="${y(44.5)}" r="${r(0.8)}" fill="white" opacity="0.5"/>
+  </g>
+  <g id="eye-r">
+    <circle cx="${x(51)}" cy="${y(43)}" r="${r(c.eR)}" fill="#1565C0"/>
+    <circle cx="${x(51)}" cy="${y(43)}" r="${r(c.eR*0.69)}" fill="#1E88E5"/>
+    <circle cx="${x(51)}" cy="${y(43)}" r="${r(c.eR*0.43)}" fill="#0D3B8E"/>
+    <circle cx="${x(53)}" cy="${y(40.5)}" r="${r(1.6)}" fill="white" opacity="0.92"/>
+    <circle cx="${x(49.5)}" cy="${y(44.5)}" r="${r(0.8)}" fill="white" opacity="0.5"/>
+  </g>
+  <ellipse cx="${x(40)}" cy="${y(51)}" rx="${r(3)}" ry="${r(2)}" fill="#F48FB1"/>
+  <path d="M${x(37.2)} ${y(53.5)} Q${x(40)} ${y(57)} ${x(42.8)} ${y(53.5)}" fill="none" stroke="#E57398" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="${x(40)}" y1="${y(53)}" x2="${x(40)}" y2="${y(54.5)}" stroke="#E57398" stroke-width="1"/>
+  <line x1="${x(18)}" y1="${y(50)}" x2="${x(34)}" y2="${y(52)}" stroke="rgba(140,110,90,0.45)" stroke-width="0.8"/>
+  <line x1="${x(17)}" y1="${y(53)}" x2="${x(33)}" y2="${y(53.5)}" stroke="rgba(140,110,90,0.35)" stroke-width="0.7"/>
+  <line x1="${x(62)}" y1="${y(50)}" x2="${x(46)}" y2="${y(52)}" stroke="rgba(140,110,90,0.45)" stroke-width="0.8"/>
+  <line x1="${x(63)}" y1="${y(53)}" x2="${x(47)}" y2="${y(53.5)}" stroke="rgba(140,110,90,0.35)" stroke-width="0.7"/>
+  ${blush}
+  <ellipse cx="${x(26)}" cy="${y(87)}" rx="${r(8)}" ry="${r(5.5)}" fill="url(#bBG)" filter="url(#bFluff)"/>
+  <ellipse cx="${x(54)}" cy="${y(87)}" rx="${r(8)}" ry="${r(5.5)}" fill="url(#bBG)" filter="url(#bFluff)"/>
+  <circle cx="${x(60)}" cy="${y(75)}" r="${r(7)}" fill="white" stroke="#EDE8DC" stroke-width="0.8"/>
+  <g id="sleep-eyes" style="display:none;">
+    <path d="M${x(23)} ${y(43)} Q${x(29)} ${y(39)} ${x(35)} ${y(43)}" fill="none" stroke="#5D4037" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${x(45)} ${y(43)} Q${x(51)} ${y(39)} ${x(57)} ${y(43)}" fill="none" stroke="#5D4037" stroke-width="2" stroke-linecap="round"/>
+  </g>`;
+}
 function getBellaStage() {
   const total = apps.filter(a=>a.status!=='Saved').length;
   let stage = BELLA_STAGES[0];
@@ -2145,7 +2287,7 @@ let bellaIdleTimer = null;
 function onNavBella() { initBellaScene(); }
 
 async function initBellaScene() {
-  if (bellaSceneInited) { refreshBellaUI(); return; }
+  if (bellaSceneInited) { refreshBellaUI(); const mc=document.getElementById('b-msgs'); if(mc&&mc.children.length===0) setTimeout(loadBellaChat,200); return; }
   bellaSceneInited = true;
   // Load synced state from server before decaying
   await loadBellaState();
@@ -2249,6 +2391,7 @@ function refreshBellaUI() {
   const $ = id => document.getElementById(id);
   if ($('b-stage-name')) $('b-stage-name').textContent = stage.name;
   if ($('b-stage-desc')) $('b-stage-desc').textContent = stage.desc;
+  const _si = BELLA_STAGES.indexOf(stage); const _sv = $('bella-svg'); if (_sv && parseInt(_sv.dataset.sd??'-1') !== _si) { drawBellaSVG(_si); _sv.dataset.sd = _si; }
 
   const prevMin = stage.min, nextMin = next ? next.min : stage.min + 25;
   const pct = next ? Math.round(((total-prevMin)/(nextMin-prevMin))*100) : 100;
@@ -2284,10 +2427,18 @@ function refreshBellaUI() {
       char.classList.add('sleep-anim');
       ['bzzz1','bzzz2','bzzz3'].forEach(id => { const z=$( id); if(z) z.classList.add('show'); });
       const no = $('night-overlay'); if (no) no.classList.add('on');
+      const se = document.getElementById('sleep-eyes'); if(se) se.style.display='block';
+      const el = document.getElementById('eye-l'); if(el) el.style.display='none';
+      const er = document.getElementById('eye-r'); if(er) er.style.display='none';
+      char.style.left='73%'; char.style.transform='scale(0.68)'; char.style.opacity='0.7';
     } else {
       char.classList.remove('sleep-anim');
       ['bzzz1','bzzz2','bzzz3'].forEach(id => { const z=$( id); if(z) z.classList.remove('show'); });
       const no = $('night-overlay'); if (no) no.classList.remove('on');
+      const se = document.getElementById('sleep-eyes'); if(se) se.style.display='none';
+      const el = document.getElementById('eye-l'); if(el) el.style.display='';
+      const er = document.getElementById('eye-r'); if(er) er.style.display='';
+      char.style.left='42%'; char.style.transform=''; char.style.opacity='1';
     }
   }
   // Float avatar
@@ -2321,6 +2472,7 @@ function showBellaSpeech(text, dur) {
 // BELLA ACTIONS
 // ══════════════════════════════════════════════════
 function petBella(event) {
+  bumpInteract();
   if (bellaState.sleeping) {
     const m = `*sleepily opens one eye* ...${nick()}? ...I forgive you for waking me because I love you 💕`;
     showBellaSpeech(m); addMsg(m,true); return;
@@ -2537,7 +2689,7 @@ async function loadBellaChat() {
     const messages = data.messages || [];
     if (!messages.length) return;
     const mc = document.getElementById('b-msgs');
-    if (!mc || mc.children.length > 0) return; // only load if chat is empty
+    if (!mc) return; mc.innerHTML = ''; // always reload for consistency
     messages.forEach(m => {
       const d = document.createElement('div');
       d.className = 'b-msg ' + (m.fromBella ? 'bella' : 'user');
@@ -2639,14 +2791,14 @@ function startBellaTabTimer() {
     } else {
       nudge = '*proud bunny* \u{1F430} '+nick()+'! '+todayApps+' applications today!! You are incredible!! But maybe squeeze in one more before resting with me? Just one more? \u{1F97A}';
     }
-    addBellaMsg(nudge, true);
+    addMsg(nudge, true);
     showBellaSpeech(nudge, 6000);
     showFloatNotif(nudge);
-    animateBella('stomping', 800);
+    charAnim('stomp', 800);
     // Reschedule — remind again after another 5 mins if still on tab
     bellaTabTimer = setTimeout(() => {
       const m2 = '*does little motivational stomps* \u{1F430} '+nick()+'!! Applications!! You can do it!! Go!! I will be here waiting!! \u{1F499}';
-      addBellaMsg(m2, true); showBellaSpeech(m2, 5000);
+      addMsg(m2, true); showBellaSpeech(m2, 5000);
     }, 5*60*1000);
   }, 4*60*1000);
 }
@@ -2657,6 +2809,29 @@ function stopBellaTabTimer() {
   bellaTabOpenTime = null;
 }
 
+
+let lastInteractTime = Date.now();
+function bumpInteract() { lastInteractTime = Date.now(); }
+
+function scheduleIdleCheckin() {
+  setTimeout(() => {
+    const idleMs = Date.now() - lastInteractTime;
+    if (idleMs > 3*60*1000 && !document.hidden) {
+      const onBella = document.getElementById('sec-bella')?.classList.contains('active');
+      const msgs = [
+        () => `*peeks around carrot* 🐰 Psst... ${nick()}! You there? Come talk to me!! 🥺`,
+        () => `*thumps paw softly* 🐰 ${nick()}!! Bella has been sitting here very patiently... 🥺`,
+        () => `*hops to screen* 🐰 Heyyy!! I miss your voice ${nick()}!! Say ANYTHING!! 🐰`,
+        () => { const s=calcStreak(apps.filter(a=>a.status!=='Saved')); return s>0?`*whispers* 🐰 ${nick()}... ${s}-day streak!! Don't break it!! I believe in you!! 💪`:`*gentle nudge* 🐰 ${nick()}!! I'm right here!! Talk to me or go apply!! You got this!! 🌟`; },
+      ];
+      const msg = msgs[Math.floor(Math.random()*msgs.length)]();
+      addMsg(msg, true);
+      showFloatNotif(msg);
+      if (onBella) { showBellaSpeech(msg, 5000); charAnim('hop', 500); }
+    }
+    scheduleIdleCheckin();
+  }, 3*60*1000 + Math.random()*2*60*1000);
+}
 function scheduleProactive() {
   const delay = proactiveIdx === 0 ? 5*60*1000 : (6+Math.random()*10)*60*1000;
   proactiveTimer = setTimeout(() => {
