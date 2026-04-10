@@ -1830,7 +1830,7 @@ function renderJobCard(a) {
       </div>
       <div class="jc-meta-item">Score: <strong style="color:var(--text);">${a.score}/10</strong></div>
       <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus(${a.id},this.value)">
-        ${['Saved','Applied','Interview','Rejected','Offer'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}
+        ${['Saved','Applied','Screening','Interview','Rejected','Offer'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}
       </select>
     </div>
     ${tsTags ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">${tsTags}</div>` : ''}
