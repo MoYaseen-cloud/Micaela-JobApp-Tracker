@@ -101,6 +101,7 @@
   .badge-interview{background:var(--green-light);color:var(--green);}
   .badge-rejected{background:var(--red-light);color:var(--red);}
   .badge-offer{background:var(--gold-light);color:var(--gold);}
+  .badge-screening{background:#EDE7F6;color:#6A1B9A;}
 
   /* ── LOADER ── */
   .loader-wrap{display:none;align-items:center;gap:10px;padding:0.8rem 0;color:var(--text2);font-size:13px;}
@@ -568,20 +569,28 @@
       </div>
     </div>
 
-        <div id="sec-tracker" class="section">
+    <div id="sec-tracker" class="section">
       <div class="page-header">
         <div class="page-title">Applications 💌</div>
         <div class="page-sub">Your full application history — click any card to expand CV, analysis &amp; notes</div>
       </div>
-      <div class="stats-row">
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card"><div class="stat-label">Total applied</div><div class="stat-val" id="t-total">0</div></div>
         <div class="stat-card"><div class="stat-label">Interviews</div><div class="stat-val" id="t-int">0</div></div>
         <div class="stat-card"><div class="stat-label">Avg probability</div><div class="stat-val" id="t-prob">—</div></div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-top:-6px;">
         <div class="stat-card"><div class="stat-label">Offers</div><div class="stat-val" id="t-offers">0</div></div>
+        <div class="stat-card"><div class="stat-label">Rejections</div><div class="stat-val" id="t-rejected" style="color:var(--red);">0</div></div>
+        <div class="stat-card"><div class="stat-label">Screening stage</div><div class="stat-val" id="t-screening" style="color:var(--purple);">0</div></div>
+      </div>
+      <!-- Search bar -->
+      <div style="position:relative;margin-bottom:12px;">
+        <input type="text" id="tracker-search" placeholder="🔍  Search by company or role..." oninput="renderTracker()" style="width:100%;padding:10px 14px 10px 14px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.15s;" onfocus="this.style.borderColor='var(--pink)'" onblur="this.style.borderColor='var(--border2)'">
       </div>
       <div class="filter-bar">
         <select id="f-fit" onchange="renderTracker()"><option value="">All fits</option><option>High</option><option>Medium</option><option>Low</option></select>
-        <select id="f-status" onchange="renderTracker()"><option value="">All statuses</option><option>Saved</option><option>Applied</option><option>Interview</option><option>Rejected</option><option>Offer</option></select>
+        <select id="f-status" onchange="renderTracker()"><option value="">All statuses</option><option>Saved</option><option>Applied</option><option>Screening</option><option>Interview</option><option>Rejected</option><option>Offer</option></select>
         <select id="f-sort" onchange="renderTracker()"><option value="date">Newest first</option><option value="prob">Highest probability</option><option value="score">Highest score</option></select>
       </div>
       <div id="jobs-list" class="jobs-list"></div>
@@ -596,6 +605,7 @@
       <div class="inner-tabs">
         <button class="inner-tab active" onclick="cvTab('saved')">From saved jobs</button>
         <button class="inner-tab" onclick="cvTab('manual')">New job posting</button>
+        <button class="inner-tab" onclick="cvTab('cover')">Cover letter ✉️</button>
       </div>
       <div id="cv-saved">
         <div class="card">
@@ -632,6 +642,50 @@
           </div>
           <div class="btn-row"><button class="btn btn-primary" onclick="rewriteManual()">Rewrite CV →</button></div>
           <div class="loader-wrap" id="loader-cv-manual"><div class="spinner"></div> Writing your tailored CV...</div>
+        </div>
+      </div>
+      <div id="cv-cover" style="display:none;">
+        <div class="card">
+          <div class="card-title">Cover letter generator ✉️</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">A tailored cover letter dramatically improves response rates — especially for SA employers who do a human review before ATS.</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Select saved job (or leave blank)</label>
+              <select id="cover-job-select" style="border-radius:var(--radius-sm);"></select>
+            </div>
+            <div class="form-group">
+              <label>Tone</label>
+              <select id="cover-tone" style="border-radius:var(--radius-sm);">
+                <option value="professional">Professional & confident</option>
+                <option value="warm">Warm & personable</option>
+                <option value="concise">Short & punchy (half page)</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Job description (paste if not using a saved job)</label>
+              <textarea id="cover-jd" style="min-height:120px;" placeholder="Paste the job description here if you didn't select a saved job above..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Any specific points to mention? (optional)</label>
+              <input type="text" id="cover-extra" placeholder="e.g. I'm especially interested in the research aspect, I know someone at the company...">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="generateCoverLetter()">Generate cover letter →</button>
+          </div>
+          <div class="loader-wrap" id="loader-cover"><div class="spinner"></div> Writing your cover letter...</div>
+        </div>
+        <div id="cover-output-wrap" style="display:none;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+              <div class="card-title" style="margin-bottom:0;">Your cover letter</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-outline" onclick="copyCoverLetter()">Copy</button>
+                <button class="btn btn-green" onclick="downloadCoverLetter()">Download .txt</button>
+              </div>
+            </div>
+            <div id="cover-output" style="white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.2rem 1.4rem;min-height:200px;"></div>
+          </div>
         </div>
       </div>
       <div id="cv-output-wrap" style="display:none;">
@@ -1220,7 +1274,7 @@ function buildCvPrompt(title, company, jd, cvType, analysis) {
     'Structure: h1 name | div.contact email|phone|location|linkedin | hr | h2 sections | div.job-title + div.job-meta + ul/li for each role | p for summary text'
   ].join('\n');
 
-  return `You are an expert CV writer. REWRITE Micaela's CV from scratch for this specific role.\n\n${typeInstruction}\n\n== EXPERIENCE BANK ==\n${MASTER_CV}\n\n== HER FULL PROFILE ==\n${PROFILE}\n\n== TARGET ROLE ==\nTitle: ${title}\nCompany: ${company}\nJob Description:\n${jd}\n\n${analysis ? `== PRIOR ANALYSIS ==\nVerdict: ${analysis.verdict||''}\nTransferable skills: ${typeof analysis.transferable_skills==='string'?analysis.transferable_skills:JSON.stringify(analysis.transferable_skills||[])}\nKey requirements: ${typeof analysis.requirements==='string'?analysis.requirements:JSON.stringify(analysis.requirements||[])}\n\n` : ''}== REWRITING RULES ==\n1. Fresh Professional Summary — first sentence names what she is and why she fits THIS role.\n2. Select and reorder bullets — most relevant to this role appears first.\n3. Use this industry's vocabulary throughout — without inventing anything.\n4. Inject keywords naturally for ATS.\n5. Make transferable skills explicit.\n6. Remove irrelevant experience.\n\n== OUTPUT FORMAT ==\n${htmlTemplate}`;
+  return `You are an expert CV writer and ATS optimisation specialist. REWRITE Micaela's CV from scratch for this specific role.\n\n${typeInstruction}\n\n== EXPERIENCE BANK ==\n${MASTER_CV}\n\n== HER FULL PROFILE ==\n${PROFILE}\n\n== TARGET ROLE ==\nTitle: ${title}\nCompany: ${company}\nJob Description:\n${jd}\n\n${analysis ? `== PRIOR ANALYSIS ==\nVerdict: ${analysis.verdict||''}\nTransferable skills: ${typeof analysis.transferable_skills==='string'?analysis.transferable_skills:JSON.stringify(analysis.transferable_skills||[])}\nKey requirements: ${typeof analysis.requirements==='string'?analysis.requirements:JSON.stringify(analysis.requirements||[])}\n\n` : ''}== REWRITING RULES ==\n1. ATS KEYWORD MIRRORING (MOST IMPORTANT): Extract the EXACT phrases, nouns and verb forms used in the job description and weave them verbatim into the CV — especially in the summary and bullet points. If the JD says "stakeholder engagement", write "stakeholder engagement" not "working with stakeholders". If it says "data capture", write "data capture". Mirror their language precisely.\n2. Fresh Professional Summary — first sentence names what she is and why she fits THIS role. Use words directly from the job title and key requirements.\n3. Select and reorder bullets — most relevant to this role appears first. Lead every bullet with a strong action verb from the industry's vocabulary.\n4. Make transferable skills explicit — don't assume the reader will make the connection. Spell it out.\n5. Remove or condense experience that is not relevant to this role.\n6. If the JD mentions specific tools, software, or methodologies she has used in any form, name them explicitly.\n7. The CV must read as if it was written specifically for this job — not adapted from a template.\n\n== OUTPUT FORMAT ==\n${htmlTemplate}`;
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -1323,12 +1377,16 @@ function updateStats() {
   const applied = apps.filter(a => a.status !== 'Saved').length;
   const ints = apps.filter(a => a.status === 'Interview').length;
   const offers = apps.filter(a => a.status === 'Offer').length;
+  const rejected = apps.filter(a => a.status === 'Rejected').length;
+  const screening = apps.filter(a => a.status === 'Screening').length;
   const probs = apps.filter(a => a.status !== 'Saved').map(a => parseInt(a.probability) || 0).filter(Boolean);
   const avgP = probs.length ? Math.round(probs.reduce((a, b) => a + b, 0) / probs.length) + '%' : '—';
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('ss-total', applied); set('ss-int', ints); set('ss-prob', avgP); set('ss-offers', offers);
   set('t-total', applied); set('t-int', ints); set('t-prob', avgP); set('t-offers', offers);
+  set('t-rejected', rejected); set('t-screening', screening);
   populateCvJobSelect();
+  populateCoverJobSelect();
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
@@ -1338,7 +1396,7 @@ function nav(s) {
   document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
   document.getElementById('sec-' + s).classList.add('active');
   if (s === 'tracker') renderTracker();
-  if (s === 'cv') populateCvJobSelect();
+  if (s === 'cv') { populateCvJobSelect(); populateCoverJobSelect(); }
   if (s === 'discover') loadPicks();
   if (s === 'analytics') renderAnalytics();
   if (s === 'bella') { onNavBella(); startBellaTabTimer(); }
@@ -1346,10 +1404,85 @@ function nav(s) {
 }
 
 function cvTab(t) {
-  document.querySelectorAll('.inner-tab').forEach((b, i) => b.classList.toggle('active', ['saved', 'manual'][i] === t));
+  document.querySelectorAll('.inner-tab').forEach((b, i) => b.classList.toggle('active', ['saved', 'manual', 'cover'][i] === t));
   document.getElementById('cv-saved').style.display = t === 'saved' ? 'block' : 'none';
   document.getElementById('cv-manual').style.display = t === 'manual' ? 'block' : 'none';
+  document.getElementById('cv-cover').style.display = t === 'cover' ? 'block' : 'none';
   document.getElementById('cv-output-wrap').style.display = 'none';
+}
+
+function populateCoverJobSelect() {
+  const sel = document.getElementById('cover-job-select');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— None / paste JD below —</option>' +
+    apps.map(a => `<option value="${a.id}">${esc(a.title)} — ${esc(a.company)}</option>`).join('');
+}
+
+let currentCoverText = '';
+
+async function generateCoverLetter() {
+  const jobId = document.getElementById('cover-job-select')?.value;
+  const manualJd = document.getElementById('cover-jd')?.value.trim() || '';
+  const tone = document.getElementById('cover-tone')?.value || 'professional';
+  const extra = document.getElementById('cover-extra')?.value.trim() || '';
+
+  const app = jobId ? apps.find(a => a.id === parseInt(jobId)) : null;
+  const jd = app ? (app.jd || '') : manualJd;
+  const jobTitle = app ? app.title : 'the role';
+  const company = app ? app.company : 'the company';
+
+  if (!jd && !manualJd) { toast('Please select a saved job or paste the job description'); return; }
+
+  setLoading('cover', true);
+  document.getElementById('cover-output-wrap').style.display = 'none';
+
+  const toneGuide = {
+    professional: 'Tone: professional, confident, formal but not stiff. Show ambition and competence.',
+    warm: 'Tone: warm, personable, genuine. Show personality and enthusiasm without being over-the-top.',
+    concise: 'Tone: direct and punchy. Maximum half a page. Every sentence earns its place. No filler phrases.'
+  }[tone] || 'Tone: professional and confident.';
+
+  const prompt = `You are an expert cover letter writer for South African job applications. Write a tailored, compelling cover letter for Micaela applying to ${jobTitle} at ${company}.
+
+${toneGuide}
+
+== MICAELA'S PROFILE ==
+${PROFILE}
+
+== JOB DESCRIPTION ==
+${jd || manualJd}
+
+${extra ? `== SPECIFIC POINTS TO INCLUDE ==\n${extra}\n\n` : ''}== RULES ==
+1. Mirror the exact language and keywords from the job description — this is critical for ATS.
+2. Open with a strong, specific first line — NOT "I am writing to apply for...".
+3. Paragraph 1: Who she is and why she is a strong match for THIS specific role.
+4. Paragraph 2: Two or three concrete examples from her experience that directly address the job's key requirements.
+5. Paragraph 3: Why this company/role specifically (keep genuine, not sycophantic).
+6. Closing: Confident call to action — not begging, not overly formal.
+7. Use South African English spelling.
+8. Keep it to one page maximum.
+9. Do NOT fabricate experience she does not have.
+10. Format: plain text, no HTML, include "Dear Hiring Manager," salutation and "Kind regards, Micaela Harripersadh" closing.
+
+Output ONLY the cover letter text, nothing else.`;
+
+  try {
+    const text = await callClaude([{ role: 'user', content: prompt }], 1200);
+    currentCoverText = text;
+    document.getElementById('cover-output').textContent = text;
+    document.getElementById('cover-output-wrap').style.display = 'block';
+    document.getElementById('cover-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    toast('Cover letter ready! ✉️');
+  } catch(e) { toast('Cover letter failed — please try again'); }
+  setLoading('cover', false);
+}
+
+function copyCoverLetter() { navigator.clipboard.writeText(currentCoverText).then(() => toast('Cover letter copied! ✉️')); }
+function downloadCoverLetter() {
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([currentCoverText], { type: 'text/plain' })),
+    download: 'Micaela_CoverLetter.txt'
+  }); a.click();
 }
 
 function populateCvJobSelect() {
@@ -1615,9 +1748,14 @@ function renderTracker() {
   const fitF = document.getElementById('f-fit')?.value || '';
   const statusF = document.getElementById('f-status')?.value || '';
   const sortBy = document.getElementById('f-sort')?.value || 'date';
+  const searchQ = (document.getElementById('tracker-search')?.value || '').toLowerCase().trim();
   let list = [...apps];
   if (fitF) list = list.filter(a => a.fit === fitF);
   if (statusF) list = list.filter(a => a.status === statusF);
+  if (searchQ) list = list.filter(a =>
+    (a.title || '').toLowerCase().includes(searchQ) ||
+    (a.company || '').toLowerCase().includes(searchQ)
+  );
   if (sortBy === 'prob') list.sort((a, b) => b.probability - a.probability);
   else if (sortBy === 'score') list.sort((a, b) => b.score - a.score);
   const el = document.getElementById('jobs-list');
@@ -1958,8 +2096,8 @@ function renderAnalytics() {
   document.getElementById('an-streak').textContent = streak + 'd';
 
   // Status breakdown
-  const statuses = ['Applied','Interview','Offer','Rejected'];
-  const statusColors = { Applied:'var(--purple)', Interview:'var(--green)', Offer:'var(--gold)', Rejected:'var(--red)' };
+  const statuses = ['Applied','Screening','Interview','Offer','Rejected'];
+  const statusColors = { Applied:'var(--purple)', Screening:'#6A1B9A', Interview:'var(--green)', Offer:'var(--gold)', Rejected:'var(--red)' };
   const statusEl = document.getElementById('an-status-row');
   if (statusEl) {
     statusEl.innerHTML = statuses.map(s => {
@@ -2330,35 +2468,64 @@ function refreshBellaUI() {
   const char = $('bella-char');
   const svg  = $('bella-svg');
   if (char) {
-    const widths = [48, 60, 72, 82, 92];
-    char.style.width = (widths[stageIdx] || 80) + 'px';
-    // Golden glow only for Super Bella
-    if (stageIdx >= 4) {
-      char.style.filter = 'drop-shadow(0 0 18px rgba(255,200,0,0.8)) drop-shadow(0 6px 10px rgba(0,0,0,0.15))';
+    // Stage sizes: Baby=48, Little=62, Teen=76, Bella=88, Super=100
+    const sizes = [48, 62, 76, 88, 100];
+    const sz = sizes[stageIdx] || 80;
+    char.style.width = sz + 'px';
+    char.style.height = (sz * 1.18) + 'px';
+    // Stage-based filter/glow
+    if (stageIdx === 0) {
+      char.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))';
+    } else if (stageIdx === 1) {
+      char.style.filter = 'drop-shadow(0 5px 8px rgba(219,112,147,0.3)) drop-shadow(0 3px 5px rgba(0,0,0,0.12))';
+    } else if (stageIdx === 2) {
+      char.style.filter = 'drop-shadow(0 0 8px rgba(156,39,176,0.35)) drop-shadow(0 5px 8px rgba(0,0,0,0.15))';
+    } else if (stageIdx === 3) {
+      char.style.filter = 'drop-shadow(0 0 10px rgba(232,84,122,0.45)) drop-shadow(0 6px 10px rgba(0,0,0,0.18))';
     } else {
-      char.style.filter = 'drop-shadow(0 6px 10px rgba(0,0,0,0.18))';
+      char.style.filter = 'drop-shadow(0 0 20px rgba(255,200,0,0.85)) drop-shadow(0 0 10px rgba(255,160,0,0.5)) drop-shadow(0 6px 10px rgba(0,0,0,0.15))';
     }
   }
   if (svg) {
-    // Teen punk ear tint (stage 2)
+    // ── Stage 0: Baby — tiny, chubby, big cheeks, droopy ears ──
+    // ── Stage 1: Little — slightly longer ears, pink bow ──
+    let bow = document.getElementById('b-bow');
+    if (stageIdx >= 1 && !bow) {
+      bow = document.createElementNS('http://www.w3.org/2000/svg','g');
+      bow.id = 'b-bow';
+      bow.innerHTML = '<ellipse cx="36" cy="11" rx="5" ry="3.5" fill="#FF69B4" opacity="0.85" transform="rotate(-20,36,11)"/><ellipse cx="44" cy="11" rx="5" ry="3.5" fill="#FF69B4" opacity="0.85" transform="rotate(20,44,11)"/><circle cx="40" cy="11" r="2.8" fill="#FF1493" opacity="0.9"/>';
+      svg.appendChild(bow);
+    } else if (stageIdx < 1 && bow) { bow.remove(); }
+
+    // ── Stage 2: Teen — purple ear tint + small earring ──
     let punk = document.getElementById('b-teen-punk');
     if (stageIdx === 2 && !punk) {
-      punk = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      punk = document.createElementNS('http://www.w3.org/2000/svg','g');
       punk.id = 'b-teen-punk';
-      punk.setAttribute('cx','15'); punk.setAttribute('cy','24');
-      punk.setAttribute('rx','4'); punk.setAttribute('ry','11');
-      punk.setAttribute('fill','#9C27B0'); punk.setAttribute('opacity','0.25');
+      punk.innerHTML = '<ellipse cx="15" cy="24" rx="4" ry="11" fill="#9C27B0" opacity="0.3"/><ellipse cx="65" cy="24" rx="4" ry="11" fill="#9C27B0" opacity="0.3"/><circle cx="18" cy="42" r="2.2" fill="#CE93D8" stroke="#9C27B0" stroke-width="0.8"/>';
       svg.appendChild(punk);
     } else if (stageIdx !== 2 && punk) { punk.remove(); }
 
-    // Crown for Super Bella (stage 4)
+    // ── Stage 3: Adult Bella — flower crown ──
+    let flowerCrown = document.getElementById('b-flower-crown');
+    if (stageIdx === 3 && !flowerCrown) {
+      flowerCrown = document.createElementNS('http://www.w3.org/2000/svg','g');
+      flowerCrown.id = 'b-flower-crown';
+      flowerCrown.innerHTML = '<ellipse cx="40" cy="25" rx="16" ry="4" fill="none" stroke="#81C784" stroke-width="2"/><circle cx="28" cy="24" r="4" fill="#FF8A65"/><circle cx="35" cy="21" r="3.5" fill="#FFD54F"/><circle cx="40" cy="20" r="4" fill="#F06292"/><circle cx="45" cy="21" r="3.5" fill="#FFD54F"/><circle cx="52" cy="24" r="4" fill="#FF8A65"/><circle cx="28" cy="24" r="2" fill="#FFCC02"/><circle cx="35" cy="21" r="2" fill="#FFCC02"/><circle cx="40" cy="20" r="2" fill="#FFCC02"/><circle cx="45" cy="21" r="2" fill="#FFCC02"/><circle cx="52" cy="24" r="2" fill="#FFCC02"/>';
+      svg.insertBefore(flowerCrown, svg.firstChild);
+    } else if (stageIdx !== 3 && flowerCrown) { flowerCrown.remove(); }
+
+    // ── Stage 4: Super Bella — gold crown + sparkles ──
     let crown = document.getElementById('b-crown');
     if (stageIdx >= 4 && !crown) {
       crown = document.createElementNS('http://www.w3.org/2000/svg','g');
       crown.id = 'b-crown';
-      crown.innerHTML = '<polygon points="40,0 45,12 54,5 50,16 30,16 26,5 35,12" fill="#FFD700" stroke="#F9A825" stroke-width="1.2"/><circle cx="33" cy="10" r="2.5" fill="#FF4081"/><circle cx="40" cy="2" r="2.5" fill="#4FC3F7"/><circle cx="47" cy="10" r="2.5" fill="#FF4081"/>';
+      crown.innerHTML = '<polygon points="40,-2 46,12 56,4 52,17 28,17 24,4 34,12" fill="#FFD700" stroke="#F9A825" stroke-width="1.5"/><circle cx="32" cy="10" r="3" fill="#FF4081"/><circle cx="40" cy="1" r="3" fill="#4FC3F7"/><circle cx="48" cy="10" r="3" fill="#FF4081"/><text x="14" y="5" font-size="7" opacity="0.9">✦</text><text x="60" y="5" font-size="7" opacity="0.9">✦</text><text x="10" y="15" font-size="6" opacity="0.7">★</text><text x="63" y="15" font-size="6" opacity="0.7">★</text>';
       svg.insertBefore(crown, svg.firstChild);
     } else if (stageIdx < 4 && crown) { crown.remove(); }
+
+    // Remove flower crown when at stage 4
+    if (stageIdx >= 4 && flowerCrown) { flowerCrown.remove(); }
   }
 
   // ── SLEEP: close eyes + move to hutch ────────────────────────────────────
@@ -2710,6 +2877,7 @@ async function sendBellaChat() {
   if (!inp) return;
   const msg = inp.value.trim(); if (!msg) return;
   inp.value = '';
+  markChatActive();
   addMsg(msg, false);
   bellaState.happiness = Math.min(100, bellaState.happiness + 7);
   saveBella(); refreshBellaUI();
@@ -2739,6 +2907,12 @@ const PROACTIVE = [
 ];
 let proactiveIdx = 0;
 let proactiveTimer = null;
+
+// Track active conversation — suppress proactive check-ins while chatting
+let lastUserChatTime = 0;
+const CHAT_ACTIVE_WINDOW = 3 * 60 * 1000; // 3 minutes after last user message = "active conversation"
+function markChatActive() { lastUserChatTime = Date.now(); }
+function isChatActive() { return (Date.now() - lastUserChatTime) < CHAT_ACTIVE_WINDOW; }
 
 // Track how long user has been on Bella tab
 let bellaTabTimer = null;
@@ -2791,9 +2965,10 @@ function stopBellaTabTimer() {
 }
 
 function scheduleProactive() {
-  const delay = proactiveIdx === 0 ? 5*60*1000 : (6+Math.random()*10)*60*1000;
+  const delay = proactiveIdx === 0 ? 5*60*1000 : (8+Math.random()*12)*60*1000;
   proactiveTimer = setTimeout(() => {
-    if (!document.hidden) {
+    // Don't interrupt an active conversation
+    if (!document.hidden && !isChatActive()) {
       const fn = PROACTIVE[proactiveIdx % PROACTIVE.length];
       const msg = fn();
       if (msg) {
@@ -2861,6 +3036,7 @@ async function sendFloatChat() {
   if (!inp) return;
   const msg = inp.value.trim(); if (!msg) return;
   inp.value = '';
+  markChatActive();
   addMsg(msg, false);
   bellaState.happiness = Math.min(100, bellaState.happiness + 7);
   saveBella(); refreshBellaUI();
